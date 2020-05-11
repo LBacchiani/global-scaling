@@ -1,0 +1,95 @@
+module VirusScannerPlan;
+export *;
+import * from ABS.DC;
+import * from EmailProcessingPipelineArchitecture;
+
+interface VirusScannerPlan{
+	List<Microservice> getMicroservice();
+	List<VirusScannerInterface> getVirusScannerInterface();
+	List<DeploymentComponent> getDeploymentComponent();
+	Unit deploy();
+	Unit undeploy();
+}
+
+class VirusScannerPlan(CloudProvider cloudProvider, SpeedPatcher sp_obj, VirusScanner_LoadBalancerInterface virusScanner_LoadBalancerObj, MessageAnalyser_LoadBalancerInterface messageAnalyser_LoadBalancerObj, AttachmentsManager_LoadBalancerInterface attachmentsManager_LoadBalancerObj) implements VirusScannerPlan{
+
+	List<List<Microservice>> ls_ls_Microservice = Nil;
+	List<Microservice> ls_Microservice = Nil;
+	List<List<VirusScannerInterface>> ls_ls_VirusScannerInterface = Nil;
+	List<VirusScannerInterface> ls_VirusScannerInterface = Nil;
+	List<List<DeploymentComponent>> ls_ls_DeploymentComponent = Nil;
+	List<DeploymentComponent> ls_DeploymentComponent = Nil;
+	{
+		cloudProvider.addInstanceDescription(Pair("c4_xlarge",
+			map[Pair(CostPerInterval,92)
+			,Pair(PaymentInterval,1)
+			,Pair(Bandwidth,750)
+			,Pair(Memory,750)
+			,Pair(Cores,4)
+			,Pair(Speed,20)
+			]));
+		cloudProvider.addInstanceDescription(Pair("c4_large",
+			map[Pair(CostPerInterval,46)
+			,Pair(PaymentInterval,1)
+			,Pair(Bandwidth,500)
+			,Pair(Memory,375)
+			,Pair(Cores,2)
+			,Pair(Speed,10)
+			]));
+		cloudProvider.addInstanceDescription(Pair("c4_2xlarge",
+			map[Pair(CostPerInterval,184)
+			,Pair(PaymentInterval,1)
+			,Pair(Bandwidth,1000)
+			,Pair(Memory,1500)
+			,Pair(Cores,8)
+			,Pair(Speed,40)
+			]));
+	}
+
+	List<Microservice> getMicroservice() { return ls_Microservice; }
+	List<VirusScannerInterface> getVirusScannerInterface() { return ls_VirusScannerInterface; }
+	List<DeploymentComponent> getDeploymentComponent() { return ls_DeploymentComponent; }
+
+	Unit deploy() {
+		ls_ls_Microservice = Cons(ls_Microservice,ls_ls_Microservice);
+		ls_Microservice = Nil;
+		ls_ls_VirusScannerInterface = Cons(ls_VirusScannerInterface,ls_ls_VirusScannerInterface);
+		ls_VirusScannerInterface = Nil;
+		ls_ls_DeploymentComponent = Cons(ls_DeploymentComponent,ls_ls_DeploymentComponent);
+		ls_DeploymentComponent = Nil;
+		this.deploy_aux();
+	}
+
+	Unit undeploy() {
+		if (ls_ls_DeploymentComponent != Nil) {
+			this.undeploy_aux();
+			ls_DeploymentComponent = head(ls_ls_DeploymentComponent);
+			ls_ls_DeploymentComponent = tail(ls_ls_DeploymentComponent);
+				ls_Microservice = head(ls_ls_Microservice);
+				ls_VirusScannerInterface = head(ls_ls_VirusScannerInterface);
+			ls_ls_Microservice = tail(ls_ls_Microservice);
+			ls_ls_VirusScannerInterface = tail(ls_ls_VirusScannerInterface);
+		}
+	}
+
+
+	Unit deploy_aux() {
+		DeploymentComponent c4_2xlarge_0 = cloudProvider.launchInstanceNamed("c4_2xlarge");
+		ls_DeploymentComponent = Cons(c4_2xlarge_0,ls_DeploymentComponent);
+		[DC: c4_2xlarge_0] VirusScannerInterface odefault___VirusScanner_0_c4_2xlarge_0 = new VirusScanner(attachmentsManager_LoadBalancerObj, messageAnalyser_LoadBalancerObj);
+		ls_VirusScannerInterface = Cons(odefault___VirusScanner_0_c4_2xlarge_0, ls_VirusScannerInterface);
+		ls_Microservice = Cons(odefault___VirusScanner_0_c4_2xlarge_0, ls_Microservice);
+		virusScanner_LoadBalancerObj.connectInstance(odefault___VirusScanner_0_c4_2xlarge_0);
+		sp_obj.addMicroservice(odefault___VirusScanner_0_c4_2xlarge_0);
+	}
+
+	Unit undeploy_aux() {
+		VirusScannerInterface odefault___VirusScanner_0_c4_2xlarge_0 = nth(ls_VirusScannerInterface,0);
+		virusScanner_LoadBalancerObj.disconnectInstance();
+		sp_obj.disconnectInstance();
+		while ( !isEmpty(ls_DeploymentComponent) ) {
+			cloudProvider.shutdownInstance(head(ls_DeploymentComponent));
+			ls_DeploymentComponent = tail(ls_DeploymentComponent);
+		}
+	}
+}

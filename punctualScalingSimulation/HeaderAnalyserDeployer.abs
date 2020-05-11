@@ -1,0 +1,95 @@
+module HeaderAnalyserPlan;
+export *;
+import * from ABS.DC;
+import * from EmailProcessingPipelineArchitecture;
+
+interface HeaderAnalyserPlan{
+	List<Microservice> getMicroservice();
+	List<HeaderAnalyserInterface> getHeaderAnalyserInterface();
+	List<DeploymentComponent> getDeploymentComponent();
+	Unit deploy();
+	Unit undeploy();
+}
+
+class HeaderAnalyserPlan(CloudProvider cloudProvider, SpeedPatcher sp_obj, HeaderAnalyser_LoadBalancerInterface headerAnalyser_LoadBalancerObj, MessageAnalyser_LoadBalancerInterface messageAnalyser_LoadBalancerObj) implements HeaderAnalyserPlan{
+
+	List<List<Microservice>> ls_ls_Microservice = Nil;
+	List<Microservice> ls_Microservice = Nil;
+	List<List<HeaderAnalyserInterface>> ls_ls_HeaderAnalyserInterface = Nil;
+	List<HeaderAnalyserInterface> ls_HeaderAnalyserInterface = Nil;
+	List<List<DeploymentComponent>> ls_ls_DeploymentComponent = Nil;
+	List<DeploymentComponent> ls_DeploymentComponent = Nil;
+	{
+		cloudProvider.addInstanceDescription(Pair("c4_xlarge",
+			map[Pair(CostPerInterval,92)
+			,Pair(PaymentInterval,1)
+			,Pair(Bandwidth,750)
+			,Pair(Memory,750)
+			,Pair(Cores,4)
+			,Pair(Speed,20)
+			]));
+		cloudProvider.addInstanceDescription(Pair("c4_large",
+			map[Pair(CostPerInterval,46)
+			,Pair(PaymentInterval,1)
+			,Pair(Bandwidth,500)
+			,Pair(Memory,375)
+			,Pair(Cores,2)
+			,Pair(Speed,10)
+			]));
+		cloudProvider.addInstanceDescription(Pair("c4_2xlarge",
+			map[Pair(CostPerInterval,184)
+			,Pair(PaymentInterval,1)
+			,Pair(Bandwidth,1000)
+			,Pair(Memory,1500)
+			,Pair(Cores,8)
+			,Pair(Speed,40)
+			]));
+	}
+
+	List<Microservice> getMicroservice() { return ls_Microservice; }
+	List<HeaderAnalyserInterface> getHeaderAnalyserInterface() { return ls_HeaderAnalyserInterface; }
+	List<DeploymentComponent> getDeploymentComponent() { return ls_DeploymentComponent; }
+
+	Unit deploy() {
+		ls_ls_Microservice = Cons(ls_Microservice,ls_ls_Microservice);
+		ls_Microservice = Nil;
+		ls_ls_HeaderAnalyserInterface = Cons(ls_HeaderAnalyserInterface,ls_ls_HeaderAnalyserInterface);
+		ls_HeaderAnalyserInterface = Nil;
+		ls_ls_DeploymentComponent = Cons(ls_DeploymentComponent,ls_ls_DeploymentComponent);
+		ls_DeploymentComponent = Nil;
+		this.deploy_aux();
+	}
+
+	Unit undeploy() {
+		if (ls_ls_DeploymentComponent != Nil) {
+			this.undeploy_aux();
+			ls_DeploymentComponent = head(ls_ls_DeploymentComponent);
+			ls_ls_DeploymentComponent = tail(ls_ls_DeploymentComponent);
+				ls_Microservice = head(ls_ls_Microservice);
+				ls_HeaderAnalyserInterface = head(ls_ls_HeaderAnalyserInterface);
+			ls_ls_Microservice = tail(ls_ls_Microservice);
+			ls_ls_HeaderAnalyserInterface = tail(ls_ls_HeaderAnalyserInterface);
+		}
+	}
+
+
+	Unit deploy_aux() {
+		DeploymentComponent c4_large_0 = cloudProvider.launchInstanceNamed("c4_large");
+		ls_DeploymentComponent = Cons(c4_large_0,ls_DeploymentComponent);
+		[DC: c4_large_0] HeaderAnalyserInterface odefault___HeaderAnalyser_0_c4_large_0 = new HeaderAnalyser(messageAnalyser_LoadBalancerObj);
+		ls_HeaderAnalyserInterface = Cons(odefault___HeaderAnalyser_0_c4_large_0, ls_HeaderAnalyserInterface);
+		ls_Microservice = Cons(odefault___HeaderAnalyser_0_c4_large_0, ls_Microservice);
+		sp_obj.addMicroservice(odefault___HeaderAnalyser_0_c4_large_0);
+		headerAnalyser_LoadBalancerObj.connectInstance(odefault___HeaderAnalyser_0_c4_large_0);
+	}
+
+	Unit undeploy_aux() {
+		HeaderAnalyserInterface odefault___HeaderAnalyser_0_c4_large_0 = nth(ls_HeaderAnalyserInterface,0);
+		sp_obj.disconnectInstance();
+		headerAnalyser_LoadBalancerObj.disconnectInstance();
+		while ( !isEmpty(ls_DeploymentComponent) ) {
+			cloudProvider.shutdownInstance(head(ls_DeploymentComponent));
+			ls_DeploymentComponent = tail(ls_DeploymentComponent);
+		}
+	}
+}

@@ -1,0 +1,95 @@
+module SentimentAnalyserPlan;
+export *;
+import * from ABS.DC;
+import * from EmailProcessingPipelineArchitecture;
+
+interface SentimentAnalyserPlan{
+	List<Microservice> getMicroservice();
+	List<SentimentAnalyserInterface> getSentimentAnalyserInterface();
+	List<DeploymentComponent> getDeploymentComponent();
+	Unit deploy();
+	Unit undeploy();
+}
+
+class SentimentAnalyserPlan(CloudProvider cloudProvider, SpeedPatcher sp_obj, SentimentAnalyser_LoadBalancerInterface sentimentAnalyser_LoadBalancerObj) implements SentimentAnalyserPlan{
+
+	List<List<Microservice>> ls_ls_Microservice = Nil;
+	List<Microservice> ls_Microservice = Nil;
+	List<List<SentimentAnalyserInterface>> ls_ls_SentimentAnalyserInterface = Nil;
+	List<SentimentAnalyserInterface> ls_SentimentAnalyserInterface = Nil;
+	List<List<DeploymentComponent>> ls_ls_DeploymentComponent = Nil;
+	List<DeploymentComponent> ls_DeploymentComponent = Nil;
+	{
+		cloudProvider.addInstanceDescription(Pair("c4_xlarge",
+			map[Pair(CostPerInterval,92)
+			,Pair(PaymentInterval,1)
+			,Pair(Bandwidth,750)
+			,Pair(Memory,750)
+			,Pair(Cores,4)
+			,Pair(Speed,20)
+			]));
+		cloudProvider.addInstanceDescription(Pair("c4_large",
+			map[Pair(CostPerInterval,46)
+			,Pair(PaymentInterval,1)
+			,Pair(Bandwidth,500)
+			,Pair(Memory,375)
+			,Pair(Cores,2)
+			,Pair(Speed,10)
+			]));
+		cloudProvider.addInstanceDescription(Pair("c4_2xlarge",
+			map[Pair(CostPerInterval,184)
+			,Pair(PaymentInterval,1)
+			,Pair(Bandwidth,1000)
+			,Pair(Memory,1500)
+			,Pair(Cores,8)
+			,Pair(Speed,40)
+			]));
+	}
+
+	List<Microservice> getMicroservice() { return ls_Microservice; }
+	List<SentimentAnalyserInterface> getSentimentAnalyserInterface() { return ls_SentimentAnalyserInterface; }
+	List<DeploymentComponent> getDeploymentComponent() { return ls_DeploymentComponent; }
+
+	Unit deploy() {
+		ls_ls_Microservice = Cons(ls_Microservice,ls_ls_Microservice);
+		ls_Microservice = Nil;
+		ls_ls_SentimentAnalyserInterface = Cons(ls_SentimentAnalyserInterface,ls_ls_SentimentAnalyserInterface);
+		ls_SentimentAnalyserInterface = Nil;
+		ls_ls_DeploymentComponent = Cons(ls_DeploymentComponent,ls_ls_DeploymentComponent);
+		ls_DeploymentComponent = Nil;
+		this.deploy_aux();
+	}
+
+	Unit undeploy() {
+		if (ls_ls_DeploymentComponent != Nil) {
+			this.undeploy_aux();
+			ls_DeploymentComponent = head(ls_ls_DeploymentComponent);
+			ls_ls_DeploymentComponent = tail(ls_ls_DeploymentComponent);
+				ls_Microservice = head(ls_ls_Microservice);
+				ls_SentimentAnalyserInterface = head(ls_ls_SentimentAnalyserInterface);
+			ls_ls_Microservice = tail(ls_ls_Microservice);
+			ls_ls_SentimentAnalyserInterface = tail(ls_ls_SentimentAnalyserInterface);
+		}
+	}
+
+
+	Unit deploy_aux() {
+		DeploymentComponent c4_2xlarge_0 = cloudProvider.launchInstanceNamed("c4_2xlarge");
+		ls_DeploymentComponent = Cons(c4_2xlarge_0,ls_DeploymentComponent);
+		[DC: c4_2xlarge_0] SentimentAnalyserInterface odefault___SentimentAnalyser_0_c4_2xlarge_0 = new SentimentAnalyser();
+		ls_SentimentAnalyserInterface = Cons(odefault___SentimentAnalyser_0_c4_2xlarge_0, ls_SentimentAnalyserInterface);
+		ls_Microservice = Cons(odefault___SentimentAnalyser_0_c4_2xlarge_0, ls_Microservice);
+		sentimentAnalyser_LoadBalancerObj.connectInstance(odefault___SentimentAnalyser_0_c4_2xlarge_0);
+		sp_obj.addMicroservice(odefault___SentimentAnalyser_0_c4_2xlarge_0);
+	}
+
+	Unit undeploy_aux() {
+		SentimentAnalyserInterface odefault___SentimentAnalyser_0_c4_2xlarge_0 = nth(ls_SentimentAnalyserInterface,0);
+		sentimentAnalyser_LoadBalancerObj.disconnectInstance();
+		sp_obj.disconnectInstance();
+		while ( !isEmpty(ls_DeploymentComponent) ) {
+			cloudProvider.shutdownInstance(head(ls_DeploymentComponent));
+			ls_DeploymentComponent = tail(ls_DeploymentComponent);
+		}
+	}
+}

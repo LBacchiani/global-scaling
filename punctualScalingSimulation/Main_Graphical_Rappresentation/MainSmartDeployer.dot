@@ -1,0 +1,323 @@
+digraph Configuration {
+rankdir=LR;
+subgraph cluster_c4_large_5 {
+label = "c4_large_5";
+comp_10 [shape=box,label=<
+<table border="0" cellborder="1" cellspacing="0"><tr><td colspan="2">default___AttachmentsManager_LoadBalancer</td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="green">
+<tr><td port="prov_AttachmentsManager_LoadBalancerInterface">AttachmentsManager_LoadBalancerInterface</td></tr>
+</table></td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="red">
+<tr><td port="req_AttachmentsManagerInterface">AttachmentsManagerInterface</td></tr>
+</table></td></tr>
+</table>
+>];
+}
+subgraph cluster_c4_large_10 {
+label = "c4_large_10";
+comp_5 [shape=box,label=<
+<table border="0" cellborder="1" cellspacing="0"><tr><td colspan="2">default___TextAnalyser_LoadBalancer</td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="green">
+<tr><td port="prov_TextAnalyser_LoadBalancerInterface">TextAnalyser_LoadBalancerInterface</td></tr>
+</table></td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="red">
+<tr><td port="req_TextAnalyserInterface">TextAnalyserInterface</td></tr>
+</table></td></tr>
+</table>
+>];
+}
+subgraph cluster_c4_xlarge_0 {
+label = "c4_xlarge_0";
+comp_3 [shape=box,label=<
+<table border="0" cellborder="1" cellspacing="0"><tr><td colspan="2">default___MessageParser</td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="green">
+<tr><td port="prov_MessageParserInterface">MessageParserInterface</td></tr>
+</table></td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="red">
+<tr><td port="req_DBInterface">DBInterface</td></tr>
+<tr><td port="req_HeaderAnalyser_LoadBalancerInterface">HeaderAnalyser_LoadBalancerInterface</td></tr>
+<tr><td port="req_MessageAnalyser_LoadBalancerInterface">MessageAnalyser_LoadBalancerInterface</td></tr>
+<tr><td port="req_TextAnalyser_LoadBalancerInterface">TextAnalyser_LoadBalancerInterface</td></tr>
+<tr><td port="req_VirusScanner_LoadBalancerInterface">VirusScanner_LoadBalancerInterface</td></tr>
+<tr><td port="req_LinkAnalyser_LoadBalancerInterface">LinkAnalyser_LoadBalancerInterface</td></tr>
+</table></td></tr>
+</table>
+>];
+}
+subgraph cluster_c4_large_2 {
+label = "c4_large_2";
+comp_9 [shape=box,label=<
+<table border="0" cellborder="1" cellspacing="0"><tr><td colspan="2">default___ImageAnalyser_LoadBalancer</td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="green">
+<tr><td port="prov_ImageAnalyser_LoadBalancerInterface">ImageAnalyser_LoadBalancerInterface</td></tr>
+</table></td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="red">
+<tr><td port="req_ImageAnalyserInterface">ImageAnalyserInterface</td></tr>
+</table></td></tr>
+</table>
+>];
+}
+subgraph cluster_c4_2xlarge_1 {
+label = "c4_2xlarge_1";
+comp_16 [shape=box,label=<
+<table border="0" cellborder="1" cellspacing="0"><tr><td colspan="2">default___ImageRecognizer</td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="green">
+<tr><td port="prov_ImageRecognizerInterface">ImageRecognizerInterface</td></tr>
+</table></td></tr>
+</table>
+>];
+comp_17 [shape=box,label=<
+<table border="0" cellborder="1" cellspacing="0"><tr><td colspan="2">default___ImageAnalyser</td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="green">
+<tr><td port="prov_ImageAnalyserInterface">ImageAnalyserInterface</td></tr>
+</table></td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="red">
+<tr><td port="req_MessageAnalyser_LoadBalancerInterface">MessageAnalyser_LoadBalancerInterface</td></tr>
+<tr><td port="req_NSFWDetector_LoadBalancerInterface">NSFWDetector_LoadBalancerInterface</td></tr>
+<tr><td port="req_ImageRecognizer_LoadBalancerInterface">ImageRecognizer_LoadBalancerInterface</td></tr>
+</table></td></tr>
+</table>
+>];
+}
+subgraph cluster_c4_large_6 {
+label = "c4_large_6";
+comp_13 [shape=box,label=<
+<table border="0" cellborder="1" cellspacing="0"><tr><td colspan="2">default___HeaderAnalyser_LoadBalancer</td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="green">
+<tr><td port="prov_HeaderAnalyser_LoadBalancerInterface">HeaderAnalyser_LoadBalancerInterface</td></tr>
+</table></td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="red">
+<tr><td port="req_HeaderAnalyserInterface">HeaderAnalyserInterface</td></tr>
+</table></td></tr>
+</table>
+>];
+}
+subgraph cluster_c4_large_11 {
+label = "c4_large_11";
+comp_4 [shape=box,label=<
+<table border="0" cellborder="1" cellspacing="0"><tr><td colspan="2">default___LinkAnalyser_LoadBalancer</td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="green">
+<tr><td port="prov_LinkAnalyser_LoadBalancerInterface">LinkAnalyser_LoadBalancerInterface</td></tr>
+</table></td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="red">
+<tr><td port="req_LinkAnalyserInterface">LinkAnalyserInterface</td></tr>
+</table></td></tr>
+</table>
+>];
+}
+subgraph cluster_c4_large_8 {
+label = "c4_large_8";
+comp_15 [shape=box,label=<
+<table border="0" cellborder="1" cellspacing="0"><tr><td colspan="2">default___MessageParser_LoadBalancer</td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="green">
+<tr><td port="prov_MessageParser_LoadBalancerInterface">MessageParser_LoadBalancerInterface</td></tr>
+</table></td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="red">
+<tr><td port="req_MessageParserInterface">MessageParserInterface</td></tr>
+</table></td></tr>
+</table>
+>];
+}
+subgraph cluster_c4_large_3 {
+label = "c4_large_3";
+comp_8 [shape=box,label=<
+<table border="0" cellborder="1" cellspacing="0"><tr><td colspan="2">default___MessageReceiver</td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="red">
+<tr><td port="req_MessageParser_LoadBalancerInterface">MessageParser_LoadBalancerInterface</td></tr>
+</table></td></tr>
+</table>
+>];
+}
+subgraph cluster_c4_large_7 {
+label = "c4_large_7";
+comp_12 [shape=box,label=<
+<table border="0" cellborder="1" cellspacing="0"><tr><td colspan="2">default___ImageRecognizer_LoadBalancer</td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="green">
+<tr><td port="prov_ImageRecognizer_LoadBalancerInterface">ImageRecognizer_LoadBalancerInterface</td></tr>
+</table></td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="red">
+<tr><td port="req_ImageRecognizerInterface">ImageRecognizerInterface</td></tr>
+</table></td></tr>
+</table>
+>];
+}
+subgraph cluster_c4_large_9 {
+label = "c4_large_9";
+comp_14 [shape=box,label=<
+<table border="0" cellborder="1" cellspacing="0"><tr><td colspan="2">default___VirusScanner_LoadBalancer</td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="green">
+<tr><td port="prov_VirusScanner_LoadBalancerInterface">VirusScanner_LoadBalancerInterface</td></tr>
+</table></td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="red">
+<tr><td port="req_VirusScannerInterface">VirusScannerInterface</td></tr>
+</table></td></tr>
+</table>
+>];
+}
+subgraph cluster_c4_large_0 {
+label = "c4_large_0";
+comp_7 [shape=box,label=<
+<table border="0" cellborder="1" cellspacing="0"><tr><td colspan="2">default___NSFWDetector_LoadBalancer</td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="green">
+<tr><td port="prov_NSFWDetector_LoadBalancerInterface">NSFWDetector_LoadBalancerInterface</td></tr>
+</table></td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="red">
+<tr><td port="req_NSFWDetectorInterface">NSFWDetectorInterface</td></tr>
+</table></td></tr>
+</table>
+>];
+}
+subgraph cluster_c4_2xlarge_2 {
+label = "c4_2xlarge_2";
+comp_22 [shape=box,label=<
+<table border="0" cellborder="1" cellspacing="0"><tr><td colspan="2">default___NSFWDetector</td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="green">
+<tr><td port="prov_NSFWDetectorInterface">NSFWDetectorInterface</td></tr>
+</table></td></tr>
+</table>
+>];
+comp_23 [shape=box,label=<
+<table border="0" cellborder="1" cellspacing="0"><tr><td colspan="2">default___LinkAnalyser</td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="green">
+<tr><td port="prov_LinkAnalyserInterface">LinkAnalyserInterface</td></tr>
+</table></td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="red">
+<tr><td port="req_MessageAnalyser_LoadBalancerInterface">MessageAnalyser_LoadBalancerInterface</td></tr>
+</table></td></tr>
+</table>
+>];
+}
+subgraph cluster_c4_large_4 {
+label = "c4_large_4";
+comp_11 [shape=box,label=<
+<table border="0" cellborder="1" cellspacing="0"><tr><td colspan="2">default___MessageAnalyser_LoadBalancer</td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="green">
+<tr><td port="prov_MessageAnalyser_LoadBalancerInterface">MessageAnalyser_LoadBalancerInterface</td></tr>
+</table></td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="red">
+<tr><td port="req_MessageAnalyserInterface">MessageAnalyserInterface</td></tr>
+</table></td></tr>
+</table>
+>];
+}
+subgraph cluster_c4_2xlarge_4 {
+label = "c4_2xlarge_4";
+comp_24 [shape=box,label=<
+<table border="0" cellborder="1" cellspacing="0"><tr><td colspan="2">default___DB</td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="green">
+<tr><td port="prov_DBInterface">DBInterface</td></tr>
+</table></td></tr>
+</table>
+>];
+}
+subgraph cluster_c4_large_1 {
+label = "c4_large_1";
+comp_6 [shape=box,label=<
+<table border="0" cellborder="1" cellspacing="0"><tr><td colspan="2">default___SentimentAnalyser_LoadBalancer</td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="green">
+<tr><td port="prov_SentimentAnalyser_LoadBalancerInterface">SentimentAnalyser_LoadBalancerInterface</td></tr>
+</table></td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="red">
+<tr><td port="req_SentimentAnalyserInterface">SentimentAnalyserInterface</td></tr>
+</table></td></tr>
+</table>
+>];
+}
+subgraph cluster_c4_2xlarge_3 {
+label = "c4_2xlarge_3";
+comp_20 [shape=box,label=<
+<table border="0" cellborder="1" cellspacing="0"><tr><td colspan="2">default___TextAnalyser</td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="green">
+<tr><td port="prov_TextAnalyserInterface">TextAnalyserInterface</td></tr>
+</table></td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="red">
+<tr><td port="req_MessageAnalyser_LoadBalancerInterface">MessageAnalyser_LoadBalancerInterface</td></tr>
+<tr><td port="req_SentimentAnalyser_LoadBalancerInterface">SentimentAnalyser_LoadBalancerInterface</td></tr>
+</table></td></tr>
+</table>
+>];
+comp_21 [shape=box,label=<
+<table border="0" cellborder="1" cellspacing="0"><tr><td colspan="2">default___VirusScanner</td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="green">
+<tr><td port="prov_VirusScannerInterface">VirusScannerInterface</td></tr>
+</table></td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="red">
+<tr><td port="req_AttachmentsManager_LoadBalancerInterface">AttachmentsManager_LoadBalancerInterface</td></tr>
+<tr><td port="req_MessageAnalyser_LoadBalancerInterface">MessageAnalyser_LoadBalancerInterface</td></tr>
+</table></td></tr>
+</table>
+>];
+}
+subgraph cluster_c4_2xlarge_0 {
+label = "c4_2xlarge_0";
+comp_18 [shape=box,label=<
+<table border="0" cellborder="1" cellspacing="0"><tr><td colspan="2">default___SentimentAnalyser</td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="green">
+<tr><td port="prov_SentimentAnalyserInterface">SentimentAnalyserInterface</td></tr>
+</table></td></tr>
+</table>
+>];
+comp_19 [shape=box,label=<
+<table border="0" cellborder="1" cellspacing="0"><tr><td colspan="2">default___MessageAnalyser</td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="green">
+<tr><td port="prov_MessageAnalyserInterface">MessageAnalyserInterface</td></tr>
+</table></td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="red">
+<tr><td port="req_DBInterface">DBInterface</td></tr>
+</table></td></tr>
+</table>
+>];
+}
+subgraph cluster_c4_xlarge_1 {
+label = "c4_xlarge_1";
+comp_1 [shape=box,label=<
+<table border="0" cellborder="1" cellspacing="0"><tr><td colspan="2">default___HeaderAnalyser</td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="green">
+<tr><td port="prov_HeaderAnalyserInterface">HeaderAnalyserInterface</td></tr>
+</table></td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="red">
+<tr><td port="req_MessageAnalyser_LoadBalancerInterface">MessageAnalyser_LoadBalancerInterface</td></tr>
+</table></td></tr>
+</table>
+>];
+comp_2 [shape=box,label=<
+<table border="0" cellborder="1" cellspacing="0"><tr><td colspan="2">default___AttachmentsManager</td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="green">
+<tr><td port="prov_AttachmentsManagerInterface">AttachmentsManagerInterface</td></tr>
+</table></td></tr>
+<tr><td><table border="0" cellborder="1" cellspacing="0" bgcolor="red">
+<tr><td port="req_ImageAnalyser_LoadBalancerInterface">ImageAnalyser_LoadBalancerInterface</td></tr>
+</table></td></tr>
+</table>
+>];
+}
+comp_1:prov_HeaderAnalyserInterface -> comp_13:req_HeaderAnalyserInterface
+comp_2:prov_AttachmentsManagerInterface -> comp_10:req_AttachmentsManagerInterface
+comp_3:prov_MessageParserInterface -> comp_15:req_MessageParserInterface
+comp_4:prov_LinkAnalyser_LoadBalancerInterface -> comp_3:req_LinkAnalyser_LoadBalancerInterface
+comp_5:prov_TextAnalyser_LoadBalancerInterface -> comp_3:req_TextAnalyser_LoadBalancerInterface
+comp_6:prov_SentimentAnalyser_LoadBalancerInterface -> comp_20:req_SentimentAnalyser_LoadBalancerInterface
+comp_7:prov_NSFWDetector_LoadBalancerInterface -> comp_17:req_NSFWDetector_LoadBalancerInterface
+comp_9:prov_ImageAnalyser_LoadBalancerInterface -> comp_2:req_ImageAnalyser_LoadBalancerInterface
+comp_10:prov_AttachmentsManager_LoadBalancerInterface -> comp_21:req_AttachmentsManager_LoadBalancerInterface
+comp_11:prov_MessageAnalyser_LoadBalancerInterface -> comp_1:req_MessageAnalyser_LoadBalancerInterface
+comp_11:prov_MessageAnalyser_LoadBalancerInterface -> comp_3:req_MessageAnalyser_LoadBalancerInterface
+comp_11:prov_MessageAnalyser_LoadBalancerInterface -> comp_17:req_MessageAnalyser_LoadBalancerInterface
+comp_11:prov_MessageAnalyser_LoadBalancerInterface -> comp_20:req_MessageAnalyser_LoadBalancerInterface
+comp_11:prov_MessageAnalyser_LoadBalancerInterface -> comp_21:req_MessageAnalyser_LoadBalancerInterface
+comp_11:prov_MessageAnalyser_LoadBalancerInterface -> comp_23:req_MessageAnalyser_LoadBalancerInterface
+comp_12:prov_ImageRecognizer_LoadBalancerInterface -> comp_17:req_ImageRecognizer_LoadBalancerInterface
+comp_13:prov_HeaderAnalyser_LoadBalancerInterface -> comp_3:req_HeaderAnalyser_LoadBalancerInterface
+comp_14:prov_VirusScanner_LoadBalancerInterface -> comp_3:req_VirusScanner_LoadBalancerInterface
+comp_15:prov_MessageParser_LoadBalancerInterface -> comp_8:req_MessageParser_LoadBalancerInterface
+comp_16:prov_ImageRecognizerInterface -> comp_12:req_ImageRecognizerInterface
+comp_17:prov_ImageAnalyserInterface -> comp_9:req_ImageAnalyserInterface
+comp_18:prov_SentimentAnalyserInterface -> comp_6:req_SentimentAnalyserInterface
+comp_19:prov_MessageAnalyserInterface -> comp_11:req_MessageAnalyserInterface
+comp_20:prov_TextAnalyserInterface -> comp_5:req_TextAnalyserInterface
+comp_21:prov_VirusScannerInterface -> comp_14:req_VirusScannerInterface
+comp_22:prov_NSFWDetectorInterface -> comp_7:req_NSFWDetectorInterface
+comp_23:prov_LinkAnalyserInterface -> comp_4:req_LinkAnalyserInterface
+comp_24:prov_DBInterface -> comp_3:req_DBInterface
+comp_24:prov_DBInterface -> comp_19:req_DBInterface
+}

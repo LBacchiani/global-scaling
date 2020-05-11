@@ -1,0 +1,95 @@
+module MessageAnalyserPlan;
+export *;
+import * from ABS.DC;
+import * from EmailProcessingPipelineArchitecture;
+
+interface MessageAnalyserPlan{
+	List<Microservice> getMicroservice();
+	List<MessageAnalyserInterface> getMessageAnalyserInterface();
+	List<DeploymentComponent> getDeploymentComponent();
+	Unit deploy();
+	Unit undeploy();
+}
+
+class MessageAnalyserPlan(CloudProvider cloudProvider, SpeedPatcher sp_obj, MessageAnalyser_LoadBalancerInterface messageAnalyser_LoadBalancerObj, DBInterface dbObj) implements MessageAnalyserPlan{
+
+	List<List<Microservice>> ls_ls_Microservice = Nil;
+	List<Microservice> ls_Microservice = Nil;
+	List<List<MessageAnalyserInterface>> ls_ls_MessageAnalyserInterface = Nil;
+	List<MessageAnalyserInterface> ls_MessageAnalyserInterface = Nil;
+	List<List<DeploymentComponent>> ls_ls_DeploymentComponent = Nil;
+	List<DeploymentComponent> ls_DeploymentComponent = Nil;
+	{
+		cloudProvider.addInstanceDescription(Pair("c4_xlarge",
+			map[Pair(CostPerInterval,92)
+			,Pair(PaymentInterval,1)
+			,Pair(Bandwidth,750)
+			,Pair(Memory,750)
+			,Pair(Cores,4)
+			,Pair(Speed,20)
+			]));
+		cloudProvider.addInstanceDescription(Pair("c4_large",
+			map[Pair(CostPerInterval,46)
+			,Pair(PaymentInterval,1)
+			,Pair(Bandwidth,500)
+			,Pair(Memory,375)
+			,Pair(Cores,2)
+			,Pair(Speed,10)
+			]));
+		cloudProvider.addInstanceDescription(Pair("c4_2xlarge",
+			map[Pair(CostPerInterval,184)
+			,Pair(PaymentInterval,1)
+			,Pair(Bandwidth,1000)
+			,Pair(Memory,1500)
+			,Pair(Cores,8)
+			,Pair(Speed,40)
+			]));
+	}
+
+	List<Microservice> getMicroservice() { return ls_Microservice; }
+	List<MessageAnalyserInterface> getMessageAnalyserInterface() { return ls_MessageAnalyserInterface; }
+	List<DeploymentComponent> getDeploymentComponent() { return ls_DeploymentComponent; }
+
+	Unit deploy() {
+		ls_ls_Microservice = Cons(ls_Microservice,ls_ls_Microservice);
+		ls_Microservice = Nil;
+		ls_ls_MessageAnalyserInterface = Cons(ls_MessageAnalyserInterface,ls_ls_MessageAnalyserInterface);
+		ls_MessageAnalyserInterface = Nil;
+		ls_ls_DeploymentComponent = Cons(ls_DeploymentComponent,ls_ls_DeploymentComponent);
+		ls_DeploymentComponent = Nil;
+		this.deploy_aux();
+	}
+
+	Unit undeploy() {
+		if (ls_ls_DeploymentComponent != Nil) {
+			this.undeploy_aux();
+			ls_DeploymentComponent = head(ls_ls_DeploymentComponent);
+			ls_ls_DeploymentComponent = tail(ls_ls_DeploymentComponent);
+				ls_Microservice = head(ls_ls_Microservice);
+				ls_MessageAnalyserInterface = head(ls_ls_MessageAnalyserInterface);
+			ls_ls_Microservice = tail(ls_ls_Microservice);
+			ls_ls_MessageAnalyserInterface = tail(ls_ls_MessageAnalyserInterface);
+		}
+	}
+
+
+	Unit deploy_aux() {
+		DeploymentComponent c4_xlarge_0 = cloudProvider.launchInstanceNamed("c4_xlarge");
+		ls_DeploymentComponent = Cons(c4_xlarge_0,ls_DeploymentComponent);
+		[DC: c4_xlarge_0] MessageAnalyserInterface odefault___MessageAnalyser_0_c4_xlarge_0 = new MessageAnalyser(dbObj);
+		ls_MessageAnalyserInterface = Cons(odefault___MessageAnalyser_0_c4_xlarge_0, ls_MessageAnalyserInterface);
+		ls_Microservice = Cons(odefault___MessageAnalyser_0_c4_xlarge_0, ls_Microservice);
+		messageAnalyser_LoadBalancerObj.connectInstance(odefault___MessageAnalyser_0_c4_xlarge_0);
+		sp_obj.addMicroservice(odefault___MessageAnalyser_0_c4_xlarge_0);
+	}
+
+	Unit undeploy_aux() {
+		MessageAnalyserInterface odefault___MessageAnalyser_0_c4_xlarge_0 = nth(ls_MessageAnalyserInterface,0);
+		messageAnalyser_LoadBalancerObj.disconnectInstance();
+		sp_obj.disconnectInstance();
+		while ( !isEmpty(ls_DeploymentComponent) ) {
+			cloudProvider.shutdownInstance(head(ls_DeploymentComponent));
+			ls_DeploymentComponent = tail(ls_DeploymentComponent);
+		}
+	}
+}
