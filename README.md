@@ -4,4 +4,4 @@ The globalScalingSimulation directory contains the model for the simulation with
 
 The localScalingSimulation directory contains the model for the simulation with local-level adaptation. In particular *Deployer.abs contains the orchestration for the single microservice, while BaseScale.abs and code.abs contains the same code described above. BalancerMonitor.abs contains the code implementing the monitor in charge of watching system's state.
 
-The graphs directory containse the visual representation of the expected results.
+The graphs directory contains the visual representation of the expected results.
