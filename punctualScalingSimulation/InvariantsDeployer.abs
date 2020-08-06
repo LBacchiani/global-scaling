@@ -5,6 +5,7 @@ import * from EmailProcessingPipelineArchitecture;
 
 interface InvariantsDeployer{
 	List<HeaderAnalyser_LoadBalancerInterface> getHeaderAnalyser_LoadBalancerInterface();
+	List<MessageReceiver_LoadBalancerInterface> getMessageReceiver_LoadBalancerInterface();
 	List<AttachmentsManager_LoadBalancerInterface> getAttachmentsManager_LoadBalancerInterface();
 	List<ImageRecognizer_LoadBalancerInterface> getImageRecognizer_LoadBalancerInterface();
 	List<MessageAnalyser_LoadBalancerInterface> getMessageAnalyser_LoadBalancerInterface();
@@ -25,6 +26,8 @@ class InvariantsDeployer(CloudProvider cloudProvider, DBInterface dbObj) impleme
 
 	List<List<HeaderAnalyser_LoadBalancerInterface>> ls_ls_HeaderAnalyser_LoadBalancerInterface = Nil;
 	List<HeaderAnalyser_LoadBalancerInterface> ls_HeaderAnalyser_LoadBalancerInterface = Nil;
+	List<List<MessageReceiver_LoadBalancerInterface>> ls_ls_MessageReceiver_LoadBalancerInterface = Nil;
+	List<MessageReceiver_LoadBalancerInterface> ls_MessageReceiver_LoadBalancerInterface = Nil;
 	List<List<AttachmentsManager_LoadBalancerInterface>> ls_ls_AttachmentsManager_LoadBalancerInterface = Nil;
 	List<AttachmentsManager_LoadBalancerInterface> ls_AttachmentsManager_LoadBalancerInterface = Nil;
 	List<List<ImageRecognizer_LoadBalancerInterface>> ls_ls_ImageRecognizer_LoadBalancerInterface = Nil;
@@ -49,9 +52,10 @@ class InvariantsDeployer(CloudProvider cloudProvider, DBInterface dbObj) impleme
 	List<LinkAnalyser_LoadBalancerInterface> ls_LinkAnalyser_LoadBalancerInterface = Nil;
 	List<List<DeploymentComponent>> ls_ls_DeploymentComponent = Nil;
 	List<DeploymentComponent> ls_DeploymentComponent = Nil;
+	Rat waiting_time = 150;
 	{
 		cloudProvider.addInstanceDescription(Pair("c4_xlarge",
-			map[Pair(CostPerInterval,92)
+			map[Pair(CostPerInterval,237)
 			,Pair(PaymentInterval,1)
 			,Pair(Bandwidth,750)
 			,Pair(Memory,750)
@@ -59,7 +63,7 @@ class InvariantsDeployer(CloudProvider cloudProvider, DBInterface dbObj) impleme
 			,Pair(Speed,20)
 			]));
 		cloudProvider.addInstanceDescription(Pair("c4_large",
-			map[Pair(CostPerInterval,46)
+			map[Pair(CostPerInterval,119)
 			,Pair(PaymentInterval,1)
 			,Pair(Bandwidth,500)
 			,Pair(Memory,375)
@@ -67,7 +71,7 @@ class InvariantsDeployer(CloudProvider cloudProvider, DBInterface dbObj) impleme
 			,Pair(Speed,10)
 			]));
 		cloudProvider.addInstanceDescription(Pair("c4_2xlarge",
-			map[Pair(CostPerInterval,184)
+			map[Pair(CostPerInterval,476)
 			,Pair(PaymentInterval,1)
 			,Pair(Bandwidth,1000)
 			,Pair(Memory,1500)
@@ -77,6 +81,7 @@ class InvariantsDeployer(CloudProvider cloudProvider, DBInterface dbObj) impleme
 	}
 
 	List<HeaderAnalyser_LoadBalancerInterface> getHeaderAnalyser_LoadBalancerInterface() { return ls_HeaderAnalyser_LoadBalancerInterface; }
+	List<MessageReceiver_LoadBalancerInterface> getMessageReceiver_LoadBalancerInterface() { return ls_MessageReceiver_LoadBalancerInterface; }
 	List<AttachmentsManager_LoadBalancerInterface> getAttachmentsManager_LoadBalancerInterface() { return ls_AttachmentsManager_LoadBalancerInterface; }
 	List<ImageRecognizer_LoadBalancerInterface> getImageRecognizer_LoadBalancerInterface() { return ls_ImageRecognizer_LoadBalancerInterface; }
 	List<MessageAnalyser_LoadBalancerInterface> getMessageAnalyser_LoadBalancerInterface() { return ls_MessageAnalyser_LoadBalancerInterface; }
@@ -93,6 +98,8 @@ class InvariantsDeployer(CloudProvider cloudProvider, DBInterface dbObj) impleme
 	Unit deploy() {
 		ls_ls_HeaderAnalyser_LoadBalancerInterface = Cons(ls_HeaderAnalyser_LoadBalancerInterface,ls_ls_HeaderAnalyser_LoadBalancerInterface);
 		ls_HeaderAnalyser_LoadBalancerInterface = Nil;
+		ls_ls_MessageReceiver_LoadBalancerInterface = Cons(ls_MessageReceiver_LoadBalancerInterface,ls_ls_MessageReceiver_LoadBalancerInterface);
+		ls_MessageReceiver_LoadBalancerInterface = Nil;
 		ls_ls_AttachmentsManager_LoadBalancerInterface = Cons(ls_AttachmentsManager_LoadBalancerInterface,ls_ls_AttachmentsManager_LoadBalancerInterface);
 		ls_AttachmentsManager_LoadBalancerInterface = Nil;
 		ls_ls_ImageRecognizer_LoadBalancerInterface = Cons(ls_ImageRecognizer_LoadBalancerInterface,ls_ls_ImageRecognizer_LoadBalancerInterface);
@@ -126,6 +133,7 @@ class InvariantsDeployer(CloudProvider cloudProvider, DBInterface dbObj) impleme
 			ls_DeploymentComponent = head(ls_ls_DeploymentComponent);
 			ls_ls_DeploymentComponent = tail(ls_ls_DeploymentComponent);
 				ls_HeaderAnalyser_LoadBalancerInterface = head(ls_ls_HeaderAnalyser_LoadBalancerInterface);
+				ls_MessageReceiver_LoadBalancerInterface = head(ls_ls_MessageReceiver_LoadBalancerInterface);
 				ls_AttachmentsManager_LoadBalancerInterface = head(ls_ls_AttachmentsManager_LoadBalancerInterface);
 				ls_ImageRecognizer_LoadBalancerInterface = head(ls_ls_ImageRecognizer_LoadBalancerInterface);
 				ls_MessageAnalyser_LoadBalancerInterface = head(ls_ls_MessageAnalyser_LoadBalancerInterface);
@@ -138,6 +146,7 @@ class InvariantsDeployer(CloudProvider cloudProvider, DBInterface dbObj) impleme
 				ls_LoadBalancer = head(ls_ls_LoadBalancer);
 				ls_LinkAnalyser_LoadBalancerInterface = head(ls_ls_LinkAnalyser_LoadBalancerInterface);
 			ls_ls_HeaderAnalyser_LoadBalancerInterface = tail(ls_ls_HeaderAnalyser_LoadBalancerInterface);
+			ls_ls_MessageReceiver_LoadBalancerInterface = tail(ls_ls_MessageReceiver_LoadBalancerInterface);
 			ls_ls_AttachmentsManager_LoadBalancerInterface = tail(ls_ls_AttachmentsManager_LoadBalancerInterface);
 			ls_ls_ImageRecognizer_LoadBalancerInterface = tail(ls_ls_ImageRecognizer_LoadBalancerInterface);
 			ls_ls_MessageAnalyser_LoadBalancerInterface = tail(ls_ls_MessageAnalyser_LoadBalancerInterface);
@@ -154,78 +163,137 @@ class InvariantsDeployer(CloudProvider cloudProvider, DBInterface dbObj) impleme
 
 
 	Unit deploy_aux() {
+		Map<DeploymentComponent,Rat> speedPatchMap = map[];
+		DeploymentComponent c4_large_11 = cloudProvider.launchInstanceNamed("c4_large");
+		ls_DeploymentComponent = Cons(c4_large_11,ls_DeploymentComponent);
+		speedPatchMap = put(speedPatchMap,c4_large_11,0);
 		DeploymentComponent c4_large_10 = cloudProvider.launchInstanceNamed("c4_large");
 		ls_DeploymentComponent = Cons(c4_large_10,ls_DeploymentComponent);
+		speedPatchMap = put(speedPatchMap,c4_large_10,0);
 		DeploymentComponent c4_large_1 = cloudProvider.launchInstanceNamed("c4_large");
 		ls_DeploymentComponent = Cons(c4_large_1,ls_DeploymentComponent);
+		speedPatchMap = put(speedPatchMap,c4_large_1,0);
 		DeploymentComponent c4_large_0 = cloudProvider.launchInstanceNamed("c4_large");
 		ls_DeploymentComponent = Cons(c4_large_0,ls_DeploymentComponent);
+		speedPatchMap = put(speedPatchMap,c4_large_0,0);
 		DeploymentComponent c4_large_3 = cloudProvider.launchInstanceNamed("c4_large");
 		ls_DeploymentComponent = Cons(c4_large_3,ls_DeploymentComponent);
+		speedPatchMap = put(speedPatchMap,c4_large_3,0);
 		DeploymentComponent c4_large_2 = cloudProvider.launchInstanceNamed("c4_large");
 		ls_DeploymentComponent = Cons(c4_large_2,ls_DeploymentComponent);
+		speedPatchMap = put(speedPatchMap,c4_large_2,0);
 		DeploymentComponent c4_large_5 = cloudProvider.launchInstanceNamed("c4_large");
 		ls_DeploymentComponent = Cons(c4_large_5,ls_DeploymentComponent);
+		speedPatchMap = put(speedPatchMap,c4_large_5,0);
 		DeploymentComponent c4_large_4 = cloudProvider.launchInstanceNamed("c4_large");
 		ls_DeploymentComponent = Cons(c4_large_4,ls_DeploymentComponent);
+		speedPatchMap = put(speedPatchMap,c4_large_4,0);
 		DeploymentComponent c4_large_7 = cloudProvider.launchInstanceNamed("c4_large");
 		ls_DeploymentComponent = Cons(c4_large_7,ls_DeploymentComponent);
+		speedPatchMap = put(speedPatchMap,c4_large_7,0);
 		DeploymentComponent c4_large_6 = cloudProvider.launchInstanceNamed("c4_large");
 		ls_DeploymentComponent = Cons(c4_large_6,ls_DeploymentComponent);
+		speedPatchMap = put(speedPatchMap,c4_large_6,0);
 		DeploymentComponent c4_large_9 = cloudProvider.launchInstanceNamed("c4_large");
 		ls_DeploymentComponent = Cons(c4_large_9,ls_DeploymentComponent);
+		speedPatchMap = put(speedPatchMap,c4_large_9,0);
 		DeploymentComponent c4_large_8 = cloudProvider.launchInstanceNamed("c4_large");
 		ls_DeploymentComponent = Cons(c4_large_8,ls_DeploymentComponent);
-		[DC: c4_large_10] VirusScanner_LoadBalancerInterface odefault___VirusScanner_LoadBalancer_0_c4_large_10 = new VirusScanner_LoadBalancer(dbObj);
-		ls_VirusScanner_LoadBalancerInterface = Cons(odefault___VirusScanner_LoadBalancer_0_c4_large_10, ls_VirusScanner_LoadBalancerInterface);
-		ls_LoadBalancer = Cons(odefault___VirusScanner_LoadBalancer_0_c4_large_10, ls_LoadBalancer);
-		[DC: c4_large_7] AttachmentsManager_LoadBalancerInterface odefault___AttachmentsManager_LoadBalancer_0_c4_large_7 = new AttachmentsManager_LoadBalancer(dbObj);
-		ls_AttachmentsManager_LoadBalancerInterface = Cons(odefault___AttachmentsManager_LoadBalancer_0_c4_large_7, ls_AttachmentsManager_LoadBalancerInterface);
-		ls_LoadBalancer = Cons(odefault___AttachmentsManager_LoadBalancer_0_c4_large_7, ls_LoadBalancer);
-		[DC: c4_large_3] ImageAnalyser_LoadBalancerInterface odefault___ImageAnalyser_LoadBalancer_0_c4_large_3 = new ImageAnalyser_LoadBalancer(dbObj);
-		ls_ImageAnalyser_LoadBalancerInterface = Cons(odefault___ImageAnalyser_LoadBalancer_0_c4_large_3, ls_ImageAnalyser_LoadBalancerInterface);
-		ls_LoadBalancer = Cons(odefault___ImageAnalyser_LoadBalancer_0_c4_large_3, ls_LoadBalancer);
-		[DC: c4_large_4] LinkAnalyser_LoadBalancerInterface odefault___LinkAnalyser_LoadBalancer_0_c4_large_4 = new LinkAnalyser_LoadBalancer(dbObj);
-		ls_LinkAnalyser_LoadBalancerInterface = Cons(odefault___LinkAnalyser_LoadBalancer_0_c4_large_4, ls_LinkAnalyser_LoadBalancerInterface);
-		ls_LoadBalancer = Cons(odefault___LinkAnalyser_LoadBalancer_0_c4_large_4, ls_LoadBalancer);
-		[DC: c4_large_9] MessageAnalyser_LoadBalancerInterface odefault___MessageAnalyser_LoadBalancer_0_c4_large_9 = new MessageAnalyser_LoadBalancer(dbObj);
-		ls_MessageAnalyser_LoadBalancerInterface = Cons(odefault___MessageAnalyser_LoadBalancer_0_c4_large_9, ls_MessageAnalyser_LoadBalancerInterface);
-		ls_LoadBalancer = Cons(odefault___MessageAnalyser_LoadBalancer_0_c4_large_9, ls_LoadBalancer);
-		[DC: c4_large_5] ImageRecognizer_LoadBalancerInterface odefault___ImageRecognizer_LoadBalancer_0_c4_large_5 = new ImageRecognizer_LoadBalancer(dbObj);
-		ls_ImageRecognizer_LoadBalancerInterface = Cons(odefault___ImageRecognizer_LoadBalancer_0_c4_large_5, ls_ImageRecognizer_LoadBalancerInterface);
-		ls_LoadBalancer = Cons(odefault___ImageRecognizer_LoadBalancer_0_c4_large_5, ls_LoadBalancer);
+		speedPatchMap = put(speedPatchMap,c4_large_8,0);
+		[DC: c4_large_4] ImageAnalyser_LoadBalancerInterface odefault___ImageAnalyser_LoadBalancer_0_c4_large_4 = new ImageAnalyser_LoadBalancer(dbObj);
+		Rat coreRequired_odefault___ImageAnalyser_LoadBalancer_0_c4_large_4 = 2;
+		speedPatchMap = put(speedPatchMap, c4_large_4, fromJust(lookup(speedPatchMap,c4_large_4)) + coreRequired_odefault___ImageAnalyser_LoadBalancer_0_c4_large_4);
+		ls_ImageAnalyser_LoadBalancerInterface = Cons(odefault___ImageAnalyser_LoadBalancer_0_c4_large_4, ls_ImageAnalyser_LoadBalancerInterface);
+		ls_LoadBalancer = Cons(odefault___ImageAnalyser_LoadBalancer_0_c4_large_4, ls_LoadBalancer);
+		[DC: c4_large_10] MessageAnalyser_LoadBalancerInterface odefault___MessageAnalyser_LoadBalancer_0_c4_large_10 = new MessageAnalyser_LoadBalancer(dbObj);
+		Rat coreRequired_odefault___MessageAnalyser_LoadBalancer_0_c4_large_10 = 2;
+		speedPatchMap = put(speedPatchMap, c4_large_10, fromJust(lookup(speedPatchMap,c4_large_10)) + coreRequired_odefault___MessageAnalyser_LoadBalancer_0_c4_large_10);
+		ls_MessageAnalyser_LoadBalancerInterface = Cons(odefault___MessageAnalyser_LoadBalancer_0_c4_large_10, ls_MessageAnalyser_LoadBalancerInterface);
+		ls_LoadBalancer = Cons(odefault___MessageAnalyser_LoadBalancer_0_c4_large_10, ls_LoadBalancer);
+		[DC: c4_large_8] AttachmentsManager_LoadBalancerInterface odefault___AttachmentsManager_LoadBalancer_0_c4_large_8 = new AttachmentsManager_LoadBalancer(dbObj);
+		Rat coreRequired_odefault___AttachmentsManager_LoadBalancer_0_c4_large_8 = 2;
+		speedPatchMap = put(speedPatchMap, c4_large_8, fromJust(lookup(speedPatchMap,c4_large_8)) + coreRequired_odefault___AttachmentsManager_LoadBalancer_0_c4_large_8);
+		ls_AttachmentsManager_LoadBalancerInterface = Cons(odefault___AttachmentsManager_LoadBalancer_0_c4_large_8, ls_AttachmentsManager_LoadBalancerInterface);
+		ls_LoadBalancer = Cons(odefault___AttachmentsManager_LoadBalancer_0_c4_large_8, ls_LoadBalancer);
+		[DC: c4_large_5] LinkAnalyser_LoadBalancerInterface odefault___LinkAnalyser_LoadBalancer_0_c4_large_5 = new LinkAnalyser_LoadBalancer(dbObj);
+		Rat coreRequired_odefault___LinkAnalyser_LoadBalancer_0_c4_large_5 = 2;
+		speedPatchMap = put(speedPatchMap, c4_large_5, fromJust(lookup(speedPatchMap,c4_large_5)) + coreRequired_odefault___LinkAnalyser_LoadBalancer_0_c4_large_5);
+		ls_LinkAnalyser_LoadBalancerInterface = Cons(odefault___LinkAnalyser_LoadBalancer_0_c4_large_5, ls_LinkAnalyser_LoadBalancerInterface);
+		[DC: c4_large_3] MessageReceiver_LoadBalancerInterface odefault___MessageReceiver_LoadBalancer_0_c4_large_3 = new MessageReceiver_LoadBalancer(dbObj);
+		Rat coreRequired_odefault___MessageReceiver_LoadBalancer_0_c4_large_3 = 2;
+		speedPatchMap = put(speedPatchMap, c4_large_3, fromJust(lookup(speedPatchMap,c4_large_3)) + coreRequired_odefault___MessageReceiver_LoadBalancer_0_c4_large_3);
+		ls_MessageReceiver_LoadBalancerInterface = Cons(odefault___MessageReceiver_LoadBalancer_0_c4_large_3, ls_MessageReceiver_LoadBalancerInterface);
+		ls_LoadBalancer = Cons(odefault___MessageReceiver_LoadBalancer_0_c4_large_3, ls_LoadBalancer);
+		[DC: c4_large_9] MessageParser_LoadBalancerInterface odefault___MessageParser_LoadBalancer_0_c4_large_9 = new MessageParser_LoadBalancer(dbObj);
+		Rat coreRequired_odefault___MessageParser_LoadBalancer_0_c4_large_9 = 2;
+		speedPatchMap = put(speedPatchMap, c4_large_9, fromJust(lookup(speedPatchMap,c4_large_9)) + coreRequired_odefault___MessageParser_LoadBalancer_0_c4_large_9);
+		ls_MessageParser_LoadBalancerInterface = Cons(odefault___MessageParser_LoadBalancer_0_c4_large_9, ls_MessageParser_LoadBalancerInterface);
+		ls_LoadBalancer = Cons(odefault___MessageParser_LoadBalancer_0_c4_large_9, ls_LoadBalancer);
 		[DC: c4_large_2] NSFWDetector_LoadBalancerInterface odefault___NSFWDetector_LoadBalancer_0_c4_large_2 = new NSFWDetector_LoadBalancer(dbObj);
+		Rat coreRequired_odefault___NSFWDetector_LoadBalancer_0_c4_large_2 = 2;
+		speedPatchMap = put(speedPatchMap, c4_large_2, fromJust(lookup(speedPatchMap,c4_large_2)) + coreRequired_odefault___NSFWDetector_LoadBalancer_0_c4_large_2);
 		ls_NSFWDetector_LoadBalancerInterface = Cons(odefault___NSFWDetector_LoadBalancer_0_c4_large_2, ls_NSFWDetector_LoadBalancerInterface);
 		ls_LoadBalancer = Cons(odefault___NSFWDetector_LoadBalancer_0_c4_large_2, ls_LoadBalancer);
 		[DC: c4_large_0] HeaderAnalyser_LoadBalancerInterface odefault___HeaderAnalyser_LoadBalancer_0_c4_large_0 = new HeaderAnalyser_LoadBalancer(dbObj);
+		Rat coreRequired_odefault___HeaderAnalyser_LoadBalancer_0_c4_large_0 = 2;
+		speedPatchMap = put(speedPatchMap, c4_large_0, fromJust(lookup(speedPatchMap,c4_large_0)) + coreRequired_odefault___HeaderAnalyser_LoadBalancer_0_c4_large_0);
 		ls_HeaderAnalyser_LoadBalancerInterface = Cons(odefault___HeaderAnalyser_LoadBalancer_0_c4_large_0, ls_HeaderAnalyser_LoadBalancerInterface);
-		ls_LoadBalancer = Cons(odefault___HeaderAnalyser_LoadBalancer_0_c4_large_0, ls_LoadBalancer);
-		[DC: c4_large_8] MessageParser_LoadBalancerInterface odefault___MessageParser_LoadBalancer_0_c4_large_8 = new MessageParser_LoadBalancer(dbObj);
-		ls_MessageParser_LoadBalancerInterface = Cons(odefault___MessageParser_LoadBalancer_0_c4_large_8, ls_MessageParser_LoadBalancerInterface);
-		ls_LoadBalancer = Cons(odefault___MessageParser_LoadBalancer_0_c4_large_8, ls_LoadBalancer);
+		[DC: c4_large_7] SentimentAnalyser_LoadBalancerInterface odefault___SentimentAnalyser_LoadBalancer_0_c4_large_7 = new SentimentAnalyser_LoadBalancer(dbObj);
+		Rat coreRequired_odefault___SentimentAnalyser_LoadBalancer_0_c4_large_7 = 2;
+		speedPatchMap = put(speedPatchMap, c4_large_7, fromJust(lookup(speedPatchMap,c4_large_7)) + coreRequired_odefault___SentimentAnalyser_LoadBalancer_0_c4_large_7);
+		ls_SentimentAnalyser_LoadBalancerInterface = Cons(odefault___SentimentAnalyser_LoadBalancer_0_c4_large_7, ls_SentimentAnalyser_LoadBalancerInterface);
+		ls_LoadBalancer = Cons(odefault___SentimentAnalyser_LoadBalancer_0_c4_large_7, ls_LoadBalancer);
+		[DC: c4_large_11] VirusScanner_LoadBalancerInterface odefault___VirusScanner_LoadBalancer_0_c4_large_11 = new VirusScanner_LoadBalancer(dbObj);
+		Rat coreRequired_odefault___VirusScanner_LoadBalancer_0_c4_large_11 = 2;
+		speedPatchMap = put(speedPatchMap, c4_large_11, fromJust(lookup(speedPatchMap,c4_large_11)) + coreRequired_odefault___VirusScanner_LoadBalancer_0_c4_large_11);
+		ls_VirusScanner_LoadBalancerInterface = Cons(odefault___VirusScanner_LoadBalancer_0_c4_large_11, ls_VirusScanner_LoadBalancerInterface);
+		ls_LoadBalancer = Cons(odefault___VirusScanner_LoadBalancer_0_c4_large_11, ls_LoadBalancer);
 		[DC: c4_large_1] TextAnalyser_LoadBalancerInterface odefault___TextAnalyser_LoadBalancer_0_c4_large_1 = new TextAnalyser_LoadBalancer(dbObj);
+		Rat coreRequired_odefault___TextAnalyser_LoadBalancer_0_c4_large_1 = 2;
+		speedPatchMap = put(speedPatchMap, c4_large_1, fromJust(lookup(speedPatchMap,c4_large_1)) + coreRequired_odefault___TextAnalyser_LoadBalancer_0_c4_large_1);
 		ls_TextAnalyser_LoadBalancerInterface = Cons(odefault___TextAnalyser_LoadBalancer_0_c4_large_1, ls_TextAnalyser_LoadBalancerInterface);
-		ls_LoadBalancer = Cons(odefault___TextAnalyser_LoadBalancer_0_c4_large_1, ls_LoadBalancer);
-		[DC: c4_large_6] SentimentAnalyser_LoadBalancerInterface odefault___SentimentAnalyser_LoadBalancer_0_c4_large_6 = new SentimentAnalyser_LoadBalancer(dbObj);
-		ls_SentimentAnalyser_LoadBalancerInterface = Cons(odefault___SentimentAnalyser_LoadBalancer_0_c4_large_6, ls_SentimentAnalyser_LoadBalancerInterface);
-		ls_LoadBalancer = Cons(odefault___SentimentAnalyser_LoadBalancer_0_c4_large_6, ls_LoadBalancer);
+		[DC: c4_large_6] ImageRecognizer_LoadBalancerInterface odefault___ImageRecognizer_LoadBalancer_0_c4_large_6 = new ImageRecognizer_LoadBalancer(dbObj);
+		Rat coreRequired_odefault___ImageRecognizer_LoadBalancer_0_c4_large_6 = 2;
+		speedPatchMap = put(speedPatchMap, c4_large_6, fromJust(lookup(speedPatchMap,c4_large_6)) + coreRequired_odefault___ImageRecognizer_LoadBalancer_0_c4_large_6);
+		ls_ImageRecognizer_LoadBalancerInterface = Cons(odefault___ImageRecognizer_LoadBalancer_0_c4_large_6, ls_ImageRecognizer_LoadBalancerInterface);
+		ls_LoadBalancer = Cons(odefault___ImageRecognizer_LoadBalancer_0_c4_large_6, ls_LoadBalancer);
+		this!patchSpeed(speedPatchMap);
+		await duration(waiting_time,waiting_time);
 	}
 
 	Unit undeploy_aux() {
-		VirusScanner_LoadBalancerInterface odefault___VirusScanner_LoadBalancer_0_c4_large_10 = nth(ls_VirusScanner_LoadBalancerInterface,0);
-		AttachmentsManager_LoadBalancerInterface odefault___AttachmentsManager_LoadBalancer_0_c4_large_7 = nth(ls_AttachmentsManager_LoadBalancerInterface,0);
-		ImageAnalyser_LoadBalancerInterface odefault___ImageAnalyser_LoadBalancer_0_c4_large_3 = nth(ls_ImageAnalyser_LoadBalancerInterface,0);
-		LinkAnalyser_LoadBalancerInterface odefault___LinkAnalyser_LoadBalancer_0_c4_large_4 = nth(ls_LinkAnalyser_LoadBalancerInterface,0);
-		MessageAnalyser_LoadBalancerInterface odefault___MessageAnalyser_LoadBalancer_0_c4_large_9 = nth(ls_MessageAnalyser_LoadBalancerInterface,0);
-		ImageRecognizer_LoadBalancerInterface odefault___ImageRecognizer_LoadBalancer_0_c4_large_5 = nth(ls_ImageRecognizer_LoadBalancerInterface,0);
+		ImageAnalyser_LoadBalancerInterface odefault___ImageAnalyser_LoadBalancer_0_c4_large_4 = nth(ls_ImageAnalyser_LoadBalancerInterface,0);
+		MessageAnalyser_LoadBalancerInterface odefault___MessageAnalyser_LoadBalancer_0_c4_large_10 = nth(ls_MessageAnalyser_LoadBalancerInterface,0);
+		AttachmentsManager_LoadBalancerInterface odefault___AttachmentsManager_LoadBalancer_0_c4_large_8 = nth(ls_AttachmentsManager_LoadBalancerInterface,0);
+		LinkAnalyser_LoadBalancerInterface odefault___LinkAnalyser_LoadBalancer_0_c4_large_5 = nth(ls_LinkAnalyser_LoadBalancerInterface,0);
+		MessageReceiver_LoadBalancerInterface odefault___MessageReceiver_LoadBalancer_0_c4_large_3 = nth(ls_MessageReceiver_LoadBalancerInterface,0);
+		MessageParser_LoadBalancerInterface odefault___MessageParser_LoadBalancer_0_c4_large_9 = nth(ls_MessageParser_LoadBalancerInterface,0);
 		NSFWDetector_LoadBalancerInterface odefault___NSFWDetector_LoadBalancer_0_c4_large_2 = nth(ls_NSFWDetector_LoadBalancerInterface,0);
 		HeaderAnalyser_LoadBalancerInterface odefault___HeaderAnalyser_LoadBalancer_0_c4_large_0 = nth(ls_HeaderAnalyser_LoadBalancerInterface,0);
-		MessageParser_LoadBalancerInterface odefault___MessageParser_LoadBalancer_0_c4_large_8 = nth(ls_MessageParser_LoadBalancerInterface,0);
+		SentimentAnalyser_LoadBalancerInterface odefault___SentimentAnalyser_LoadBalancer_0_c4_large_7 = nth(ls_SentimentAnalyser_LoadBalancerInterface,0);
+		VirusScanner_LoadBalancerInterface odefault___VirusScanner_LoadBalancer_0_c4_large_11 = nth(ls_VirusScanner_LoadBalancerInterface,0);
 		TextAnalyser_LoadBalancerInterface odefault___TextAnalyser_LoadBalancer_0_c4_large_1 = nth(ls_TextAnalyser_LoadBalancerInterface,0);
-		SentimentAnalyser_LoadBalancerInterface odefault___SentimentAnalyser_LoadBalancer_0_c4_large_6 = nth(ls_SentimentAnalyser_LoadBalancerInterface,0);
+		ImageRecognizer_LoadBalancerInterface odefault___ImageRecognizer_LoadBalancer_0_c4_large_6 = nth(ls_ImageRecognizer_LoadBalancerInterface,0);
 		while ( !isEmpty(ls_DeploymentComponent) ) {
 			cloudProvider.shutdownInstance(head(ls_DeploymentComponent));
 			ls_DeploymentComponent = tail(ls_DeploymentComponent);
+		}
+	}
+
+	Unit patchSpeed(Map<DeploymentComponent,Rat> dcs) {
+		foreach(entry in entries(dcs)) {
+			DeploymentComponent dc = fst(entry);
+			Rat coreUsed = snd(entry);
+			InfRat speed_aux = await dc!total(Speed);
+			Rat total_speed = case speed_aux {
+				Fin(x) => x;
+				_ => -1;
+			};
+			if(total_speed != -1) {
+				Rat totalCore = await dc!getNumberOfCores();
+				Rat speedPerCore = total_speed / totalCore;
+				dc!decrementResources(total_speed - (speedPerCore * coreUsed), Speed);
+			}
 		}
 	}
 }

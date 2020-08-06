@@ -7,19 +7,23 @@ interface LoadBalancerMonitorInterface{
   Unit check();
 }
 
-class LoadBalancerMonitor(LoadBalancer balancer, String balancerName, Rat computationalLoad, Int deplN, Rat multFactor, Rat windowDim) implements LoadBalancerMonitorInterface {
+class LoadBalancerMonitor(LoadBalancer balancer, String balancerName, Rat computationalLoad, Int deplN, Rat multFactor) implements LoadBalancerMonitorInterface {
   Int deployment_number = deplN;
   ScalingWrapper sw;
-  Rat ksmall = rat(0.015) * windowDim * multFactor;
-  Rat kbig =  rat(0.045) * windowDim * multFactor;
+  Rat ksmall = 10 * multFactor;
+  Rat kbig =  25 * multFactor;
   {sw = new ScalingWrapperImpl(balancer);}
 
   Unit check() {
     Float aat = await balancer!averageTime();
-    Int completed = await balancer!completed();
-    Int total = await balancer!arrived();
-    Int lost = await balancer!lost();
-    Int pending = await balancer!pending();
+    Rat completed = await balancer!completed();
+    completed = completed / 10;
+    Rat total = await balancer!arrived();
+    total = total / 10;
+    Rat lost = await balancer!lost();
+    lost = lost / 10;
+    Rat pending = await balancer!pending();
+    pending = pending / 10;
     if(total - ((computationalLoad * deployment_number) - kbig)  > ksmall || ((computationalLoad * deployment_number) - kbig) - total > ksmall) {
       Float val = float((total + kbig)/ computationalLoad);
       Int toDeploy = ceil(val);
@@ -39,7 +43,6 @@ interface ScalingWrapper {
 class ScalingWrapperImpl(LoadBalancer balancer) implements ScalingWrapper{
   Unit deploy(Int n) {
     Int times = n;
-    await duration(150,150);
     while(times != 0) {
       balancer!deploy();
       times = times - 1;
