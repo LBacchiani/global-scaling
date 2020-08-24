@@ -28,18 +28,19 @@ exported() -> #{  }.
 'init'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},[Stack])->
     C=(get(this))#state.class,
     put(vars, #{}),
+    gc:register_object(O),
     O.
 %% --- Class has no recovery block
 
 %% --- Methods
 
- %% abs\lang\abslang.abs:1246
- %% abs\lang\abslang.abs:1246
+ %% abs\lang\abslang.abs:1256
+ %% abs\lang\abslang.abs:1256
 'm_getProductLine'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O }),
     try
-         %% abs\lang\abslang.abs:1246--1246
+         %% abs\lang\abslang.abs:1256--1256
         builtin:getProductLine(Cog)
     catch
         _:Exception ->

@@ -3,7 +3,7 @@
 -export([get_val_internal/2,set_val_internal/3,init_internal/0,get_state_for_modelapi/1,implemented_interfaces/0,exported/0]).
 -compile(export_all).
 
-implemented_interfaces() -> [ <<"Monitor">>, <<"Object">> ].
+implemented_interfaces() -> [ <<"Object">>, <<"Monitor">> ].
 
 exported() -> #{  }.
 
@@ -28,6 +28,7 @@ exported() -> #{  }.
 'init'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},[Stack])->
     C=(get(this))#state.class,
     put(vars, #{}),
+    gc:register_object(O),
     O.
 %% --- Class has no recovery block
 
@@ -44,7 +45,7 @@ exported() -> #{  }.
         T_1 = builtin:println(Cog,iolist_to_binary([<<"GLOBAL TIME: "/utf8>>, builtin:toString(Cog,m_ABS_StdLib_funs:f_timeValue(Cog,m_ABS_StdLib_funs:f_now(Cog,[O,DC| Stack]),[O,DC| Stack]))])),
         T_1,
          %% Error_abs.abs:23--23
-        T_2 = future:start(maps:get('service', get(vars)),'m_receive',[<<"hello world"/utf8>>,[]],#task_info{method= <<"receive"/utf8>>, creation={dataTime,builtin:currentms(Cog)}, proc_deadline=dataInfDuration},Cog,[O,DC| Stack]),
+        T_2 = cog:create_task(maps:get('service', get(vars)),'m_receive',[<<"hello world"/utf8>>,[]],#task_info{method= <<"receive"/utf8>>, creation={dataTime,builtin:currentms(Cog)}, proc_deadline=dataInfDuration},Cog,false),
         T_2,
          %% Error_abs.abs:24--24
         cog:block_current_task_for_duration(Cog, rationals:rdiv(3,2) , rationals:rdiv(3,2) ,[O,DC| Stack]),

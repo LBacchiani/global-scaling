@@ -4,7 +4,7 @@
 -export([get_val_internal/2,set_val_internal/3,init_internal/0,get_state_for_modelapi/1,implemented_interfaces/0,exported/0]).
 -compile(export_all).
 
-implemented_interfaces() -> [ <<"DeploymentComponentForCloudProvider">>, <<"Object">>, <<"DeploymentComponent">> ].
+implemented_interfaces() -> [ <<"DeploymentComponent">>, <<"Object">>, <<"DeploymentComponentForCloudProvider">> ].
 
 exported() -> #{  }.
 
@@ -14,85 +14,85 @@ exported() -> #{  }.
 'init_internal'()->
     #state{}.
 
- %% abs\lang\abslang.abs:995
+ %% abs\lang\abslang.abs:1005
 'get_val_internal'(#state{'description'=G},'description')->
     G;
- %% abs\lang\abslang.abs:995
+ %% abs\lang\abslang.abs:1005
 'get_val_internal'(#state{'initconfig'=G},'initconfig')->
     G;
- %% abs\lang\abslang.abs:1005
+ %% abs\lang\abslang.abs:1015
 'get_val_internal'(#state{'cpuhistory'=G},'cpuhistory')->
     G;
- %% abs\lang\abslang.abs:1006
+ %% abs\lang\abslang.abs:1016
 'get_val_internal'(#state{'cpuhistorytotal'=G},'cpuhistorytotal')->
     G;
- %% abs\lang\abslang.abs:1007
+ %% abs\lang\abslang.abs:1017
 'get_val_internal'(#state{'bwhistory'=G},'bwhistory')->
     G;
- %% abs\lang\abslang.abs:1008
+ %% abs\lang\abslang.abs:1018
 'get_val_internal'(#state{'bwhistorytotal'=G},'bwhistorytotal')->
     G;
- %% abs\lang\abslang.abs:1009
+ %% abs\lang\abslang.abs:1019
 'get_val_internal'(#state{'memoryhistory'=G},'memoryhistory')->
     G;
- %% abs\lang\abslang.abs:1010
+ %% abs\lang\abslang.abs:1020
 'get_val_internal'(#state{'memoryhistorytotal'=G},'memoryhistorytotal')->
     G;
- %% abs\lang\abslang.abs:1016
+ %% abs\lang\abslang.abs:1026
 'get_val_internal'(#state{'cpuconsumed'=G},'cpuconsumed')->
     G;
- %% abs\lang\abslang.abs:1017
+ %% abs\lang\abslang.abs:1027
 'get_val_internal'(#state{'bwconsumed'=G},'bwconsumed')->
     G;
- %% abs\lang\abslang.abs:1018
+ %% abs\lang\abslang.abs:1028
 'get_val_internal'(#state{'memoryconsumed'=G},'memoryconsumed')->
     G;
- %% abs\lang\abslang.abs:1022
+ %% abs\lang\abslang.abs:1032
 'get_val_internal'(#state{'creationTime'=G},'creationTime')->
     G;
- %% abs\lang\abslang.abs:1023
+ %% abs\lang\abslang.abs:1033
 'get_val_internal'(#state{'shutdownTime'=G},'shutdownTime')->
     G;
- %% abs\lang\abslang.abs:1027
+ %% abs\lang\abslang.abs:1037
 'get_val_internal'(#state{'initialized'=G},'initialized')->
     G;
- %% abs\lang\abslang.abs:1030
+ %% abs\lang\abslang.abs:1040
 'get_val_internal'(#state{'is_shutdown'=G},'is_shutdown')->
     G;
- %% abs\lang\abslang.abs:1032
+ %% abs\lang\abslang.abs:1042
 'get_val_internal'(#state{'cpu'=G},'cpu')->
     G;
- %% abs\lang\abslang.abs:1034
+ %% abs\lang\abslang.abs:1044
 'get_val_internal'(#state{'cpunext'=G},'cpunext')->
     G;
- %% abs\lang\abslang.abs:1035
+ %% abs\lang\abslang.abs:1045
 'get_val_internal'(#state{'bw'=G},'bw')->
     G;
- %% abs\lang\abslang.abs:1037
+ %% abs\lang\abslang.abs:1047
 'get_val_internal'(#state{'bwnext'=G},'bwnext')->
     G;
- %% abs\lang\abslang.abs:1038
+ %% abs\lang\abslang.abs:1048
 'get_val_internal'(#state{'memory'=G},'memory')->
     G;
- %% abs\lang\abslang.abs:1040
+ %% abs\lang\abslang.abs:1050
 'get_val_internal'(#state{'memorynext'=G},'memorynext')->
     G;
- %% abs\lang\abslang.abs:1041
+ %% abs\lang\abslang.abs:1051
 'get_val_internal'(#state{'paymentInterval'=G},'paymentInterval')->
     G;
- %% abs\lang\abslang.abs:1044
+ %% abs\lang\abslang.abs:1054
 'get_val_internal'(#state{'costPerInterval'=G},'costPerInterval')->
     G;
- %% abs\lang\abslang.abs:1045
+ %% abs\lang\abslang.abs:1055
 'get_val_internal'(#state{'startupDuration'=G},'startupDuration')->
     G;
- %% abs\lang\abslang.abs:1046
+ %% abs\lang\abslang.abs:1056
 'get_val_internal'(#state{'shutdownDuration'=G},'shutdownDuration')->
     G;
- %% abs\lang\abslang.abs:1047
+ %% abs\lang\abslang.abs:1057
 'get_val_internal'(#state{'numberOfCores'=G},'numberOfCores')->
     G;
- %% abs\lang\abslang.abs:1049
+ %% abs\lang\abslang.abs:1059
 'get_val_internal'(#state{'cloudprovider'=G},'cloudprovider')->
     G;
 'get_val_internal'(_,_)->
@@ -100,85 +100,85 @@ exported() -> #{  }.
     %% Will never occur in generated code.
     none.
 
- %% abs\lang\abslang.abs:995
+ %% abs\lang\abslang.abs:1005
 'set_val_internal'(S,'description',V)->
     S#state{'description'=V};
- %% abs\lang\abslang.abs:995
+ %% abs\lang\abslang.abs:1005
 'set_val_internal'(S,'initconfig',V)->
     S#state{'initconfig'=V};
- %% abs\lang\abslang.abs:1005
+ %% abs\lang\abslang.abs:1015
 'set_val_internal'(S,'cpuhistory',V)->
     S#state{'cpuhistory'=V};
- %% abs\lang\abslang.abs:1006
+ %% abs\lang\abslang.abs:1016
 'set_val_internal'(S,'cpuhistorytotal',V)->
     S#state{'cpuhistorytotal'=V};
- %% abs\lang\abslang.abs:1007
+ %% abs\lang\abslang.abs:1017
 'set_val_internal'(S,'bwhistory',V)->
     S#state{'bwhistory'=V};
- %% abs\lang\abslang.abs:1008
+ %% abs\lang\abslang.abs:1018
 'set_val_internal'(S,'bwhistorytotal',V)->
     S#state{'bwhistorytotal'=V};
- %% abs\lang\abslang.abs:1009
+ %% abs\lang\abslang.abs:1019
 'set_val_internal'(S,'memoryhistory',V)->
     S#state{'memoryhistory'=V};
- %% abs\lang\abslang.abs:1010
+ %% abs\lang\abslang.abs:1020
 'set_val_internal'(S,'memoryhistorytotal',V)->
     S#state{'memoryhistorytotal'=V};
- %% abs\lang\abslang.abs:1016
+ %% abs\lang\abslang.abs:1026
 'set_val_internal'(S,'cpuconsumed',V)->
     S#state{'cpuconsumed'=V};
- %% abs\lang\abslang.abs:1017
+ %% abs\lang\abslang.abs:1027
 'set_val_internal'(S,'bwconsumed',V)->
     S#state{'bwconsumed'=V};
- %% abs\lang\abslang.abs:1018
+ %% abs\lang\abslang.abs:1028
 'set_val_internal'(S,'memoryconsumed',V)->
     S#state{'memoryconsumed'=V};
- %% abs\lang\abslang.abs:1022
+ %% abs\lang\abslang.abs:1032
 'set_val_internal'(S,'creationTime',V)->
     S#state{'creationTime'=V};
- %% abs\lang\abslang.abs:1023
+ %% abs\lang\abslang.abs:1033
 'set_val_internal'(S,'shutdownTime',V)->
     S#state{'shutdownTime'=V};
- %% abs\lang\abslang.abs:1027
+ %% abs\lang\abslang.abs:1037
 'set_val_internal'(S,'initialized',V)->
     S#state{'initialized'=V};
- %% abs\lang\abslang.abs:1030
+ %% abs\lang\abslang.abs:1040
 'set_val_internal'(S,'is_shutdown',V)->
     S#state{'is_shutdown'=V};
- %% abs\lang\abslang.abs:1032
+ %% abs\lang\abslang.abs:1042
 'set_val_internal'(S,'cpu',V)->
     S#state{'cpu'=V};
- %% abs\lang\abslang.abs:1034
+ %% abs\lang\abslang.abs:1044
 'set_val_internal'(S,'cpunext',V)->
     S#state{'cpunext'=V};
- %% abs\lang\abslang.abs:1035
+ %% abs\lang\abslang.abs:1045
 'set_val_internal'(S,'bw',V)->
     S#state{'bw'=V};
- %% abs\lang\abslang.abs:1037
+ %% abs\lang\abslang.abs:1047
 'set_val_internal'(S,'bwnext',V)->
     S#state{'bwnext'=V};
- %% abs\lang\abslang.abs:1038
+ %% abs\lang\abslang.abs:1048
 'set_val_internal'(S,'memory',V)->
     S#state{'memory'=V};
- %% abs\lang\abslang.abs:1040
+ %% abs\lang\abslang.abs:1050
 'set_val_internal'(S,'memorynext',V)->
     S#state{'memorynext'=V};
- %% abs\lang\abslang.abs:1041
+ %% abs\lang\abslang.abs:1051
 'set_val_internal'(S,'paymentInterval',V)->
     S#state{'paymentInterval'=V};
- %% abs\lang\abslang.abs:1044
+ %% abs\lang\abslang.abs:1054
 'set_val_internal'(S,'costPerInterval',V)->
     S#state{'costPerInterval'=V};
- %% abs\lang\abslang.abs:1045
+ %% abs\lang\abslang.abs:1055
 'set_val_internal'(S,'startupDuration',V)->
     S#state{'startupDuration'=V};
- %% abs\lang\abslang.abs:1046
+ %% abs\lang\abslang.abs:1056
 'set_val_internal'(S,'shutdownDuration',V)->
     S#state{'shutdownDuration'=V};
- %% abs\lang\abslang.abs:1047
+ %% abs\lang\abslang.abs:1057
 'set_val_internal'(S,'numberOfCores',V)->
     S#state{'numberOfCores'=V};
- %% abs\lang\abslang.abs:1049
+ %% abs\lang\abslang.abs:1059
 'set_val_internal'(S,'cloudprovider',V)->
     S#state{'cloudprovider'=V}.
 
@@ -219,129 +219,130 @@ exported() -> #{  }.
     put(vars, #{}),
     put(this, C:set_val_internal(get(this),'description',P_description)),
     put(this, C:set_val_internal(get(this),'initconfig',P_initconfig)),
-     %% abs\lang\abslang.abs:1005--1005
+     %% abs\lang\abslang.abs:1015--1015
     put(this, C:set_val_internal(get(this),'cpuhistory',[])),
-     %% abs\lang\abslang.abs:1006--1006
-    put(this, C:set_val_internal(get(this),'cpuhistorytotal',[])),
-     %% abs\lang\abslang.abs:1007--1007
-    put(this, C:set_val_internal(get(this),'bwhistory',[])),
-     %% abs\lang\abslang.abs:1008--1008
-    put(this, C:set_val_internal(get(this),'bwhistorytotal',[])),
-     %% abs\lang\abslang.abs:1009--1009
-    put(this, C:set_val_internal(get(this),'memoryhistory',[])),
-     %% abs\lang\abslang.abs:1010--1010
-    put(this, C:set_val_internal(get(this),'memoryhistorytotal',[])),
      %% abs\lang\abslang.abs:1016--1016
-    put(this, C:set_val_internal(get(this),'cpuconsumed',0)),
+    put(this, C:set_val_internal(get(this),'cpuhistorytotal',[])),
      %% abs\lang\abslang.abs:1017--1017
-    put(this, C:set_val_internal(get(this),'bwconsumed',0)),
+    put(this, C:set_val_internal(get(this),'bwhistory',[])),
      %% abs\lang\abslang.abs:1018--1018
-    put(this, C:set_val_internal(get(this),'memoryconsumed',0)),
-     %% abs\lang\abslang.abs:1022--1022
-    put(this, C:set_val_internal(get(this),'creationTime',m_ABS_StdLib_funs:f_now(Cog,[O,DC| Stack]))),
-     %% abs\lang\abslang.abs:1023--1023
-    put(this, C:set_val_internal(get(this),'shutdownTime',dataNothing)),
+    put(this, C:set_val_internal(get(this),'bwhistorytotal',[])),
+     %% abs\lang\abslang.abs:1019--1019
+    put(this, C:set_val_internal(get(this),'memoryhistory',[])),
+     %% abs\lang\abslang.abs:1020--1020
+    put(this, C:set_val_internal(get(this),'memoryhistorytotal',[])),
+     %% abs\lang\abslang.abs:1026--1026
+    put(this, C:set_val_internal(get(this),'cpuconsumed',0)),
      %% abs\lang\abslang.abs:1027--1027
+    put(this, C:set_val_internal(get(this),'bwconsumed',0)),
+     %% abs\lang\abslang.abs:1028--1028
+    put(this, C:set_val_internal(get(this),'memoryconsumed',0)),
+     %% abs\lang\abslang.abs:1032--1032
+    put(this, C:set_val_internal(get(this),'creationTime',m_ABS_StdLib_funs:f_now(Cog,[O,DC| Stack]))),
+     %% abs\lang\abslang.abs:1033--1033
+    put(this, C:set_val_internal(get(this),'shutdownTime',dataNothing)),
+     %% abs\lang\abslang.abs:1037--1037
     put(this, C:set_val_internal(get(this),'initialized',false)),
-     %% abs\lang\abslang.abs:1030--1030
+     %% abs\lang\abslang.abs:1040--1040
     put(this, C:set_val_internal(get(this),'is_shutdown',false)),
-     %% abs\lang\abslang.abs:1032--1033
+     %% abs\lang\abslang.abs:1042--1043
     put(this, C:set_val_internal(get(this),'cpu',begin
         case m_ABS_StdLib_funs:f_lookup(Cog,C:get_val_internal(get(this), 'initconfig'),dataSpeed,[O,DC| Stack]) of
             dataNothing->dataInfRat;
             {dataJust,V_v_0}->{ dataFin,V_v_0};
-            _ -> io:format("No match for FnApp(initconfig,Speed()) at abs\lang\abslang.abs:1032~n"), 
-            exit(dataPatternMatchFailException)
-        end
-    end)),
-     %% abs\lang\abslang.abs:1034--1034
-    put(this, C:set_val_internal(get(this),'cpunext',C:get_val_internal(get(this), 'cpu'))),
-     %% abs\lang\abslang.abs:1035--1036
-    put(this, C:set_val_internal(get(this),'bw',begin
-        case m_ABS_StdLib_funs:f_lookup(Cog,C:get_val_internal(get(this), 'initconfig'),dataBandwidth,[O,DC| Stack]) of
-            dataNothing->dataInfRat;
-            {dataJust,V_v_1}->{ dataFin,V_v_1};
-            _ -> io:format("No match for FnApp(initconfig,Bandwidth()) at abs\lang\abslang.abs:1035~n"), 
-            exit(dataPatternMatchFailException)
-        end
-    end)),
-     %% abs\lang\abslang.abs:1037--1037
-    put(this, C:set_val_internal(get(this),'bwnext',C:get_val_internal(get(this), 'bw'))),
-     %% abs\lang\abslang.abs:1038--1039
-    put(this, C:set_val_internal(get(this),'memory',begin
-        case m_ABS_StdLib_funs:f_lookup(Cog,C:get_val_internal(get(this), 'initconfig'),dataMemory,[O,DC| Stack]) of
-            dataNothing->dataInfRat;
-            {dataJust,V_m_0}->{ dataFin,V_m_0};
-            _ -> io:format("No match for FnApp(initconfig,Memory()) at abs\lang\abslang.abs:1038~n"), 
-            exit(dataPatternMatchFailException)
-        end
-    end)),
-     %% abs\lang\abslang.abs:1040--1040
-    put(this, C:set_val_internal(get(this),'memorynext',C:get_val_internal(get(this), 'memory'))),
-     %% abs\lang\abslang.abs:1041--1043
-    put(this, C:set_val_internal(get(this),'paymentInterval',begin
-        case m_ABS_StdLib_funs:f_lookup(Cog,C:get_val_internal(get(this), 'initconfig'),dataPaymentInterval,[O,DC| Stack]) of
-            dataNothing->1;
-            {dataJust,V_n_0}->builtin:truncate(Cog,V_n_0);
-            _ -> io:format("No match for FnApp(initconfig,PaymentInterval()) at abs\lang\abslang.abs:1042~n"), 
+            _ -> io:format("No match for FnApp(initconfig,Speed()) at abs\lang\abslang.abs:1042~n"), 
             exit(dataPatternMatchFailException)
         end
     end)),
      %% abs\lang\abslang.abs:1044--1044
-    put(this, C:set_val_internal(get(this),'costPerInterval',m_ABS_StdLib_funs:f_lookupDefault(Cog,C:get_val_internal(get(this), 'initconfig'),dataCostPerInterval, rationals:rdiv(0,1) ,[O,DC| Stack]))),
-     %% abs\lang\abslang.abs:1045--1045
-    put(this, C:set_val_internal(get(this),'startupDuration',m_ABS_StdLib_funs:f_lookupDefault(Cog,C:get_val_internal(get(this), 'initconfig'),dataStartupduration, rationals:rdiv(0,1) ,[O,DC| Stack]))),
-     %% abs\lang\abslang.abs:1046--1046
-    put(this, C:set_val_internal(get(this),'shutdownDuration',m_ABS_StdLib_funs:f_lookupDefault(Cog,C:get_val_internal(get(this), 'initconfig'),dataShutdownduration, rationals:rdiv(0,1) ,[O,DC| Stack]))),
+    put(this, C:set_val_internal(get(this),'cpunext',C:get_val_internal(get(this), 'cpu'))),
+     %% abs\lang\abslang.abs:1045--1046
+    put(this, C:set_val_internal(get(this),'bw',begin
+        case m_ABS_StdLib_funs:f_lookup(Cog,C:get_val_internal(get(this), 'initconfig'),dataBandwidth,[O,DC| Stack]) of
+            dataNothing->dataInfRat;
+            {dataJust,V_v_1}->{ dataFin,V_v_1};
+            _ -> io:format("No match for FnApp(initconfig,Bandwidth()) at abs\lang\abslang.abs:1045~n"), 
+            exit(dataPatternMatchFailException)
+        end
+    end)),
      %% abs\lang\abslang.abs:1047--1047
+    put(this, C:set_val_internal(get(this),'bwnext',C:get_val_internal(get(this), 'bw'))),
+     %% abs\lang\abslang.abs:1048--1049
+    put(this, C:set_val_internal(get(this),'memory',begin
+        case m_ABS_StdLib_funs:f_lookup(Cog,C:get_val_internal(get(this), 'initconfig'),dataMemory,[O,DC| Stack]) of
+            dataNothing->dataInfRat;
+            {dataJust,V_m_0}->{ dataFin,V_m_0};
+            _ -> io:format("No match for FnApp(initconfig,Memory()) at abs\lang\abslang.abs:1048~n"), 
+            exit(dataPatternMatchFailException)
+        end
+    end)),
+     %% abs\lang\abslang.abs:1050--1050
+    put(this, C:set_val_internal(get(this),'memorynext',C:get_val_internal(get(this), 'memory'))),
+     %% abs\lang\abslang.abs:1051--1053
+    put(this, C:set_val_internal(get(this),'paymentInterval',begin
+        case m_ABS_StdLib_funs:f_lookup(Cog,C:get_val_internal(get(this), 'initconfig'),dataPaymentInterval,[O,DC| Stack]) of
+            dataNothing->1;
+            {dataJust,V_n_0}->builtin:truncate(Cog,V_n_0);
+            _ -> io:format("No match for FnApp(initconfig,PaymentInterval()) at abs\lang\abslang.abs:1052~n"), 
+            exit(dataPatternMatchFailException)
+        end
+    end)),
+     %% abs\lang\abslang.abs:1054--1054
+    put(this, C:set_val_internal(get(this),'costPerInterval',m_ABS_StdLib_funs:f_lookupDefault(Cog,C:get_val_internal(get(this), 'initconfig'),dataCostPerInterval, rationals:rdiv(0,1) ,[O,DC| Stack]))),
+     %% abs\lang\abslang.abs:1055--1055
+    put(this, C:set_val_internal(get(this),'startupDuration',m_ABS_StdLib_funs:f_lookupDefault(Cog,C:get_val_internal(get(this), 'initconfig'),dataStartupduration, rationals:rdiv(0,1) ,[O,DC| Stack]))),
+     %% abs\lang\abslang.abs:1056--1056
+    put(this, C:set_val_internal(get(this),'shutdownDuration',m_ABS_StdLib_funs:f_lookupDefault(Cog,C:get_val_internal(get(this), 'initconfig'),dataShutdownduration, rationals:rdiv(0,1) ,[O,DC| Stack]))),
+     %% abs\lang\abslang.abs:1057--1057
     put(this, C:set_val_internal(get(this),'numberOfCores',m_ABS_StdLib_funs:f_lookupDefault(Cog,C:get_val_internal(get(this), 'initconfig'),dataCores, rationals:rdiv(1,1) ,[O,DC| Stack]))),
-     %% abs\lang\abslang.abs:1049--1049
+     %% abs\lang\abslang.abs:1059--1059
     put(this, C:set_val_internal(get(this),'cloudprovider',null)),
-     %% abs\lang\abslang.abs:1051--1051
+     %% abs\lang\abslang.abs:1061--1061
     put(this, C:set_val_internal(get(this), 'initialized',true)),
+    gc:register_object(O),
     O.
 %% --- Class has no recovery block
 
 %% --- Methods
 
- %% abs\lang\abslang.abs:1053
- %% abs\lang\abslang.abs:1053
+ %% abs\lang\abslang.abs:1063
+ %% abs\lang\abslang.abs:1063
 'm_load'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},V_rtype_0,V_periods_0,Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O,
  'rtype' => V_rtype_0,
  'periods' => V_periods_0 }),
     try
-         %% abs\lang\abslang.abs:1054--1054
+         %% abs\lang\abslang.abs:1064--1064
         put(vars, (get(vars))#{'result' => 0}),
-         %% abs\lang\abslang.abs:1055--1055
+         %% abs\lang\abslang.abs:1065--1065
         case maps:get('rtype', get(vars)) of
             dataSpeed->
-                 %% abs\lang\abslang.abs:1057--1057
+                 %% abs\lang\abslang.abs:1067--1067
                 case (not cmp:eq(C:get_val_internal(get(this), 'cpu'),dataInfRat)) of
-                    true ->  %% abs\lang\abslang.abs:1058--1058
+                    true ->  %% abs\lang\abslang.abs:1068--1068
                     put(vars, (get(vars))#{'result' := m_ABS_DC_funs:f_averageDivsN(Cog,C:get_val_internal(get(this), 'cpuhistory'),C:get_val_internal(get(this), 'cpuhistorytotal'),maps:get('periods', get(vars)),[O,DC| Stack])});
                     false ->                 ok
                 end;
             dataBandwidth->
-                 %% abs\lang\abslang.abs:1062--1062
+                 %% abs\lang\abslang.abs:1072--1072
                 case (not cmp:eq(C:get_val_internal(get(this), 'bw'),dataInfRat)) of
-                    true ->  %% abs\lang\abslang.abs:1063--1063
+                    true ->  %% abs\lang\abslang.abs:1073--1073
                     put(vars, (get(vars))#{'result' := m_ABS_DC_funs:f_averageDivsN(Cog,C:get_val_internal(get(this), 'bwhistory'),C:get_val_internal(get(this), 'bwhistorytotal'),maps:get('periods', get(vars)),[O,DC| Stack])});
                     false ->                 ok
                 end;
             dataMemory->
-                 %% abs\lang\abslang.abs:1067--1067
+                 %% abs\lang\abslang.abs:1077--1077
                 case (not cmp:eq(C:get_val_internal(get(this), 'memory'),dataInfRat)) of
-                    true ->  %% abs\lang\abslang.abs:1068--1068
+                    true ->  %% abs\lang\abslang.abs:1078--1078
                     put(vars, (get(vars))#{'result' := m_ABS_DC_funs:f_averageDivsN(Cog,C:get_val_internal(get(this), 'memoryhistory'),C:get_val_internal(get(this), 'memoryhistorytotal'),maps:get('periods', get(vars)),[O,DC| Stack])});
                     false ->                 ok
                 end;
             _->
-                 %% abs\lang\abslang.abs:1055--1071
+                 %% abs\lang\abslang.abs:1065--1081
                 throw(dataPatternMatchFailException)
         end,
-         %% abs\lang\abslang.abs:1072--1072
+         %% abs\lang\abslang.abs:1082--1082
         maps:get('result', get(vars))
     catch
         _:Exception ->
@@ -349,31 +350,31 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [erlang:get_stacktrace()]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs\lang\abslang.abs:1074
- %% abs\lang\abslang.abs:1074
+ %% abs\lang\abslang.abs:1084
+ %% abs\lang\abslang.abs:1084
 'm_total'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},V_rtype_0,Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O,
  'rtype' => V_rtype_0 }),
     try
-         %% abs\lang\abslang.abs:1075--1075
+         %% abs\lang\abslang.abs:1085--1085
         put(vars, (get(vars))#{'result' => dataInfRat}),
-         %% abs\lang\abslang.abs:1076--1076
+         %% abs\lang\abslang.abs:1086--1086
         case maps:get('rtype', get(vars)) of
             dataSpeed->
-                 %% abs\lang\abslang.abs:1077--1077
+                 %% abs\lang\abslang.abs:1087--1087
                 put(vars, (get(vars))#{'result' := C:get_val_internal(get(this), 'cpu')});
             dataBandwidth->
-                 %% abs\lang\abslang.abs:1078--1078
+                 %% abs\lang\abslang.abs:1088--1088
                 put(vars, (get(vars))#{'result' := C:get_val_internal(get(this), 'bw')});
             dataMemory->
-                 %% abs\lang\abslang.abs:1079--1079
+                 %% abs\lang\abslang.abs:1089--1089
                 put(vars, (get(vars))#{'result' := C:get_val_internal(get(this), 'memory')});
             _->
-                 %% abs\lang\abslang.abs:1076--1080
+                 %% abs\lang\abslang.abs:1086--1090
                 throw(dataPatternMatchFailException)
         end,
-         %% abs\lang\abslang.abs:1081--1081
+         %% abs\lang\abslang.abs:1091--1091
         maps:get('result', get(vars))
     catch
         _:Exception ->
@@ -381,8 +382,8 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [erlang:get_stacktrace()]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs\lang\abslang.abs:1087
- %% abs\lang\abslang.abs:1087
+ %% abs\lang\abslang.abs:1097
+ %% abs\lang\abslang.abs:1097
 'm_transfer'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},V_target_0,V_amount_0,V_rtype_0,Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O,
@@ -390,7 +391,7 @@ exported() -> #{  }.
  'amount' => V_amount_0,
  'rtype' => V_rtype_0 }),
     try
-         %% abs\lang\abslang.abs:1088--1088
+         %% abs\lang\abslang.abs:1098--1098
         put(vars, (get(vars))#{'amount' := (fun() -> case O of
             null -> throw(dataNullPointerException);
             Callee=#object{oid=Oid,cog=Cog} ->
@@ -417,13 +418,13 @@ exported() -> #{  }.
                 Result;
             Callee ->
                 %% remote call
-                TempFuture = future:start(Callee,'m_decrementResources',[maps:get('amount', get(vars)),maps:get('rtype', get(vars)),[]],#task_info{method= <<"decrementResources"/utf8>>},Cog,[O,DC| Stack]),
+                TempFuture = cog:create_task(Callee,'m_decrementResources',[maps:get('amount', get(vars)),maps:get('rtype', get(vars)),[]],#task_info{method= <<"decrementResources"/utf8>>},Cog, true),
                 future:get_blocking(TempFuture, Cog, [O,DC| Stack])
         end end)()}),
-         %% abs\lang\abslang.abs:1089--1089
-        T_1 = future:start(maps:get('target', get(vars)),'m_incrementResources',[maps:get('amount', get(vars)),maps:get('rtype', get(vars)),[]],#task_info{method= <<"incrementResources"/utf8>>, creation={dataTime,builtin:currentms(Cog)}, proc_deadline=dataInfDuration},Cog,[O,DC| Stack]),
+         %% abs\lang\abslang.abs:1099--1099
+        T_1 = cog:create_task(maps:get('target', get(vars)),'m_incrementResources',[maps:get('amount', get(vars)),maps:get('rtype', get(vars)),[]],#task_info{method= <<"incrementResources"/utf8>>, creation={dataTime,builtin:currentms(Cog)}, proc_deadline=dataInfDuration},Cog,false),
         T_1,
-         %% abs\lang\abslang.abs:1090--1090
+         %% abs\lang\abslang.abs:1100--1100
         maps:get('amount', get(vars))
     catch
         _:Exception ->
@@ -431,48 +432,48 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [erlang:get_stacktrace()]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs\lang\abslang.abs:1093
- %% abs\lang\abslang.abs:1093
+ %% abs\lang\abslang.abs:1103
+ %% abs\lang\abslang.abs:1103
 'm_decrementResources'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},V_amount_0,V_rtype_0,Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O,
  'amount' => V_amount_0,
  'rtype' => V_rtype_0 }),
     try
-         %% abs\lang\abslang.abs:1094--1094
+         %% abs\lang\abslang.abs:1104--1104
         case maps:get('rtype', get(vars)) of
             dataSpeed->
-                 %% abs\lang\abslang.abs:1095--1095
+                 %% abs\lang\abslang.abs:1105--1105
                 case (not cmp:eq(C:get_val_internal(get(this), 'cpunext'),dataInfRat)) of
-                    true ->  %% abs\lang\abslang.abs:1096--1096
+                    true ->  %% abs\lang\abslang.abs:1106--1106
                     put(vars, (get(vars))#{'amount' := m_ABS_StdLib_funs:f_min(Cog,maps:get('amount', get(vars)),m_ABS_DC_funs:f_finvalue(Cog,C:get_val_internal(get(this), 'cpunext'),[O,DC| Stack]),[O,DC| Stack])}),
-                     %% abs\lang\abslang.abs:1097--1097
+                     %% abs\lang\abslang.abs:1107--1107
                     put(this, C:set_val_internal(get(this), 'cpunext',{ dataFin,( rationals:sub(m_ABS_DC_funs:f_finvalue(Cog,C:get_val_internal(get(this), 'cpunext'),[O,DC| Stack]),maps:get('amount', get(vars)))) }));
                     false ->                 ok
                 end;
             dataBandwidth->
-                 %% abs\lang\abslang.abs:1099--1099
+                 %% abs\lang\abslang.abs:1109--1109
                 case (not cmp:eq(C:get_val_internal(get(this), 'bwnext'),dataInfRat)) of
-                    true ->  %% abs\lang\abslang.abs:1100--1100
+                    true ->  %% abs\lang\abslang.abs:1110--1110
                     put(vars, (get(vars))#{'amount' := m_ABS_StdLib_funs:f_min(Cog,maps:get('amount', get(vars)),m_ABS_DC_funs:f_finvalue(Cog,C:get_val_internal(get(this), 'bwnext'),[O,DC| Stack]),[O,DC| Stack])}),
-                     %% abs\lang\abslang.abs:1101--1101
+                     %% abs\lang\abslang.abs:1111--1111
                     put(this, C:set_val_internal(get(this), 'bwnext',{ dataFin,( rationals:sub(m_ABS_DC_funs:f_finvalue(Cog,C:get_val_internal(get(this), 'bwnext'),[O,DC| Stack]),maps:get('amount', get(vars)))) }));
                     false ->                 ok
                 end;
             dataMemory->
-                 %% abs\lang\abslang.abs:1103--1103
+                 %% abs\lang\abslang.abs:1113--1113
                 case (not cmp:eq(C:get_val_internal(get(this), 'memorynext'),dataInfRat)) of
-                    true ->  %% abs\lang\abslang.abs:1104--1104
+                    true ->  %% abs\lang\abslang.abs:1114--1114
                     put(vars, (get(vars))#{'amount' := m_ABS_StdLib_funs:f_min(Cog,maps:get('amount', get(vars)),m_ABS_DC_funs:f_finvalue(Cog,C:get_val_internal(get(this), 'memorynext'),[O,DC| Stack]),[O,DC| Stack])}),
-                     %% abs\lang\abslang.abs:1105--1105
+                     %% abs\lang\abslang.abs:1115--1115
                     put(this, C:set_val_internal(get(this), 'memorynext',{ dataFin,( rationals:sub(m_ABS_DC_funs:f_finvalue(Cog,C:get_val_internal(get(this), 'memorynext'),[O,DC| Stack]),maps:get('amount', get(vars)))) }));
                     false ->                 ok
                 end;
             _->
-                 %% abs\lang\abslang.abs:1094--1107
+                 %% abs\lang\abslang.abs:1104--1117
                 throw(dataPatternMatchFailException)
         end,
-         %% abs\lang\abslang.abs:1108--1108
+         %% abs\lang\abslang.abs:1118--1118
         maps:get('amount', get(vars))
     catch
         _:Exception ->
@@ -480,42 +481,42 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [erlang:get_stacktrace()]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs\lang\abslang.abs:1110
- %% abs\lang\abslang.abs:1110
+ %% abs\lang\abslang.abs:1120
+ %% abs\lang\abslang.abs:1120
 'm_incrementResources'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},V_amount_0,V_rtype_0,Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O,
  'amount' => V_amount_0,
  'rtype' => V_rtype_0 }),
     try
-         %% abs\lang\abslang.abs:1111--1111
+         %% abs\lang\abslang.abs:1121--1121
         case maps:get('rtype', get(vars)) of
             dataSpeed->
-                 %% abs\lang\abslang.abs:1113--1113
+                 %% abs\lang\abslang.abs:1123--1123
                 case (not cmp:eq(C:get_val_internal(get(this), 'cpunext'),dataInfRat)) of
-                    true ->  %% abs\lang\abslang.abs:1114--1114
+                    true ->  %% abs\lang\abslang.abs:1124--1124
                     put(this, C:set_val_internal(get(this), 'cpunext',{ dataFin,( rationals:add(m_ABS_DC_funs:f_finvalue(Cog,C:get_val_internal(get(this), 'cpunext'),[O,DC| Stack]),maps:get('amount', get(vars)))) }));
                     false ->                 ok
                 end;
             dataBandwidth->
-                 %% abs\lang\abslang.abs:1117--1117
+                 %% abs\lang\abslang.abs:1127--1127
                 case (not cmp:eq(C:get_val_internal(get(this), 'bwnext'),dataInfRat)) of
-                    true ->  %% abs\lang\abslang.abs:1118--1118
+                    true ->  %% abs\lang\abslang.abs:1128--1128
                     put(this, C:set_val_internal(get(this), 'bwnext',{ dataFin,( rationals:add(m_ABS_DC_funs:f_finvalue(Cog,C:get_val_internal(get(this), 'bwnext'),[O,DC| Stack]),maps:get('amount', get(vars)))) }));
                     false ->                 ok
                 end;
             dataMemory->
-                 %% abs\lang\abslang.abs:1120--1120
+                 %% abs\lang\abslang.abs:1130--1130
                 case (not cmp:eq(C:get_val_internal(get(this), 'memorynext'),dataInfRat)) of
-                    true ->  %% abs\lang\abslang.abs:1121--1121
+                    true ->  %% abs\lang\abslang.abs:1131--1131
                     put(this, C:set_val_internal(get(this), 'memorynext',{ dataFin,( rationals:add(m_ABS_DC_funs:f_finvalue(Cog,C:get_val_internal(get(this), 'memorynext'),[O,DC| Stack]),maps:get('amount', get(vars)))) }));
                     false ->                 ok
                 end;
             _->
-                 %% abs\lang\abslang.abs:1111--1123
+                 %% abs\lang\abslang.abs:1121--1133
                 throw(dataPatternMatchFailException)
         end,
-         %% abs\lang\abslang.abs:1124--1124
+         %% abs\lang\abslang.abs:1134--1134
         maps:get('amount', get(vars))
     catch
         _:Exception ->
@@ -523,14 +524,14 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [erlang:get_stacktrace()]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs\lang\abslang.abs:1126
- %% abs\lang\abslang.abs:1126
+ %% abs\lang\abslang.abs:1136
+ %% abs\lang\abslang.abs:1136
 'm_setProvider'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},V_provider_0,Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O,
  'provider' => V_provider_0 }),
     try
-         %% abs\lang\abslang.abs:1127--1127
+         %% abs\lang\abslang.abs:1137--1137
         put(this, C:set_val_internal(get(this), 'cloudprovider',maps:get('provider', get(vars)))),
         dataUnit
         
@@ -540,13 +541,13 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [erlang:get_stacktrace()]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs\lang\abslang.abs:1129
- %% abs\lang\abslang.abs:1129
+ %% abs\lang\abslang.abs:1139
+ %% abs\lang\abslang.abs:1139
 'm_convertToDC'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O }),
     try
-         %% abs\lang\abslang.abs:1129--1129
+         %% abs\lang\abslang.abs:1139--1139
         O
     catch
         _:Exception ->
@@ -554,13 +555,13 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [erlang:get_stacktrace()]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs\lang\abslang.abs:1131
- %% abs\lang\abslang.abs:1131
+ %% abs\lang\abslang.abs:1141
+ %% abs\lang\abslang.abs:1141
 'm_getProvider'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O }),
     try
-         %% abs\lang\abslang.abs:1131--1131
+         %% abs\lang\abslang.abs:1141--1141
         C:get_val_internal(get(this), 'cloudprovider')
     catch
         _:Exception ->
@@ -568,26 +569,26 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [erlang:get_stacktrace()]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs\lang\abslang.abs:1132
- %% abs\lang\abslang.abs:1132
+ %% abs\lang\abslang.abs:1142
+ %% abs\lang\abslang.abs:1142
 'm_acquire'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O }),
     try
-         %% abs\lang\abslang.abs:1133--1133
+         %% abs\lang\abslang.abs:1143--1143
         put(vars, (get(vars))#{'result' => true}),
-         %% abs\lang\abslang.abs:1134--1134
+         %% abs\lang\abslang.abs:1144--1144
         case (not cmp:eq(C:get_val_internal(get(this), 'cloudprovider'),null)) of
-            true ->  %% abs\lang\abslang.abs:1135--1135
-            put(vars, (get(vars))#{'tmp884599555' => future:start(C:get_val_internal(get(this), 'cloudprovider'),'m_acquireInstance',[O,[]],#task_info{method= <<"acquireInstance"/utf8>>, creation={dataTime,builtin:currentms(Cog)}, proc_deadline=dataInfDuration},Cog,[O,DC| Stack])}),
-             %% abs\lang\abslang.abs:1135--1135
-            future:await(maps:get('tmp884599555', get(vars)), Cog, [O,DC| Stack]),
+            true ->  %% abs\lang\abslang.abs:1145--1145
+            put(vars, (get(vars))#{'tmp943501193' => cog:create_task(C:get_val_internal(get(this), 'cloudprovider'),'m_acquireInstance',[O,[]],#task_info{method= <<"acquireInstance"/utf8>>, creation={dataTime,builtin:currentms(Cog)}, proc_deadline=dataInfDuration},Cog,true)}),
+             %% abs\lang\abslang.abs:1145--1145
+            future:await(maps:get('tmp943501193', get(vars)), Cog, [O,DC| Stack]),
             ok,
-             %% abs\lang\abslang.abs:1135--1135
-            put(vars, (get(vars))#{'result' := future:get_blocking(maps:get('tmp884599555', get(vars)), Cog, [O,DC| Stack])});
+             %% abs\lang\abslang.abs:1145--1145
+            put(vars, (get(vars))#{'result' := future:get_blocking(maps:get('tmp943501193', get(vars)), Cog, [O,DC| Stack])});
             false ->         ok
         end,
-         %% abs\lang\abslang.abs:1137--1137
+         %% abs\lang\abslang.abs:1147--1147
         maps:get('result', get(vars))
     catch
         _:Exception ->
@@ -595,26 +596,26 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [erlang:get_stacktrace()]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs\lang\abslang.abs:1139
- %% abs\lang\abslang.abs:1139
+ %% abs\lang\abslang.abs:1149
+ %% abs\lang\abslang.abs:1149
 'm_release'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O }),
     try
-         %% abs\lang\abslang.abs:1140--1140
+         %% abs\lang\abslang.abs:1150--1150
         put(vars, (get(vars))#{'result' => true}),
-         %% abs\lang\abslang.abs:1141--1141
+         %% abs\lang\abslang.abs:1151--1151
         case (not cmp:eq(C:get_val_internal(get(this), 'cloudprovider'),null)) of
-            true ->  %% abs\lang\abslang.abs:1142--1142
-            put(vars, (get(vars))#{'tmp1140697305' => future:start(C:get_val_internal(get(this), 'cloudprovider'),'m_releaseInstance',[O,[]],#task_info{method= <<"releaseInstance"/utf8>>, creation={dataTime,builtin:currentms(Cog)}, proc_deadline=dataInfDuration},Cog,[O,DC| Stack])}),
-             %% abs\lang\abslang.abs:1142--1142
-            future:await(maps:get('tmp1140697305', get(vars)), Cog, [O,DC| Stack]),
+            true ->  %% abs\lang\abslang.abs:1152--1152
+            put(vars, (get(vars))#{'tmp1690796457' => cog:create_task(C:get_val_internal(get(this), 'cloudprovider'),'m_releaseInstance',[O,[]],#task_info{method= <<"releaseInstance"/utf8>>, creation={dataTime,builtin:currentms(Cog)}, proc_deadline=dataInfDuration},Cog,true)}),
+             %% abs\lang\abslang.abs:1152--1152
+            future:await(maps:get('tmp1690796457', get(vars)), Cog, [O,DC| Stack]),
             ok,
-             %% abs\lang\abslang.abs:1142--1142
-            put(vars, (get(vars))#{'result' := future:get_blocking(maps:get('tmp1140697305', get(vars)), Cog, [O,DC| Stack])});
+             %% abs\lang\abslang.abs:1152--1152
+            put(vars, (get(vars))#{'result' := future:get_blocking(maps:get('tmp1690796457', get(vars)), Cog, [O,DC| Stack])});
             false ->         ok
         end,
-         %% abs\lang\abslang.abs:1144--1144
+         %% abs\lang\abslang.abs:1154--1154
         maps:get('result', get(vars))
     catch
         _:Exception ->
@@ -622,28 +623,28 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [erlang:get_stacktrace()]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs\lang\abslang.abs:1147
- %% abs\lang\abslang.abs:1147
+ %% abs\lang\abslang.abs:1157
+ %% abs\lang\abslang.abs:1157
 'm_shutdown'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O }),
     try
-         %% abs\lang\abslang.abs:1148--1148
+         %% abs\lang\abslang.abs:1158--1158
         case not (C:get_val_internal(get(this), 'is_shutdown')) of
-            true ->  %% abs\lang\abslang.abs:1149--1149
+            true ->  %% abs\lang\abslang.abs:1159--1159
             put(this, C:set_val_internal(get(this), 'is_shutdown',true)),
-             %% abs\lang\abslang.abs:1150--1150
+             %% abs\lang\abslang.abs:1160--1160
             put(this, C:set_val_internal(get(this), 'shutdownTime',{ dataJust,m_ABS_StdLib_funs:f_now(Cog,[O,DC| Stack])})),
-             %% abs\lang\abslang.abs:1151--1151
+             %% abs\lang\abslang.abs:1161--1161
             case (not cmp:eq(C:get_val_internal(get(this), 'cloudprovider'),null)) of
-                true ->  %% abs\lang\abslang.abs:1152--1152
-                T_1 = future:start(C:get_val_internal(get(this), 'cloudprovider'),'m_internalShutdownInstance',[O,[]],#task_info{method= <<"internalShutdownInstance"/utf8>>, creation={dataTime,builtin:currentms(Cog)}, proc_deadline=dataInfDuration},Cog,[O,DC| Stack]),
+                true ->  %% abs\lang\abslang.abs:1162--1162
+                T_1 = cog:create_task(C:get_val_internal(get(this), 'cloudprovider'),'m_internalShutdownInstance',[O,[]],#task_info{method= <<"internalShutdownInstance"/utf8>>, creation={dataTime,builtin:currentms(Cog)}, proc_deadline=dataInfDuration},Cog,false),
                 T_1;
                 false ->             ok
             end;
             false ->         ok
         end,
-         %% abs\lang\abslang.abs:1155--1155
+         %% abs\lang\abslang.abs:1165--1165
         true
     catch
         _:Exception ->
@@ -651,13 +652,13 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [erlang:get_stacktrace()]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs\lang\abslang.abs:1158
- %% abs\lang\abslang.abs:1158
+ %% abs\lang\abslang.abs:1168
+ %% abs\lang\abslang.abs:1168
 'm_getName'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O }),
     try
-         %% abs\lang\abslang.abs:1158--1158
+         %% abs\lang\abslang.abs:1168--1168
         C:get_val_internal(get(this), 'description')
     catch
         _:Exception ->
@@ -665,13 +666,13 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [erlang:get_stacktrace()]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs\lang\abslang.abs:1159
- %% abs\lang\abslang.abs:1159
+ %% abs\lang\abslang.abs:1169
+ %% abs\lang\abslang.abs:1169
 'm_getCreationTime'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O }),
     try
-         %% abs\lang\abslang.abs:1159--1159
+         %% abs\lang\abslang.abs:1169--1169
         C:get_val_internal(get(this), 'creationTime')
     catch
         _:Exception ->
@@ -679,13 +680,13 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [erlang:get_stacktrace()]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs\lang\abslang.abs:1160
- %% abs\lang\abslang.abs:1160
+ %% abs\lang\abslang.abs:1170
+ %% abs\lang\abslang.abs:1170
 'm_getStartupDuration'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O }),
     try
-         %% abs\lang\abslang.abs:1160--1160
+         %% abs\lang\abslang.abs:1170--1170
         C:get_val_internal(get(this), 'startupDuration')
     catch
         _:Exception ->
@@ -693,13 +694,13 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [erlang:get_stacktrace()]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs\lang\abslang.abs:1161
- %% abs\lang\abslang.abs:1161
+ %% abs\lang\abslang.abs:1171
+ %% abs\lang\abslang.abs:1171
 'm_getShutdownDuration'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O }),
     try
-         %% abs\lang\abslang.abs:1161--1161
+         %% abs\lang\abslang.abs:1171--1171
         C:get_val_internal(get(this), 'shutdownDuration')
     catch
         _:Exception ->
@@ -707,13 +708,13 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [erlang:get_stacktrace()]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs\lang\abslang.abs:1162
- %% abs\lang\abslang.abs:1162
+ %% abs\lang\abslang.abs:1172
+ %% abs\lang\abslang.abs:1172
 'm_getPaymentInterval'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O }),
     try
-         %% abs\lang\abslang.abs:1162--1162
+         %% abs\lang\abslang.abs:1172--1172
         C:get_val_internal(get(this), 'paymentInterval')
     catch
         _:Exception ->
@@ -721,13 +722,13 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [erlang:get_stacktrace()]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs\lang\abslang.abs:1163
- %% abs\lang\abslang.abs:1163
+ %% abs\lang\abslang.abs:1173
+ %% abs\lang\abslang.abs:1173
 'm_getCostPerInterval'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O }),
     try
-         %% abs\lang\abslang.abs:1163--1163
+         %% abs\lang\abslang.abs:1173--1173
         C:get_val_internal(get(this), 'costPerInterval')
     catch
         _:Exception ->
@@ -735,23 +736,23 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [erlang:get_stacktrace()]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs\lang\abslang.abs:1165
- %% abs\lang\abslang.abs:1165
+ %% abs\lang\abslang.abs:1175
+ %% abs\lang\abslang.abs:1175
 'm_getAccumulatedCost'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O }),
     try
-         %% abs\lang\abslang.abs:1166--1166
+         %% abs\lang\abslang.abs:1176--1176
         put(vars, (get(vars))#{'result' => 0}),
-         %% abs\lang\abslang.abs:1167--1167
+         %% abs\lang\abslang.abs:1177--1177
         case (cmp:gt(C:get_val_internal(get(this), 'costPerInterval'),0)) and (cmp:gt(C:get_val_internal(get(this), 'paymentInterval'),0)) of
-            true ->  %% abs\lang\abslang.abs:1168--1168
+            true ->  %% abs\lang\abslang.abs:1178--1178
             put(vars, (get(vars))#{'nIntervals' => builtin:truncate(Cog, rationals:rdiv(builtin:truncate(Cog,m_ABS_StdLib_funs:f_timeDifference(Cog,C:get_val_internal(get(this), 'creationTime'),m_ABS_StdLib_funs:f_now(Cog,[O,DC| Stack]),[O,DC| Stack])),C:get_val_internal(get(this), 'paymentInterval')) )}),
-             %% abs\lang\abslang.abs:1169--1169
+             %% abs\lang\abslang.abs:1179--1179
             put(vars, (get(vars))#{'result' := ( rationals:mul(maps:get('nIntervals', get(vars)),C:get_val_internal(get(this), 'costPerInterval'))) });
             false ->         ok
         end,
-         %% abs\lang\abslang.abs:1171--1171
+         %% abs\lang\abslang.abs:1181--1181
         maps:get('result', get(vars))
     catch
         _:Exception ->
@@ -759,13 +760,13 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [erlang:get_stacktrace()]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs\lang\abslang.abs:1174
- %% abs\lang\abslang.abs:1174
+ %% abs\lang\abslang.abs:1184
+ %% abs\lang\abslang.abs:1184
 'm_getNumberOfCores'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O }),
     try
-         %% abs\lang\abslang.abs:1174--1174
+         %% abs\lang\abslang.abs:1184--1184
         C:get_val_internal(get(this), 'numberOfCores')
     catch
         _:Exception ->

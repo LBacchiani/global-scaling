@@ -16,8 +16,16 @@ class MessageReceiverPlan(CloudProvider cloudProvider, MessageReceiver_LoadBalan
 	List<MessageReceiverInterface> ls_MessageReceiverInterface = Nil;
 	List<List<DeploymentComponent>> ls_ls_DeploymentComponent = Nil;
 	List<DeploymentComponent> ls_DeploymentComponent = Nil;
-	Rat waiting_time = 150;
+	Rat waiting_time = 100;
 	{
+		cloudProvider.addInstanceDescription(Pair("c4_4xlarge",
+			map[Pair(CostPerInterval,950)
+			,Pair(PaymentInterval,1)
+			,Pair(Bandwidth,2000)
+			,Pair(Memory,3000)
+			,Pair(Cores,16)
+			,Pair(Speed,80)
+			]));
 		cloudProvider.addInstanceDescription(Pair("c4_xlarge",
 			map[Pair(CostPerInterval,237)
 			,Pair(PaymentInterval,1)
@@ -72,7 +80,7 @@ class MessageReceiverPlan(CloudProvider cloudProvider, MessageReceiver_LoadBalan
 		ls_DeploymentComponent = Cons(c4_large_0,ls_DeploymentComponent);
 		speedPatchMap = put(speedPatchMap,c4_large_0,0);
 		[DC: c4_large_0] MessageReceiverInterface odefault___MessageReceiver_0_c4_large_0 = new MessageReceiver(messageParser_LoadBalancerObj);
-		Rat coreRequired_odefault___MessageReceiver_0_c4_large_0 = 2;
+		Rat coreRequired_odefault___MessageReceiver_0_c4_large_0 = 1;
 		speedPatchMap = put(speedPatchMap, c4_large_0, fromJust(lookup(speedPatchMap,c4_large_0)) + coreRequired_odefault___MessageReceiver_0_c4_large_0);
 		ls_MessageReceiverInterface = Cons(odefault___MessageReceiver_0_c4_large_0, ls_MessageReceiverInterface);
 		this!patchSpeed(speedPatchMap);

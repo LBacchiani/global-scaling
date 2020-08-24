@@ -28,6 +28,7 @@ exported() -> #{  }.
 'init'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},[Stack])->
     C=(get(this))#state.class,
     put(vars, #{}),
+    gc:register_object(O),
     O.
 %% --- Class has no recovery block
 
