@@ -27,33 +27,11 @@ class MonitorImpl() implements Monitor {
 }
 
 {
-/*	CloudProvider cp = new CloudProvider("CloudProvider");
+  CloudProvider cp = new CloudProvider("CloudProvider");
 	cp.addInstanceDescription(Pair("c4_xlarge", map[Pair(Memory,750),Pair(Cores,4),Pair(Speed,20)]));
 	DeploymentComponent vm = cp.launchInstanceNamed("c4_xlarge");
 	DeploymentComponent vm1 = cp.launchInstanceNamed("c4_xlarge");
 	[DC: vm] Monitor m = new MonitorImpl();
 	[DC: vm1] Service service = new ServiceImpl();
-	m.execute(service);*/
-	List<Rat> realWorkload = list[47,47,47,47,54,54,54,46,46,46,
-																50,50,50,50,65,65,84,84,68,90,
-																112,137,137,143,167,188,188,210,231,231,
-																251,251,274,294,311,311,311,332,355,375,
-																375,393,393,416,422,422,422,427,427,431,
-																431,431,431,418,418,418,413,413,399,396,
-																414,390,390,392,412,412,412,412,390,393,
-																393,414,440,425,404,384,403,403,403,388,
-																408,427,427,405,420,420,440,430,416,416,
-																405,405,413,413,413,413,427,427,447,447,
-																438,438,438,418,407,433,449,420,405,405,
-																405,412,412,412,393,393,345,323,317,305,
-																294,272,250,272,250,227,208,192,182,169,
-																154,145,133,125,112,112,94,92,88,85,
-																83,80,75,72,61,59,55,52,52,52,
-																52,43,43,43,40,40,40,40,44,42];
-	Int i = 0;
-	println("#X  Y");
-	while(i < length(realWorkload)) {
-		println(toString(i + 1) + " " + toString(nth(realWorkload,i)));
-		i = i + 1;
-	}
+	m.execute(service);
 }

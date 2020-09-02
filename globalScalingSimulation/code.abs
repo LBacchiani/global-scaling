@@ -1236,7 +1236,7 @@ class Monitor(DBInterface db, Rat windowDim, Rat initialCost, Rat initInstancesN
                                                Triple(1,300,5)]; //MA
   //name -> (list of (n instance, message handled, mult factor), number of scaling done, wrapper object)
   Map<String,Triple<List<Triple<Rat,Rat,Rat>>,Int,WrapperScaleInterface>> scalingPolicy = map[];
-  Rat numberOfMessaggesActualSupported = 0;
+  Rat messagesSupported = 0;
   Int scaleTrigger = 0;
   Int i = 10;
   Rat ksmall = 13;
@@ -1293,16 +1293,17 @@ class Monitor(DBInterface db, Rat windowDim, Rat initialCost, Rat initInstancesN
   }
 
   Pair<Map<String,Int>,Map<String,Int>> findBestConfiguration(Rat totalMessagesArrived) {
-    Map<String,Int> policies = await this!createUndeployedPolicyMap(elements(keys(scalingPolicy)));
-    Map<String,Int> printablepolicies = await this!createUndeployedPolicyMap(elements(keys(scalingPolicy)));
+    List<String> keys = elements(keys(scalingPolicy));
+    Map<String,Int> policies = await this!createUndeployedPolicyMap(keys);
+    Map<String,Int> printablepolicies = await this!createUndeployedPolicyMap(keys);
     List<Triple<Rat,Rat,Rat>> resVector = initConfig;
-    numberOfMessaggesActualSupported = await this!findMin(initConfig);
-    while(totalMessagesArrived - numberOfMessaggesActualSupported  > 0) {
+    messagesSupported = await this!findMin(initConfig);
+    while(totalMessagesArrived - messagesSupported  > 0) {
       String key = await this!findClosestFrequenceKey(totalMessagesArrived,resVector);
       Triple<List<Triple<Rat,Rat,Rat>>, Int, WrapperScaleInterface> val = fromJust(lookup(scalingPolicy,key));
       List<Triple<Rat,Rat,Rat>> freqList = fstT(val);
       resVector = await this!vectorSum(resVector,freqList);
-      numberOfMessaggesActualSupported = await this!findMin(resVector);
+      messagesSupported = await this!findMin(resVector);
       policies = put(policies, key, fromJust(lookup(policies,key)) + 1);
       printablepolicies = put(printablepolicies, key, fromJust(lookup(printablepolicies,key)) + 1);
       Rat max = await this!findMaxNumberOfComponent(freqList);
@@ -1408,7 +1409,7 @@ class Monitor(DBInterface db, Rat windowDim, Rat initialCost, Rat initInstancesN
 	// active behavior
 	Unit run() {
     println("#X   Y");
-    numberOfMessaggesActualSupported = await this!findMin(initConfig);
+    messagesSupported = await this!findMin(initConfig);
     while(True){
       //wait the monitoring time
 			duration(monitoringWindowDimension, monitoringWindowDimension);
@@ -1426,8 +1427,8 @@ class Monitor(DBInterface db, Rat windowDim, Rat initialCost, Rat initInstancesN
       Rat totalCost = await this!computeTotalCost();
       Rat nInst = await this!computeInstanceNumber();
       nInst = nInst + initInstancesNumber;
-      String toPrint = toString(i) + "  " + toString(float(100/3) * averageAnalysisTime) + " #MSG:" + toString(float(numberOfMessaggesInTheMonitoringWindow)) + " COMPLETED:" + toString(float(completed)) + " REJECTED: " + toString(float(rejected)) + " SUPP: " + toString(numberOfMessaggesActualSupported) + " COST: " + toString(float((totalCost + initialCost) / 1000)) + " INST: " + toString(nInst);
-      if(numberOfMessaggesInTheMonitoringWindow - (numberOfMessaggesActualSupported - kbig) > ksmall || (numberOfMessaggesActualSupported - kbig)  - numberOfMessaggesInTheMonitoringWindow > ksmall){
+      String toPrint = toString(i) + "  " + toString(float(100/3) * averageAnalysisTime) + " #MSG:" + toString(float(numberOfMessaggesInTheMonitoringWindow)) + " COMPLETED:" + toString(float(completed)) + " REJECTED: " + toString(float(rejected)) + " SUPP: " + toString(messagesSupported) + " COST: " + toString(float((totalCost + initialCost) / 1000)) + " INST: " + toString(nInst);
+      if(numberOfMessaggesInTheMonitoringWindow - (messagesSupported - kbig) > ksmall || (messagesSupported - kbig)  - numberOfMessaggesInTheMonitoringWindow > ksmall){
         Pair<Map<String,Int>,Map<String,Int>> configurations = await this!findBestConfiguration(numberOfMessaggesInTheMonitoringWindow + kbig);
         Map<String,Int> configuration = fst(configurations);
         Map<String,Int> printableconfiguration = snd(configurations);
@@ -1578,7 +1579,6 @@ class MailGenerator(MessageReceiver_LoadBalancerInterface entryPoint) implements
       i = (i + 1) % length(realWorkload);
       Int j = 0;
       Int time = 0;
-      Int last_send_time = 0;
       while(j < currentMessageNumber) {
         entryPoint!newMessage("Message" + toString(messageCounter));
         duration(windowDim / currentMessageNumber, windowDim / currentMessageNumber);
