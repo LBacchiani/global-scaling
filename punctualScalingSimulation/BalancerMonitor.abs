@@ -7,32 +7,32 @@ interface LoadBalancerMonitorInterface{
   Unit check();
 }
 
-class LoadBalancerMonitor(LoadBalancer balancer, String balancerName, Rat computationalLoad, Int deplN, Rat multFactor) implements LoadBalancerMonitorInterface {
-  Int deployment_number = deplN;
+class LoadBalancerMonitor(LoadBalancer balancer, String balancerName, Rat mcl, Int baseInstanceN, Rat mf) implements LoadBalancerMonitorInterface {
+  Int deployment_number = baseInstanceN;
   ScalingWrapper sw;
-  Rat ksmall = 13 * multFactor;
-  Rat kbig =  39 * multFactor;
+  Rat ksmall = 13 * mf;
+  Rat kbig =  39 * mf;
   {sw = new ScalingWrapperImpl(balancer);}
 
   Unit check() {
     Float aat = await balancer!averageTime();
     Rat completed = await balancer!completed();
     completed = completed / 10;
-    Rat total = await balancer!arrived();
-    total = total / 10;
+    Rat inbound_workload = await balancer!arrived();
+    inbound_workload = inbound_workload / 10;
     Rat lost = await balancer!lost();
     lost = lost / 10;
     Rat pending = await balancer!pending();
     pending = pending / 10;
-    //println(balancerName + " " + toString(float(total)) + " " + toString(float(lost)));
-    if(total - ((computationalLoad * deployment_number) - kbig)  > ksmall || ((computationalLoad * deployment_number) - kbig) - total > ksmall) {
-      Float val = float((total + kbig)/ computationalLoad);
+    //println(balancerName + " " + toString(float(inbound_workload)) + " " + toString(float(lost)));
+    if(inbound_workload - ((mcl * deployment_number) - kbig)  > ksmall || ((mcl * deployment_number) - kbig) - inbound_workload > ksmall) {
+      Float val = float((inbound_workload + kbig)/ mcl);
       Int integerVal = truncate(rat(val));
       Rat diff = rat(val) - integerVal;
       if(diff > 0) {integerVal = integerVal + 1;}
       Int toDeploy = integerVal;
       if(toDeploy > deployment_number) {sw!deploy(toDeploy - deployment_number);}
-      else if(toDeploy < deployment_number && deployment_number >= deplN) {sw!undeploy(deployment_number - toDeploy);}
+      else if(toDeploy < deployment_number && deployment_number >= baseInstanceN) {sw!undeploy(deployment_number - toDeploy);}
       deployment_number = toDeploy;
     }
     balancer!resetMetrics();
