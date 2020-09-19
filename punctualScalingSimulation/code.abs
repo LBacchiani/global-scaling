@@ -1849,7 +1849,7 @@ interface DBInterface {
   Int insertTextAnalysisResults(TextAnalysis res);
   Int insertAttachmentAnalysisResults(AttachmentAnalysis res);
   Results returnMessageResults(String messageId);
-  Int returnNumberOfMessaggesInTheMonitoringWindow();
+  Int returninbound_workload();
   Int messageCompleted();
   Int pendingMessages();
   Float returnAverageAnalysisTime();
@@ -1861,7 +1861,7 @@ interface DBInterface {
 
 class DB() implements DBInterface {
   Map<String,Results> actualMessages = map[];
-  Int numberOfMessaggesInTheMonitoringWindow = 0;
+  Int inbound_workload = 0;
   //map structure to store the start time of each message analysis using the messageId as key
   Map<String, Rat> startAnalysisTimes = map[];
   //sum of the analysis durations of messages completed in the current time window
@@ -1869,11 +1869,11 @@ class DB() implements DBInterface {
   Int totalMessages = 0;
   Int rejected = 0;
 
-  Unit messageArrived() {numberOfMessaggesInTheMonitoringWindow = numberOfMessaggesInTheMonitoringWindow + 1;}
+  Unit messageArrived() {inbound_workload = inbound_workload + 1;}
 
   Int rejectedMessages() {return rejected;}
 
-  Int returnNumberOfMessaggesInTheMonitoringWindow(){return numberOfMessaggesInTheMonitoringWindow;}
+  Int returninbound_workload(){return inbound_workload;}
 
   Int pendingMessages() {return length(entries(actualMessages));}
 
@@ -2001,7 +2001,7 @@ class DB() implements DBInterface {
     //reset the variables after the monitor check
     totalMessages = 0;
     totalTime = 0;
-    numberOfMessaggesInTheMonitoringWindow = 0;
+    inbound_workload = 0;
     rejected = 0;
   }
 }
@@ -2052,19 +2052,18 @@ class Monitor(DBInterface db, List<LoadBalancer> balancers, List<LoadBalancerMon
     while(True){
       //wait the monitoring time
 			duration(monitoringWindowDimension,monitoringWindowDimension);
-      this!checkBalancers();
 			Float averageAnalysisTime = await db!returnAverageAnalysisTime();
       Rat completed = await db!messageCompleted();
       completed = completed / 10;
-      Rat numberOfMessaggesInTheMonitoringWindow = await db!returnNumberOfMessaggesInTheMonitoringWindow();
-      numberOfMessaggesInTheMonitoringWindow = numberOfMessaggesInTheMonitoringWindow / 10;
+      Rat inbound_workload = await db!returninbound_workload();
+      inbound_workload = inbound_workload / 10;
       Rat rejected = await db!rejectedMessages();
       rejected = rejected / 10;
       Int totalInstances = await this!getTotalInstances();
       String instances = await this!getInstances();
       Rat totalCost = await this!computeCost();
-      String toPrint = toString(i) + "  " + toString(float(100/3) * averageAnalysisTime) + " #MSG:" + toString(float(numberOfMessaggesInTheMonitoringWindow)) + " COMPLETED:" + toString(float(completed)) + " REJECTED: " + toString(float(rejected)) + " COST: " + toString(float((totalCost + initialCost) / 1000)) + " INST: " + toString(totalInstances + 3) +" " + instances;
-      Rat totalCost = await this!computeCost();
+      String toPrint = toString(i) + "  " + toString(float(100/3) * averageAnalysisTime) + " #MSG:" + toString(float(inbound_workload)) + " COMPLETED:" + toString(float(completed)) + " REJECTED: " + toString(float(rejected)) + " COST: " + toString(float((totalCost + initialCost) / 1000)) + " INST: " + toString(totalInstances + 3) +" " + instances;
+      this!checkBalancers();
       db!resetMetrics();
       println(toPrint);
       i = i + 10;

@@ -27,11 +27,14 @@ class MonitorImpl() implements Monitor {
 }
 
 {
-  CloudProvider cp = new CloudProvider("CloudProvider");
+  /*CloudProvider cp = new CloudProvider("CloudProvider");
 	cp.addInstanceDescription(Pair("c4_xlarge", map[Pair(Memory,750),Pair(Cores,4),Pair(Speed,20)]));
 	DeploymentComponent vm = cp.launchInstanceNamed("c4_xlarge");
 	DeploymentComponent vm1 = cp.launchInstanceNamed("c4_xlarge");
 	[DC: vm] Monitor m = new MonitorImpl();
 	[DC: vm1] Service service = new ServiceImpl();
-	m.execute(service);
+	m.execute(service);*/
+	Map<String,Int> mapp = map[Pair("A",1), Pair("B",2), Pair("C",3)];
+	Int i = 0;
+	while(i < 1000) {foreach(k in elements(keys(mapp))){println(k);}println("");}
 }

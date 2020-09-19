@@ -8,10 +8,10 @@ interface LoadBalancerMonitorInterface{
 }
 
 class LoadBalancerMonitor(LoadBalancer balancer, String balancerName, Rat mcl, Int baseInstanceN, Rat mf) implements LoadBalancerMonitorInterface {
-  Int deployment_number = baseInstanceN;
+  Int deplInstances = baseInstanceN;
   ScalingWrapper sw;
-  Rat ksmall = 13 * mf;
-  Rat kbig =  39 * mf;
+  Rat k = 20 * mf;
+  Rat kbig =  30 * mf;
   {sw = new ScalingWrapperImpl(balancer);}
 
   Unit check() {
@@ -24,16 +24,11 @@ class LoadBalancerMonitor(LoadBalancer balancer, String balancerName, Rat mcl, I
     lost = lost / 10;
     Rat pending = await balancer!pending();
     pending = pending / 10;
-    //println(balancerName + " " + toString(float(inbound_workload)) + " " + toString(float(lost)));
-    if(inbound_workload - ((mcl * deployment_number) - kbig)  > ksmall || ((mcl * deployment_number) - kbig) - inbound_workload > ksmall) {
-      Float val = float((inbound_workload + kbig)/ mcl);
-      Int integerVal = truncate(rat(val));
-      Rat diff = rat(val) - integerVal;
-      if(diff > 0) {integerVal = integerVal + 1;}
-      Int toDeploy = integerVal;
-      if(toDeploy > deployment_number) {sw!deploy(toDeploy - deployment_number);}
-      else if(toDeploy < deployment_number && deployment_number >= baseInstanceN) {sw!undeploy(deployment_number - toDeploy);}
-      deployment_number = toDeploy;
+    if(inbound_workload - (mcl * deplInstances - kbig)  > k || (mcl * deplInstances - kbig) - inbound_workload > k) {
+      Int configInstances = ceil(float((inbound_workload + kbig)/ mcl));
+      if(configInstances > deplInstances) {sw!deploy(configInstances - deplInstances);}
+      else if(configInstances < deplInstances && deplInstances >= baseInstanceN) {sw!undeploy(deplInstances - configInstances);}
+      deplInstances = configInstances;
     }
     balancer!resetMetrics();
   }
