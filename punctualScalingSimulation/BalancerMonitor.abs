@@ -10,27 +10,20 @@ interface LoadBalancerMonitorInterface{
 class LoadBalancerMonitor(LoadBalancer balancer, String balancerName, Rat mcl, Int baseInstanceN, Rat mf) implements LoadBalancerMonitorInterface {
   Int deplInstances = baseInstanceN;
   ScalingWrapper sw;
-  Rat k = 20 * mf;
-  Rat kbig =  30 * mf;
+  Rat k = 10 * mf;
+  Rat kbig =  20 * mf;
   {sw = new ScalingWrapperImpl(balancer);}
 
   Unit check() {
-    Float aat = await balancer!averageTime();
-    Rat completed = await balancer!completed();
-    completed = completed / 10;
-    Rat inbound_workload = await balancer!arrived();
+    Rat inbound_workload = balancer.returninbound_workload();
     inbound_workload = inbound_workload / 10;
-    Rat lost = await balancer!lost();
-    lost = lost / 10;
-    Rat pending = await balancer!pending();
-    pending = pending / 10;
     if(inbound_workload - (mcl * deplInstances - kbig)  > k || (mcl * deplInstances - kbig) - inbound_workload > k) {
       Int configInstances = ceil(float((inbound_workload + kbig)/ mcl));
       if(configInstances > deplInstances) {sw!deploy(configInstances - deplInstances);}
       else if(configInstances < deplInstances && deplInstances >= baseInstanceN) {sw!undeploy(deplInstances - configInstances);}
       deplInstances = configInstances;
     }
-    balancer!resetMetrics();
+    balancer.resetMetrics();
   }
 }
 
