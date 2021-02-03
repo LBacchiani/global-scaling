@@ -139,7 +139,7 @@ interface MessageReceiver_LoadBalancerInterface extends LoadBalancer {
 class MessageReceiver_LoadBalancer(DBInterface db) implements MessageReceiver_LoadBalancerInterface {
   List<MessageReceiverInterface> instancesConnected = list[];
   Int nextInstance = -1;
-  Rat buffer_size = 100 * 1;
+  Rat buffer_size = 50 * 1;
   Int inbound_workload = 0;
   Int pending = 0;
   MessageReceiverPlan plan;
@@ -225,7 +225,7 @@ interface MessageParser_LoadBalancerInterface extends LoadBalancer {
 class MessageParser_LoadBalancer(DBInterface db) implements MessageParser_LoadBalancerInterface {
   List<MessageParserInterface> instancesConnected = list[];
   Int nextInstance = -1;
-  Rat buffer_size = 100 * 1;
+  Rat buffer_size = 50 * 1;
   Int pending = 0;
   Int inbound_workload = 0;
   Int id = 0;
@@ -331,7 +331,7 @@ interface HeaderAnalyser_LoadBalancerInterface {
 //[SmartDeployCost : "{\"class\" : \"HeaderAnalyser_LoadBalancer\", \"scenarios\" : [{ \"name\" : \"default\", \"provide\" : -1, \"cost\" : { \"Cores\" : 2, \"Memory\" : 200 }, \"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{ \"add\" : { \"name\" : \"connectInstance\", \"param_type\" : \"HeaderAnalyserInterface\" }, \"remove\" : { \"name\" : \"disconnectInstance\", \"return_type\": \"HeaderAnalyserInterface\" }}]}]}"]
 class HeaderAnalyser_LoadBalancer(DBInterface db)  implements HeaderAnalyser_LoadBalancerInterface {
   List<HeaderAnalyserInterface> instancesConnected = list[];
-  Rat buffer_size = 100 * 1;
+  Rat buffer_size = 50 * 1;
   Int nextInstance = 0;
   Int deplTimes = 0;
 
@@ -376,7 +376,7 @@ interface LinkAnalyser_LoadBalancerInterface {
 class LinkAnalyser_LoadBalancer(DBInterface db)  implements LinkAnalyser_LoadBalancerInterface {
   List<LinkAnalyserInterface> instancesConnected = list[];
   Int nextInstance = 0;
-  Rat buffer_size = 100 * 1;
+  Rat buffer_size = 50 * 1;
   Int deplTimes = 0;
 
   Unit connectInstance(LinkAnalyserInterface newInstance){
@@ -493,7 +493,7 @@ class SentimentAnalyser_LoadBalancer(DBInterface dbObj)  implements SentimentAna
   SentimentAnalyserPlan plan;
   Int inbound_workload = 0;
   Int pending = 0;
-  Rat buffer_size = 100 * 5/2;
+  Rat buffer_size = 50 * 5/2;
   Int deplTimes = 0;
 
   Unit connectInstance(SentimentAnalyserInterface newInstance){
@@ -579,7 +579,7 @@ class VirusScanner_LoadBalancer(DBInterface db)  implements VirusScanner_LoadBal
   List<VirusScannerInterface> instancesConnected = list[];
   Int nextInstance = -1;
   Int pending = 0;
-  Rat buffer_size = 100 *  2;
+  Rat buffer_size = 50 *  2;
   Int inbound_workload = 0;
   Map<Int,Rat> messagesTime = map[];
   VirusScannerPlan plan;
@@ -668,7 +668,7 @@ class AttachmentsManager_LoadBalancer(DBInterface db)  implements AttachmentsMan
   List<AttachmentsManagerInterface> instancesConnected = list[];
   Int nextInstance = -1;
   Int pending = 0;
-  Rat buffer_size = 100 * 3/2;
+  Rat buffer_size = 50 * 3/2;
   Int inbound_workload = 0;
   Map<Int,Rat> messagesTime = map[];
   AttachmentsManagerPlan plan;
@@ -753,7 +753,7 @@ class ImageAnalyser_LoadBalancer(DBInterface db)  implements ImageAnalyser_LoadB
   List<ImageAnalyserInterface> instancesConnected = list[];
   Int nextInstance = -1;
   Int pending = 0;
-  Rat buffer_size = 100 * 3/2;
+  Rat buffer_size = 50 * 3/2;
   ImageAnalyserPlan plan;
   Int inbound_workload = 0;
   Int deplTimes = 0;
@@ -853,7 +853,7 @@ class NSFWDetector_LoadBalancer(DBInterface db)  implements NSFWDetector_LoadBal
   NSFWDetectorPlan plan;
   Int inbound_workload = 0;
   Int pending = 0;
-  Rat buffer_size = 100 * 3/2;
+  Rat buffer_size = 50 * 3/2;
   Int deplTimes = 0;
 
 
@@ -944,7 +944,7 @@ class ImageRecognizer_LoadBalancer(DBInterface db)  implements ImageRecognizer_L
   ImageRecognizerPlan plan;
   Int inbound_workload = 0;
   Int pending = 0;
-  Rat buffer_size = 100 * 3/2;
+  Rat buffer_size = 50 * 3/2;
   Int deplTimes = 0;
 
   Unit connectInstance(ImageRecognizerInterface newInstance){
@@ -1030,7 +1030,7 @@ interface MessageAnalyser_LoadBalancerInterface extends LoadBalancer {
 class MessageAnalyser_LoadBalancer(DBInterface db)  implements MessageAnalyser_LoadBalancerInterface {
   List<MessageAnalyserInterface> instancesConnected = list[];
   Int nextInstance = -1;
-  Rat buffer_size = 100 * 5;
+  Rat buffer_size = 50 * 5;
   Int pending = 0;
   Int inbound_workload = 0;
   MessageAnalyserPlan plan;
@@ -1232,7 +1232,6 @@ class Monitor(DBInterface db, List<LoadBalancer> balancers, List<LoadBalancerMon
 
 	// active behavior
 	Unit run() {
-    println("#X  Y");
     while(True){
       //wait the monitoring time
 			await duration(monitoringWindowDimension,monitoringWindowDimension);
@@ -1341,9 +1340,7 @@ class SetUpSystem() implements SetUpSystemInterface {
     monitors = appendright(monitors,imageRecMonitor);
     LoadBalancerMonitorInterface messageAnalyserMonitor = new LoadBalancerMonitor(head(messageAnalyser_LoadBalancerList), "MA", 300, 1, 5);
     monitors = appendright(monitors,messageAnalyserMonitor);
-
     MonitorInterface monitor = new Monitor(dbObj, balancers, monitors, windowDim, base_cost + invariants_cost);
-
 		return head(messageReceiver_LoadBalancerList);
 	}
 
@@ -1355,7 +1352,28 @@ interface MailGeneratorInterface{}
 class MailGenerator(MessageReceiver_LoadBalancerInterface entryPoint) implements MailGeneratorInterface {
   Rat windowDim = 30;
 	Unit run() {
-    List<Int> realWorkload = list[47,47,47,47,54,54,54,46,46,46,
+    //new workload
+    List<Int> realWorkload = list[82, 84, 85, 90, 93, 96, 100, 104, 108, 114,
+                                  118, 122, 128, 133, 138, 142, 147, 150, 150, 151,
+                                  151, 152, 152, 153, 153, 153, 153, 153, 154, 154,
+                                  154, 154, 154, 155, 155, 155, 155, 155, 155, 155,
+                                  155, 155, 155, 155, 155, 155, 155, 156, 156, 156,
+                                  156, 157, 157, 157, 157, 163, 173, 180, 196, 210,
+                                  220, 234, 242, 246, 254, 261, 271, 280, 295, 287,
+                                  279, 268, 258, 250, 242, 234, 225, 220, 215, 205,
+                                  200, 196, 190, 187, 184, 187, 190, 193, 197, 200,
+                                  203, 206, 209, 212, 216, 220, 224, 219, 214, 210,
+                                  204, 192, 188, 184, 180, 175, 170, 165, 160, 157,
+                                  154, 150, 152, 154, 156, 158, 162, 168, 174, 182,
+                                  191, 200, 209, 219, 228, 237, 247, 256, 266, 275,
+                                  284, 294, 303, 313, 322, 331, 341, 355, 369, 374,
+                                  386, 398, 416, 427, 445, 455, 496, 515, 496, 480,
+                                  470, 455, 440, 420, 399, 388, 378, 368, 358, 348,
+                                  337, 327, 317, 307, 297, 286, 276, 266, 256, 246,
+                                  235, 225, 215, 205, 195, 185, 175, 164, 155, 145,
+                                  134, 124, 114, 104, 97, 96, 93, 88, 85, 84];
+    //primo workload
+    /*List<Int> realWorkload = list[47,47,47,47,54,54,54,46,46,46,
                                   50,50,50,50,65,65,84,84,68,90,
                                   112,137,137,143,167,188,188,210,231,231,
                                   251,251,274,294,311,311,311,332,355,375,
@@ -1371,7 +1389,7 @@ class MailGenerator(MessageReceiver_LoadBalancerInterface entryPoint) implements
                                   154,145,133,125,112,112,94,92,88,85,
                                   83,80,75,72,61,59,55,52,52,52,
                                   52,43,43,43,40,40,40,40,44,42,
-                                  47,47,47,47,54,54,54,46,46,46];
+                                  47,47,47,47,54,54,54,46,46,46];*/
 		Int i = 0;
     while(True) {
       Rat currentMessageNumber = nth(realWorkload, i);
@@ -1382,7 +1400,6 @@ class MailGenerator(MessageReceiver_LoadBalancerInterface entryPoint) implements
         await duration(windowDim / currentMessageNumber, windowDim / currentMessageNumber);
         j = j + 1;
       }
-      //println("MSG: " + toString(currentMessageNumber));
     }
   }
 }

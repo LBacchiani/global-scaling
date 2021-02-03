@@ -14,7 +14,7 @@ class Process() implements ProcessInterface {
 	Unit run() {
 		while(True) {
 			await duration(300,300);
-			println("process alive");
+			println(`process alive at $now()$`);
 		}
 	}
 }
