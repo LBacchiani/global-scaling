@@ -1,0 +1,45 @@
+module Test2;
+export *;
+import * from ABS.DC;
+
+interface ServiceInterface{Unit exec();}
+
+class Service() implements ServiceInterface {
+	Unit exec() {[Cost: 30] skip;}
+}
+
+interface ProcessInterface {}
+
+class Process() implements ProcessInterface {
+	Unit run() {
+		while(True) {
+			await duration(300,300);
+			println(`process alive at $now()$`);
+		}
+	}
+}
+
+interface GeneratorInterface{}
+
+class Generator(ServiceInterface s) implements GeneratorInterface {
+	Unit run() {
+    while(True) {
+      Rat currentMessageNumber = 300;
+      Int j = 0;
+      while(j < currentMessageNumber) {
+				await s!exec();
+        j = j + 1;
+      }
+      println(toString("generator alive"));
+		}
+	}
+}
+
+{
+	CloudProvider cp = new CloudProvider("CloudProvider");
+	cp.addInstanceDescription(Pair("c4_4xlarge", map[Pair(Speed,80)]));
+	DeploymentComponent dc = cp.launchInstanceNamed("c4_4xlarge");
+	[DC: dc] ServiceInterface s = new Service();
+	GeneratorInterface gen = new Generator(s);
+	ProcessInterface p = new Process();
+}

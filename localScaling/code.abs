@@ -1,0 +1,1411 @@
+module EmailProcessingPipelineArchitecture;
+
+export *;
+import * from ABS.DC;
+import * from ABS.SmartDeploy;
+
+import * from BaseScale;
+import * from InvariantsDeployer;
+import * from MessageReceiverPlan;
+import * from MessageParserPlan;
+import * from SentimentAnalyserPlan;
+import * from VirusScannerPlan;
+import * from AttachmentsManagerPlan;
+import * from ImageAnalyserPlan;
+import * from NSFWDetectorPlan;
+import * from ImageRecognizerPlan;
+import * from MessageAnalyserPlan;
+import * from BalancerMonitor;
+
+
+//////////////////////////////////CLOUD PROVIDER/////////////////////////
+[SmartDeployCloudProvider: "{ \"c4_large\" : { \"cost\" : 119, \"payment_interval\" : 1, \"resources\" : { \"Cores\" : 2, \"Memory\" : 375, \"Bandwidth\" : 500, \"Speed\" : 10, \"Startupduration\" : 100}} , \"c4_xlarge\" : { \"cost\" : 237, \"payment_interval\" : 1, \"resources\" : { \"Cores\" : 4, \"Memory\" : 750, \"Bandwidth\" : 750, \"Speed\" : 20, \"Startupduration\" : 100}} , \"c4_2xlarge\" : { \"cost\" : 476, \"payment_interval\" : 1, \"resources\" : { \"Cores\" : 8, \"Memory\" : 1500, \"Bandwidth\" : 1000, \"Speed\" : 40, \"Startupduration\" : 100}}, \"c4_4xlarge\" : { \"cost\" : 950, \"payment_interval\" : 1, \"resources\" : { \"Cores\" : 16, \"Memory\" : 3000, \"Bandwidth\" : 2000, \"Speed\" : 80, \"Startupduration\" : 100}}}"]
+///////////////////////////////////////////////////////////////////////
+
+/////////////////////INVARIANTS ANNOTATION/////////////////////////////////////
+/*
+[ SmartDeploy : "{ \"id\":\"InvariantsDeployer\", \"specification\":\"MessageReceiver_LoadBalancer = 1 and MessageParser_LoadBalancer = 1 and HeaderAnalyser_LoadBalancer = 1 and LinkAnalyser_LoadBalancer = 1 and TextAnalyser_LoadBalancer = 1 and SentimentAnalyser_LoadBalancer = 1 and VirusScanner_LoadBalancer = 1 and AttachmentsManager_LoadBalancer = 1 and ImageAnalyser_LoadBalancer = 1 and NSFWDetector_LoadBalancer = 1 and ImageRecognizer_LoadBalancer = 1 and MessageAnalyser_LoadBalancer = 1 and forall ?x in DC: ( ?x.MessageAnalyser_LoadBalancer + ?x.MessageParser_LoadBalancer + ?x.HeaderAnalyser_LoadBalancer + ?x.LinkAnalyser_LoadBalancer + ?x.TextAnalyser_LoadBalancer + ?x.SentimentAnalyser_LoadBalancer + ?x.VirusScanner_LoadBalancer + ?x.AttachmentsManager_LoadBalancer + ?x.ImageAnalyser_LoadBalancer + ?x.NSFWDetector_LoadBalancer + ?x.ImageRecognizer_LoadBalancer + ?x.MessageAnalyser_LoadBalancer  > 0 impl (sum ?y in obj: ?x.?y) = 1)\", \"DC\":[ ], \"obj\":[{\"name\":\"dbObj\",\"interface\":\"DBInterface\",\"provides\":[{\"ports\":[\"DBInterface\"],\"num\":-1}],\"methods\" : []} ], \"cloud_provider_DC_availability\":{ \"c4_large\":40, \"c4_xlarge\":40, \"c4_2xlarge\":40 }, \"bind preferences\":[ \"local\"], \"add_method_priorities\":[], \"remove_method_priorities\":[] }" ]
+*/
+
+///////BASESCALE///////
+/*
+[SmartDeploy : "{\"id\":\"BaseScale\",\"specification\":\"MessageReceiver = 1 and MessageParser = 1 and HeaderAnalyser = 1 and LinkAnalyser = 1 and TextAnalyser = 1 and SentimentAnalyser = 2 and VirusScanner = 1 and AttachmentsManager = 1 and ImageAnalyser = 1 and NSFWDetector = 2 and ImageRecognizer = 2 and MessageAnalyser = 2 and forall ?x in DC: (?x.HeaderAnalyser + ?x.LinkAnalyser + ?x.TextAnalyser > 0 impl (sum ?y in obj: ?x.?y) = 1)\",\"DC\":[], \"obj\":[{\"name\":\"messageReceiver_LoadBalancerObj\",\"interface\":\"MessageReceiver_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"MessageReceiver_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : [{\"add\" : { \"name\": \"connectInstance\", \"param_type\": \"MessageReceiverInterface\" },\"remove\" : { \"name\": \"disconnectInstance\", \"return_type\" : \"MessageReceiverInterface\"}}]}, {\"name\":\"messageParser_LoadBalancerObj\",\"interface\":\"MessageParser_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"MessageParser_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : [{\"add\" : { \"name\": \"connectInstance\", \"param_type\": \"MessageParserInterface\" },\"remove\" : { \"name\": \"disconnectInstance\", \"return_type\" : \"MessageParserInterface\"}}]}, {\"name\":\"headerAnalyser_LoadBalancerObj\",\"interface\":\"HeaderAnalyser_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"HeaderAnalyser_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : [{\"add\" : { \"name\": \"connectInstance\", \"param_type\": \"HeaderAnalyserInterface\" },\"remove\" : { \"name\": \"disconnectInstance\", \"return_type\" : \"HeaderAnalyserInterface\"}}]}, {\"name\":\"linkAnalyser_LoadBalancerObj\",\"interface\":\"LinkAnalyser_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"LinkAnalyser_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : [{\"add\" : { \"name\": \"connectInstance\", \"param_type\": \"LinkAnalyserInterface\" },\"remove\" : { \"name\": \"disconnectInstance\", \"return_type\" : \"LinkAnalyserInterface\"}}]}, {\"name\":\"textAnalyser_LoadBalancerObj\",\"interface\":\"TextAnalyser_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"TextAnalyser_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : [{\"add\" : { \"name\": \"connectInstance\", \"param_type\": \"TextAnalyserInterface\" },\"remove\" : { \"name\": \"disconnectInstance\", \"return_type\" : \"TextAnalyserInterface\"}}]}, {\"name\":\"sentimentAnalyser_LoadBalancerObj\",\"interface\":\"SentimentAnalyser_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"SentimentAnalyser_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : [{\"add\" : { \"name\": \"connectInstance\", \"param_type\": \"SentimentAnalyserInterface\" },\"remove\" : { \"name\": \"disconnectInstance\", \"return_type\" : \"SentimentAnalyserInterface\"}}]}, {\"name\":\"virusScanner_LoadBalancerObj\",\"interface\":\"VirusScanner_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"VirusScanner_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : [{\"add\" : { \"name\": \"connectInstance\", \"param_type\": \"VirusScannerInterface\" },\"remove\" : { \"name\": \"disconnectInstance\", \"return_type\" : \"VirusScannerInterface\"}}]}, {\"name\":\"attachmentsManager_LoadBalancerObj\",\"interface\":\"AttachmentsManager_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"AttachmentsManager_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : [{\"add\" : { \"name\": \"connectInstance\", \"param_type\": \"AttachmentsManagerInterface\" },\"remove\" : { \"name\": \"disconnectInstance\", \"return_type\" : \"AttachmentsManagerInterface\"}}]},  {\"name\":\"imageAnalyser_LoadBalancerObj\",\"interface\":\"ImageAnalyser_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"ImageAnalyser_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : [{\"add\" : { \"name\": \"connectInstance\", \"param_type\": \"ImageAnalyserInterface\" },\"remove\" : { \"name\": \"disconnectInstance\", \"return_type\" : \"ImageAnalyserInterface\"}}]}, {\"name\":\"nsfwDetector_LoadBalancerObj\",\"interface\":\"NSFWDetector_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"NSFWDetector_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : [{\"add\" : { \"name\": \"connectInstance\", \"param_type\": \"NSFWDetectorInterface\" },\"remove\" : { \"name\": \"disconnectInstance\", \"return_type\" : \"NSFWDetectorInterface\"}}]}, {\"name\":\"imageRecognizer_LoadBalancerObj\",\"interface\":\"ImageRecognizer_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"ImageRecognizer_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : [{\"add\" : { \"name\": \"connectInstance\", \"param_type\": \"ImageRecognizerInterface\" },\"remove\" : { \"name\": \"disconnectInstance\", \"return_type\" : \"ImageRecognizerInterface\"}}]}, {\"name\":\"messageAnalyser_LoadBalancerObj\",\"interface\":\"MessageAnalyser_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"MessageAnalyser_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : [{\"add\" : { \"name\": \"connectInstance\", \"param_type\": \"MessageAnalyserInterface\" },\"remove\" : { \"name\": \"disconnectInstance\", \"return_type\" : \"MessageAnalyserInterface\"}}]}, {\"name\":\"dbObj\",\"interface\":\"DBInterface\",\"provides\":[{\"ports\":[\"DBInterface\"],\"num\":-1}],\"methods\" : []}], \"cloud_provider_DC_availability\":{ \"c4_large\":40, \"c4_xlarge\":40, \"c4_2xlarge\":40, \"c4_4xlarge\":40 }, \"bind preferences\":[\"((forall ?x of type MessageReceiver in '.*' :  forall ?y of type messageReceiver_LoadBalancerObj in '.*' : ?x used by ?y) and (forall ?x of type MessageParser in '.*' :  forall ?y of type messageParser_LoadBalancerObj in '.*' : ?x used by ?y) and (forall ?x of type HeaderAnalyser in '.*' :  forall ?y of type headerAnalyser_LoadBalancerObj in '.*' : ?x used by ?y) and (forall ?x of type LinkAnalyser in '.*' :  forall ?y of type linkAnalyser_LoadBalancerObj in '.*' : ?x used by ?y) and (forall ?x of type TextAnalyser in '.*' :  forall ?y of type textAnalyser_LoadBalancerObj in '.*' : ?x used by ?y) and  (forall ?x of type SentimentAnalyser in '.*' :  forall ?y of type sentimentAnalyser_LoadBalancerObj in '.*' : ?x used by ?y) and  (forall ?x of type VirusScanner in '.*' :  forall ?y of type virusScanner_LoadBalancerObj in '.*' : ?x used by ?y) and (forall ?x of type AttachmentsManager in '.*' :  forall ?y of type attachmentsManager_LoadBalancerObj in '.*' : ?x used by ?y) and  (forall ?x of type ImageAnalyser in '.*' :  forall ?y of type imageAnalyser_LoadBalancerObj in '.*' : ?x used by ?y) and  (forall ?x of type NSFWDetector in '.*' :  forall ?y of type nsfwDetector_LoadBalancerObj in '.*' : ?x used by ?y) and  (forall ?x of type ImageRecognizer in '.*' :  forall ?y of type imageRecognizer_LoadBalancerObj in '.*' : ?x used by ?y) and  (forall ?x of type MessageAnalyser in '.*' :  forall ?y of type messageAnalyser_LoadBalancerObj in '.*' : ?x used by ?y))\"]}"]
+*/
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+///MESSAGE RECEIVER PLAN///
+/*
+[ SmartDeploy : "{ \"id\":\"MessageReceiverPlan\", \"specification\":\"MessageReceiver = 1\", \"DC\":[ ], \"obj\":[{\"name\":\"messageReceiver_LoadBalancerObj\",\"interface\":\"MessageReceiver_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"MessageReceiver_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : [{\"add\" : { \"name\": \"connectInstance\", \"param_type\": \"MessageReceiverInterface\" },\"remove\" : { \"name\": \"disconnectInstance\", \"return_type\" : \"MessageReceiverInterface\"}}]},{\"name\":\"messageParser_LoadBalancerObj\",\"interface\":\"MessageParser_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"MessageParser_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : []}], \"cloud_provider_DC_availability\":{ \"c4_large\":40, \"c4_xlarge\":40, \"c4_2xlarge\":40 }, \"bind preferences\":[\"(forall ?x of type MessageReceiver in '.*' :  forall ?y of type messageReceiver_LoadBalancerObj in '.*' : ?x used by ?y)\"]}"]
+*/
+///MESSAGE PARSER PLAN///
+/*
+[ SmartDeploy : "{ \"id\":\"MessageParserPlan\", \"specification\":\"MessageParser = 1\", \"DC\":[ ], \"obj\":[{\"name\":\"messageParser_LoadBalancerObj\",\"interface\":\"MessageParser_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"MessageParser_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : [{\"add\" : { \"name\": \"connectInstance\", \"param_type\": \"MessageParserInterface\"},\"remove\" : { \"name\": \"disconnectInstance\", \"return_type\" : \"MessageParserInterface\"}}]}, {\"name\":\"headerAnalyser_LoadBalancerObj\",\"interface\":\"HeaderAnalyser_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"HeaderAnalyser_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : []}, {\"name\":\"linkAnalyser_LoadBalancerObj\",\"interface\":\"LinkAnalyser_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"LinkAnalyser_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : []}, {\"name\":\"textAnalyser_LoadBalancerObj\",\"interface\":\"TextAnalyser_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"TextAnalyser_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : []}, {\"name\":\"virusScanner_LoadBalancerObj\",\"interface\":\"VirusScanner_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"VirusScanner_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : []},{\"name\":\"dbObj\",\"interface\":\"DBInterface\",\"provides\":[{\"ports\":[\"DBInterface\"],\"num\":-1}],\"methods\" : []}, {\"name\":\"messageAnalyser_LoadBalancerObj\",\"interface\":\"MessageAnalyser_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"MessageAnalyser_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : []}], \"cloud_provider_DC_availability\":{ \"c4_large\":40, \"c4_xlarge\":40, \"c4_2xlarge\":40 }, \"bind preferences\":[\"(forall ?x of type MessageParser in '.*' : forall ?y of type messageParser_LoadBalancerObj in '.*': ?x used by ?y)\"]}"]
+*/
+
+/*
+///HEADER ANALYSER PLAN///
+[ SmartDeploy : "{ \"id\":\"HeaderAnalyserPlan\", \"specification\":\"HeaderAnalyser = 1\", \"DC\":[ ], \"obj\":[{\"name\":\"sp_obj\",\"interface\":\"SpeedPatcher\",\"provides\":[{\"ports\":[\"SpeedPatcher\"],\"num\":-1}],\"methods\" : [{\"add\" : { \"name\": \"addMicroservice\", \"param_type\": \"Microservice\"}, \"remove\" : { \"name\": \"disconnectInstance\"}}]},{\"name\":\"headerAnalyser_LoadBalancerObj\",\"interface\":\"HeaderAnalyser_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"HeaderAnalyser_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : [{\"add\" : { \"name\": \"connectInstance\", \"param_type\": \"HeaderAnalyserInterface\" },\"remove\" : { \"name\": \"disconnectInstance\", \"return_type\" : \"HeaderAnalyserInterface\"}}]}, {\"name\":\"messageAnalyser_LoadBalancerObj\",\"interface\":\"MessageAnalyser_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"MessageAnalyser_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : []}], \"cloud_provider_DC_availability\":{ \"c4_large\":40, \"c4_xlarge\":40, \"c4_2xlarge\":40 }, \"bind preferences\":[\"(forall ?x of type HeaderAnalyser in '.*' :  forall ?y of type headerAnalyser_LoadBalancerObj in '.*' : ?x used by ?y)\",\"(forall ?x of type HeaderAnalyser in '.*' :  forall ?y of type sp_obj in '.*' : ?x used by ?y)\"]}"]
+*/
+
+//LINK ANALYSER PLAN////
+/*
+[ SmartDeploy : "{ \"id\":\"LinkAnalyserPlan\", \"specification\":\"LinkAnalyser = 1\", \"DC\":[ ], \"obj\":[{\"name\":\"sp_obj\",\"interface\":\"SpeedPatcher\",\"provides\":[{\"ports\":[\"SpeedPatcher\"],\"num\":-1}],\"methods\" : [{\"add\" : { \"name\": \"addMicroservice\", \"param_type\": \"Microservice\"}, \"remove\" : { \"name\": \"disconnectInstance\"}}]},{\"name\":\"linkAnalyser_LoadBalancerObj\",\"interface\":\"LinkAnalyser_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"LinkAnalyser_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : [{\"add\" : { \"name\": \"connectInstance\", \"param_type\": \"LinkAnalyserInterface\" },\"remove\" : { \"name\": \"disconnectInstance\", \"return_type\" : \"LinkAnalyserInterface\"}}]}, {\"name\":\"messageAnalyser_LoadBalancerObj\",\"interface\":\"MessageAnalyser_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"MessageAnalyser_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : []}], \"cloud_provider_DC_availability\":{ \"c4_large\":40, \"c4_xlarge\":40, \"c4_2xlarge\":40 }, \"bind preferences\":[\"(forall ?x of type LinkAnalyser in '.*' :  forall ?y of type linkAnalyser_LoadBalancerObj in '.*' : ?x used by ?y)\",\"(forall ?x of type LinkAnalyser in '.*' :  forall ?y of type sp_obj in '.*' : ?x used by ?y)\"]}"]
+*/
+
+///Text ANALYSER PLAN///
+/*
+[ SmartDeploy : "{ \"id\":\"TextAnalyserPlan\", \"specification\":\"TextAnalyser = 1\", \"DC\":[ ], \"obj\":[{\"name\":\"sp_obj\",\"interface\":\"SpeedPatcher\",\"provides\":[{\"ports\":[\"SpeedPatcher\"],\"num\":-1}],\"methods\" : [{\"add\" : { \"name\": \"addMicroservice\", \"param_type\": \"Microservice\"}, \"remove\" : { \"name\": \"disconnectInstance\"}}]},{\"name\":\"textAnalyser_LoadBalancerObj\",\"interface\":\"TextAnalyser_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"TextAnalyser_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : [{\"add\" : { \"name\": \"connectInstance\", \"param_type\": \"TextAnalyserInterface\" },\"remove\" : { \"name\": \"disconnectInstance\", \"return_type\" : \"TextAnalyserInterface\"}}]},{\"name\":\"sentimentAnalyser_LoadBalancerObj\",\"interface\":\"SentimentAnalyser_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"SentimentAnalyser_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : []},{\"name\":\"messageAnalyser_LoadBalancerObj\",\"interface\":\"MessageAnalyser_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"MessageAnalyser_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : []}], \"cloud_provider_DC_availability\":{ \"c4_large\":40, \"c4_xlarge\":40, \"c4_2xlarge\":40 }, \"bind preferences\":[\"(forall ?x of type TextAnalyser in '.*' :  forall ?y of type textAnalyser_LoadBalancerObj in '.*' : ?x used by ?y)\",\"(forall ?x  of type TextAnalyser in '.*' :  forall ?y of type sp_obj in '.*' : ?x used by ?y)\"]}"]
+*/
+
+///Sentiment Analyser PLAN////
+/*
+[ SmartDeploy : "{ \"id\":\"SentimentAnalyserPlan\", \"specification\":\"SentimentAnalyser = 1\", \"DC\":[ ], \"obj\":[{\"name\":\"sentimentAnalyser_LoadBalancerObj\",\"interface\":\"SentimentAnalyser_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"SentimentAnalyser_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : [{\"add\" : { \"name\": \"connectInstance\", \"param_type\": \"SentimentAnalyserInterface\" },\"remove\" : { \"name\": \"disconnectInstance\", \"return_type\" : \"SentimentAnalyserInterface\"}}]}], \"cloud_provider_DC_availability\":{ \"c4_large\":40, \"c4_xlarge\":40, \"c4_2xlarge\":40 }, \"bind preferences\":[\"(forall ?x of type SentimentAnalyser in '.*' :  forall ?y of type sentimentAnalyser_LoadBalancerObj in '.*' : ?x used by ?y)\"]}"]
+*/
+///Virus Scanner PLAN////
+/*
+[ SmartDeploy : "{ \"id\":\"VirusScannerPlan\", \"specification\":\"VirusScanner = 1\", \"DC\":[ ], \"obj\":[{\"name\":\"virusScanner_LoadBalancerObj\",\"interface\":\"VirusScanner_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"VirusScanner_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : [{\"add\" : { \"name\": \"connectInstance\", \"param_type\": \"VirusScannerInterface\" },\"remove\" : { \"name\": \"disconnectInstance\", \"return_type\" : \"VirusScannerInterface\"}}]}, {\"name\":\"messageAnalyser_LoadBalancerObj\",\"interface\":\"MessageAnalyser_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"MessageAnalyser_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : []},{\"name\":\"attachmentsManager_LoadBalancerObj\",\"interface\":\"AttachmentsManager_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"AttachmentsManager_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : []}], \"cloud_provider_DC_availability\":{ \"c4_large\":40, \"c4_xlarge\":40, \"c4_2xlarge\":40 }, \"bind preferences\":[\"(forall ?x of type VirusScanner in '.*' :  forall ?y of type virusScanner_LoadBalancerObj in '.*' : ?x used by ?y)\"]}"]
+*/
+
+///Attachments Manager PLAN////
+/*
+[ SmartDeploy : "{ \"id\":\"AttachmentsManagerPlan\", \"specification\":\"AttachmentsManager = 1\", \"DC\":[ ], \"obj\":[{\"name\":\"attachmentsManager_LoadBalancerObj\",\"interface\":\"AttachmentsManager_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"AttachmentsManager_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : [{\"add\" : { \"name\": \"connectInstance\", \"param_type\": \"AttachmentsManagerInterface\" },\"remove\" : { \"name\": \"disconnectInstance\", \"return_type\" : \"AttachmentsManagerInterface\"}}]}, {\"name\":\"imageAnalyser_LoadBalancerObj\",\"interface\":\"ImageAnalyser_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"ImageAnalyser_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : []}], \"cloud_provider_DC_availability\":{ \"c4_large\":40, \"c4_xlarge\":40, \"c4_2xlarge\":40 }, \"bind preferences\":[\"(forall ?x of type AttachmentsManager in '.*' :  forall ?y of type attachmentsManager_LoadBalancerObj in '.*' : ?x used by ?y)\"]}"]
+*/
+//IMAGE ANALYSER PLAN//
+/*
+[ SmartDeploy : "{ \"id\":\"ImageAnalyserPlan\", \"specification\":\"ImageAnalyser = 1\", \"DC\":[ ], \"obj\":[{\"name\":\"imageAnalyser_LoadBalancerObj\",\"interface\":\"ImageAnalyser_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"ImageAnalyser_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : [{\"add\" : { \"name\": \"connectInstance\", \"param_type\": \"ImageAnalyserInterface\" },\"remove\" : { \"name\": \"disconnectInstance\", \"return_type\" : \"ImageAnalyserInterface\"}}]},{\"name\":\"nsfwDetector_LoadBalancerObj\",\"interface\":\"NSFWDetector_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"NSFWDetector_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : []},{\"name\":\"messageAnalyser_LoadBalancerObj\",\"interface\":\"MessageAnalyser_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"MessageAnalyser_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : []},{\"name\":\"imageRecognizer_LoadBalancerObj\",\"interface\":\"ImageRecognizer_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"ImageRecognizer_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : []}], \"cloud_provider_DC_availability\":{ \"c4_large\":40, \"c4_xlarge\":40, \"c4_2xlarge\":40 }, \"bind preferences\":[\"(forall ?x of type ImageAnalyser in '.*' :  forall ?y of type imageAnalyser_LoadBalancerObj in '.*' : ?x used by ?y)\"]}"]
+*/
+
+//NSFW DETECTOR PLAN//
+/*
+[ SmartDeploy : "{ \"id\":\"NSFWDetectorPlan\", \"specification\":\"NSFWDetector = 1\", \"DC\":[ ], \"obj\":[{\"name\":\"nsfwDetector_LoadBalancerObj\",\"interface\":\"NSFWDetector_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"NSFWDetector_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : [{\"add\" : { \"name\": \"connectInstance\", \"param_type\": \"NSFWDetectorInterface\" },\"remove\" : { \"name\": \"disconnectInstance\", \"return_type\" : \"NSFWDetectorInterface\"}}]}], \"cloud_provider_DC_availability\":{ \"c4_large\":40, \"c4_xlarge\":40, \"c4_2xlarge\":40 }, \"bind preferences\":[\"(forall ?x of type NSFWDetector in '.*' :  forall ?y of type nsfwDetector_LoadBalancerObj in '.*' : ?x used by ?y)\"]}"]
+*/
+
+//Image Recognizer PLAN//
+/*
+[ SmartDeploy : "{ \"id\":\"ImageRecognizerPlan\", \"specification\":\"ImageRecognizer = 1\", \"DC\":[ ], \"obj\":[{\"name\":\"imageRecognizer_LoadBalancerObj\",\"interface\":\"ImageRecognizer_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"ImageRecognizer_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : [{\"add\" : { \"name\": \"connectInstance\", \"param_type\": \"ImageRecognizerInterface\" },\"remove\" : { \"name\": \"disconnectInstance\", \"return_type\" : \"ImageRecognizerInterface\"}}]}], \"cloud_provider_DC_availability\":{ \"c4_large\":40, \"c4_xlarge\":40, \"c4_2xlarge\":40 }, \"bind preferences\":[\"(forall ?x of type ImageRecognizer in '.*' :  forall ?y of type imageRecognizer_LoadBalancerObj in '.*' : ?x used by ?y)\"]}"]
+*/
+
+//MESSAGE ANALYSER PLAN//
+/*
+[ SmartDeploy : "{ \"id\":\"MessageAnalyserPlan\", \"specification\":\"MessageAnalyser = 1\", \"DC\":[ ], \"obj\":[{\"name\":\"messageAnalyser_LoadBalancerObj\",\"interface\":\"MessageAnalyser_LoadBalancerInterface\",\"provides\":[{\"ports\":[\"MessageAnalyser_LoadBalancerInterface\"],\"num\":-1}],\"methods\" : [{\"add\" : { \"name\": \"connectInstance\", \"param_type\": \"MessageAnalyserInterface\" },\"remove\" : { \"name\": \"disconnectInstance\", \"return_type\" : \"MessageAnalyserInterface\"}}]},{\"name\":\"dbObj\",\"interface\":\"DBInterface\",\"provides\":[{\"ports\":[\"DBInterface\"],\"num\":-1}],\"methods\" : []}], \"cloud_provider_DC_availability\":{ \"c4_large\":40, \"c4_xlarge\":40, \"c4_2xlarge\":40 }, \"bind preferences\":[\"(forall ?x of type MessageAnalyser in '.*' :  forall ?y of type messageAnalyser_LoadBalancerObj in '.*' : ?x used by ?y)\"]}"]
+*/
+
+
+exception MessageNotInstantiatedInTheMap;
+
+interface MessageResultInterface{
+  Unit insertRes(String r);
+  Int getActivityWaiting();
+  String getRes();
+}
+
+class MessageResult(Int n) implements MessageResultInterface {
+  Int nWaiting = n;
+  String messId = "";
+  String res = "";
+
+  Unit insertRes(String r) {
+    res = res + r + "\n";
+    nWaiting = nWaiting - 1;
+  }
+
+  Int getActivityWaiting() {return nWaiting;}
+
+  String getRes() {return res;}
+
+}
+
+interface LoadBalancer {
+  Unit resetMetrics();
+  Unit deploy();
+  Unit undeploy();
+  Int returninbound_workload();
+  String getInstanceNumberDescription();
+  Rat getCost();
+  Int getInstancesNumber();
+}
+
+
+interface MessageReceiver_LoadBalancerInterface extends LoadBalancer {
+    Unit connectInstance(MessageReceiverInterface newInstance);
+    MessageReceiverInterface disconnectInstance();
+    Unit newMessage(String mailData);
+    Unit connectPlan(MessageReceiverPlan p);
+    Unit removeMessage();
+}
+
+//[SmartDeployCost : "{\"class\" : \"MessageReceiver_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"MessageParserInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"MessageParserInterface\"}}]}]}"]
+class MessageReceiver_LoadBalancer(DBInterface db) implements MessageReceiver_LoadBalancerInterface {
+  List<MessageReceiverInterface> instancesConnected = list[];
+  Int nextInstance = -1;
+  Rat buffer_size = 50 * 1;
+  Int inbound_workload = 0;
+  Int pending = 0;
+  MessageReceiverPlan plan;
+  Int deplTimes = 0;
+  Rat cost = 0;
+
+  Unit connectInstance(MessageReceiverInterface newInstance){
+    if(plan != null){deplTimes = deplTimes + 1;}
+    instancesConnected = appendright(instancesConnected, newInstance);
+  }
+
+  MessageReceiverInterface disconnectInstance(){
+    deplTimes = deplTimes - 1;
+    MessageReceiverInterface removedInstance = nth(instancesConnected, length(instancesConnected)-1);
+    instancesConnected = without(instancesConnected, removedInstance);
+    return removedInstance;
+  }
+
+  Rat getCost() {
+    Rat totalCost = 0;
+    List<DeploymentComponent> dcs = plan.getDeploymentComponent();
+    if(length(dcs) > 0) {
+      DeploymentComponent dc = nth(dcs,0);
+      Rat cost = dc.getCostPerInterval();
+      totalCost = deplTimes * cost;
+    }
+    return totalCost;
+  }
+
+  Unit connectPlan(MessageReceiverPlan p) {plan = p;}
+
+  Unit resetMetrics() {inbound_workload = 0;}
+
+  String getInstanceNumberDescription() {return "MR" + toString(length(instancesConnected)) + " ";}
+
+  Unit deploy() {plan!deploy();}
+
+  Unit undeploy() {plan!undeploy();}
+
+  Int getInstancesNumber() {return length(instancesConnected);}
+
+  Int returninbound_workload() {return inbound_workload;}
+
+  Unit newMessage(String mailData){
+    inbound_workload = inbound_workload + 1;
+    db.messageArrived();
+    if(pending < buffer_size) {
+      pending = pending + 1;
+      nextInstance = (nextInstance + 1) % length(instancesConnected);
+      MessageReceiverInterface selectedInstance = nth(instancesConnected, nextInstance);
+      selectedInstance!newMessage(mailData, this);
+    } else {db.messageLoss("");}
+  }
+
+  Unit removeMessage() {pending = pending - 1;}
+
+}
+
+interface MessageReceiverInterface {
+    Unit newMessage(String mailData, MessageReceiver_LoadBalancerInterface balancer);
+}
+
+////[SmartDeployCost : "{\"class\" : \"MessageReceiver\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 1,\"Memory\" : 100},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"MessageParser_LoadBalancerInterface\"}],\"methods\" : []}]}"]
+class MessageReceiver(MessageParser_LoadBalancerInterface parserLoadBalancer) implements MessageReceiverInterface {
+  Int speed_res = 5;
+  Int mcl = 116;
+  Unit newMessage (String mailData, MessageReceiver_LoadBalancerInterface balancer) {
+    [Cost: speed_res * 30 / mcl] skip;
+    balancer.removeMessage();
+    parserLoadBalancer.newRequest(mailData);
+  }
+}
+
+interface MessageParser_LoadBalancerInterface extends LoadBalancer {
+    Unit connectInstance(MessageParserInterface newInstance);
+    MessageParserInterface disconnectInstance();
+    Unit newRequest (String mailData);
+    Unit removeMessage();
+    Unit connectPlan(MessageParserPlan p);
+}
+
+//[SmartDeployCost : "{\"class\" : \"MessageParser_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"MessageParserInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"MessageParserInterface\"}}]}]}"]
+class MessageParser_LoadBalancer(DBInterface db) implements MessageParser_LoadBalancerInterface {
+  List<MessageParserInterface> instancesConnected = list[];
+  Int nextInstance = -1;
+  Rat buffer_size = 50 * 1;
+  Int pending = 0;
+  Int inbound_workload = 0;
+  Int id = 0;
+  MessageParserPlan plan;
+  Int deplTimes = 0;
+
+
+  Unit connectInstance(MessageParserInterface newInstance){
+    if(plan != null) {deplTimes = deplTimes + 1;}
+    instancesConnected = appendright(instancesConnected, newInstance);
+  }
+
+  MessageParserInterface disconnectInstance(){
+    deplTimes = deplTimes - 1;
+    MessageParserInterface removedInstance = nth(instancesConnected, length(instancesConnected)-1);
+    instancesConnected = without(instancesConnected, removedInstance);
+    return removedInstance;
+  }
+
+  Rat getCost() {
+    Rat totalCost = 0;
+    List<DeploymentComponent> dcs = await plan!getDeploymentComponent();
+    if(length(dcs) > 0) {
+      DeploymentComponent dc = nth(dcs,0);
+      Rat cost = dc.getCostPerInterval();
+      totalCost = deplTimes * cost;
+    }
+    return totalCost;
+  }
+
+  Unit connectPlan(MessageParserPlan p) {plan = p;}
+
+  Unit resetMetrics() {inbound_workload = 0;}
+
+  String getInstanceNumberDescription() {return "MP" + toString(length(instancesConnected)) + " ";}
+
+  Unit deploy() {plan!deploy();}
+
+  Unit undeploy() {plan!undeploy();}
+
+  Int getInstancesNumber() {return length(instancesConnected);}
+
+  Int returninbound_workload() {return inbound_workload;}
+
+  Unit newRequest (String mailData){
+    inbound_workload = inbound_workload + 1;
+    if(pending < buffer_size) {
+      nextInstance = (nextInstance + 1) % length(instancesConnected);
+      MessageParserInterface selectedInstance = nth(instancesConnected, nextInstance);
+      pending = pending + 1;
+      selectedInstance!parseMessage(mailData, this, id);
+      id = id + 1;
+    } else {db.messageLoss("");}
+  }
+
+  Unit removeMessage() {pending = pending - 1;}
+
+}
+
+interface MessageParserInterface   {
+  Unit parseMessage (String mailData, MessageParser_LoadBalancerInterface balancer, Int id);
+}
+
+
+////[SmartDeployCost : "{\"class\" : \"MessageParser\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 1,\"Memory\" : 100},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"HeaderAnalyser_LoadBalancerInterface\"}, {\"kind\" : \"require\",\"type\" : \"LinkAnalyser_LoadBalancerInterface\"}, {\"kind\" : \"require\",\"type\" : \"TextAnalyser_LoadBalancerInterface\"}, {\"kind\" : \"require\",\"type\" : \"VirusScanner_LoadBalancerInterface\"}, {\"kind\" : \"require\",\"type\" : \"MessageAnalyser_LoadBalancerInterface\"}, {\"kind\" : \"require\",\"type\" : \"DBInterface\"}],\"methods\" : []}]}"]
+class MessageParser(HeaderAnalyser_LoadBalancerInterface headerAnalyserLoadBalancer, LinkAnalyser_LoadBalancerInterface linkAnalyserLoadBalancer, TextAnalyser_LoadBalancerInterface textAnalyserLoadBalancer, VirusScanner_LoadBalancerInterface virusScannerLoadBalancer, MessageAnalyser_LoadBalancerInterface messageAnalyserLoadBalancer, DBInterface db) implements MessageParserInterface {
+  Int speed_res = 5;
+  Int mcl = 110;
+  Unit parseMessage (String mailData, MessageParser_LoadBalancerInterface balancer, Int id){
+		[Cost: speed_res * 30 / mcl] skip;
+    balancer.removeMessage();
+    String headers = mailData + "_NetworkHeaders";
+    String sender = mailData + "_Sender";
+    String messageHeader = mailData + "_MessageHeader";
+    String messageBody = mailData + "_MessageBody";
+    Set<String> links = set[];
+    Set<String> attachments = set[];
+    Int n_links = random(11);
+    Int n_attachments = random(5);
+    while (size(links) < n_links) {links = insertElement(links, mailData + "_Link" + toString(size(links)));}
+    while (size(attachments) < n_attachments) {attachments = insertElement(attachments, mailData + "_Attachment" + toString(size(attachments)));}
+    String messageId = toString(id);
+    db.insertMessageInformation(messageId, n_attachments);
+    headerAnalyserLoadBalancer.newRequest(headers, messageId);
+    if(n_links > 0){linkAnalyserLoadBalancer.newRequest(links, messageId);}
+    else{messageAnalyserLoadBalancer.insertResult("", messageId);}
+    if(messageHeader != "" || messageBody != ""){textAnalyserLoadBalancer.newRequest(messageHeader, messageBody, messageId);}
+    else{messageAnalyserLoadBalancer.insertResult("", messageId);}
+    while(size(attachments) > 0){
+      String attach = take(attachments);
+      attachments = remove(attachments, attach);
+      virusScannerLoadBalancer.newRequest(attach, messageId);
+    }
+  }
+}
+
+interface HeaderAnalyser_LoadBalancerInterface {
+    Unit connectInstance(HeaderAnalyserInterface newInstance);
+    HeaderAnalyserInterface disconnectInstance();
+    Unit newRequest (String headers, String messageId);
+  }
+
+//[SmartDeployCost : "{\"class\" : \"HeaderAnalyser_LoadBalancer\", \"scenarios\" : [{ \"name\" : \"default\", \"provide\" : -1, \"cost\" : { \"Cores\" : 2, \"Memory\" : 200 }, \"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{ \"add\" : { \"name\" : \"connectInstance\", \"param_type\" : \"HeaderAnalyserInterface\" }, \"remove\" : { \"name\" : \"disconnectInstance\", \"return_type\": \"HeaderAnalyserInterface\" }}]}]}"]
+class HeaderAnalyser_LoadBalancer(DBInterface db)  implements HeaderAnalyser_LoadBalancerInterface {
+  List<HeaderAnalyserInterface> instancesConnected = list[];
+  Rat buffer_size = 50 * 1;
+  Int nextInstance = 0;
+  Int deplTimes = 0;
+
+  Unit connectInstance(HeaderAnalyserInterface newInstance){
+    deplTimes = deplTimes + 1;
+    instancesConnected = appendright(instancesConnected, newInstance);
+  }
+
+  HeaderAnalyserInterface disconnectInstance(){
+    deplTimes = deplTimes - 1;
+    HeaderAnalyserInterface removedInstance = nth(instancesConnected, length(instancesConnected)-1);
+    instancesConnected = without(instancesConnected, removedInstance);
+    return removedInstance;
+  }
+
+  Unit newRequest (String headers, String messageId){
+    HeaderAnalyserInterface selectedInstance = nth(instancesConnected, nextInstance);
+    selectedInstance.analyzeHeaders(headers, messageId);
+  }
+}
+
+interface HeaderAnalyserInterface {
+  Unit analyzeHeaders (String headers, String messageId);
+}
+
+////[SmartDeployCost : "{\"class\" : \"HeaderAnalyser\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"MessageAnalyser_LoadBalancerInterface\"}],\"methods\" : []}]}"]
+class HeaderAnalyser(MessageAnalyser_LoadBalancerInterface messageAnalyserLoadBalancer) implements HeaderAnalyserInterface {
+
+  Unit analyzeHeaders (String headers, String messageId) {
+    String res = "Results of HeaderAnalysis (" + headers + ") by HeaderAnalyser in " + toString(thisDC());
+    messageAnalyserLoadBalancer.insertResult(res, messageId);
+  }
+}
+
+interface LinkAnalyser_LoadBalancerInterface {
+  Unit connectInstance(LinkAnalyserInterface newInstance);
+  LinkAnalyserInterface disconnectInstance();
+  Unit newRequest (Set<String> links, String messageId);
+}
+
+//[SmartDeployCost : "{\"class\" : \"LinkAnalyser_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"LinkAnalyserInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"LinkAnalyserInterface\"}}]}]}"]
+class LinkAnalyser_LoadBalancer(DBInterface db)  implements LinkAnalyser_LoadBalancerInterface {
+  List<LinkAnalyserInterface> instancesConnected = list[];
+  Int nextInstance = 0;
+  Rat buffer_size = 50 * 1;
+  Int deplTimes = 0;
+
+  Unit connectInstance(LinkAnalyserInterface newInstance){
+    deplTimes = deplTimes + 1;
+    instancesConnected = appendright(instancesConnected, newInstance);
+  }
+
+  LinkAnalyserInterface disconnectInstance(){
+    deplTimes = deplTimes - 1;
+    LinkAnalyserInterface removedInstance = nth(instancesConnected, length(instancesConnected)-1);
+    instancesConnected = without(instancesConnected, removedInstance);
+    return removedInstance;
+  }
+
+  Unit newRequest (Set<String> links, String messageId){
+    LinkAnalyserInterface selectedInstance = nth(instancesConnected, nextInstance);
+    selectedInstance.analyzeLink(links, messageId);
+  }
+}
+
+interface LinkAnalyserInterface   {
+  Unit analyzeLink (Set<String> links, String messageId);
+}
+
+////[SmartDeployCost : "{\"class\" : \"LinkAnalyser\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"MessageAnalyser_LoadBalancerInterface\"}],\"methods\" : []}]}"]
+class LinkAnalyser(MessageAnalyser_LoadBalancerInterface messageAnalyserLoadBalancer) implements LinkAnalyserInterface {
+  Unit analyzeLink (Set<String> links, String messageId) {
+    String res = "Results of LinkAnalysis by LinkAnalyser in " + toString(thisDC());
+    messageAnalyserLoadBalancer.insertResult(res, messageId);
+  }
+}
+
+interface TextAnalyser_LoadBalancerInterface {
+  Unit connectInstance(TextAnalyserInterface newInstance);
+  TextAnalyserInterface disconnectInstance();
+  Unit newRequest (String messageHeader, String messageBody, String messageId);
+}
+
+//[SmartDeployCost : "{\"class\" : \"TextAnalyser_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"TextAnalyserInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"TextAnalyserInterface\"}}]}]}"]
+class TextAnalyser_LoadBalancer(DBInterface db)  implements TextAnalyser_LoadBalancerInterface {
+  List<TextAnalyserInterface> instancesConnected = list[];
+  Int nextInstance = 0;
+  Int deplTimes = 0;
+
+  Unit connectInstance(TextAnalyserInterface newInstance){
+    deplTimes = deplTimes + 1;
+    instancesConnected = appendright(instancesConnected, newInstance);
+  }
+
+  TextAnalyserInterface disconnectInstance(){
+    deplTimes = deplTimes - 1;
+    TextAnalyserInterface removedInstance = nth(instancesConnected, length(instancesConnected)-1);
+    instancesConnected = without(instancesConnected, removedInstance);
+    return removedInstance;
+  }
+
+  Unit newRequest (String messageHeader, String messageBody, String messageId){
+    TextAnalyserInterface selectedInstance = nth(instancesConnected, nextInstance);
+    selectedInstance!analyzeText(messageHeader, messageBody, messageId);
+  }
+}
+
+interface TextAnalyserInterface {
+  Unit analyzeText (String messageHeader, String messageBody, String messageId);
+}
+
+////[SmartDeployCost : "{\"class\" : \"TextAnalyser\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{ \"kind\" : \"require\",\"type\" : \"SentimentAnalyser_LoadBalancerInterface\" },{\"kind\" : \"require\",\"type\" : \"MessageAnalyser_LoadBalancerInterface\"}],\"methods\" : []}]}"]
+class TextAnalyser(SentimentAnalyser_LoadBalancerInterface sentimentAnalayserLoadBalancer, MessageAnalyser_LoadBalancerInterface messageAnalyserLoadBalancer) implements TextAnalyserInterface {
+
+  Unit analyzeText (String messageHeader, String messageBody, String messageId) {
+    Bool refused = False;
+    if(messageHeader != ""){}//message header analysis
+    String sentimentAnalysisResults = "";
+    if(messageBody != ""){
+      Int n_text_blocks = random(4) + 1;
+      List<Maybe<Fut<String>>> futList = list[];
+      while (length(futList) < n_text_blocks) {
+        Maybe<Fut<String>> currentFuture = sentimentAnalayserLoadBalancer.newRequest(messageBody + "_block" + toString(length(futList)), messageId);
+        futList = appendright(futList, currentFuture);
+      }
+			while (futList != Nil) {
+        //wait the results from all sentiment analysers
+        Maybe<Fut<String>> maybe = head(futList);
+        futList = tail(futList);
+        if(!isJust(maybe)) {
+          refused = True;
+          futList = Nil;
+        } else {
+          Fut<String> currentFuture = fromJust(maybe);
+          await currentFuture?;
+          String currentResult = currentFuture.get;
+          sentimentAnalysisResults = sentimentAnalysisResults + "\n\t\t" + currentResult;
+        }
+			}
+    }
+    String res = "Results of TextAnalysis by TextAnalyser in " + toString(thisDC()) + " on: \n \t\t" + messageHeader + "\n \t\t" + messageBody + "\n \t\tSentimentAnalysis return:" + sentimentAnalysisResults;
+    if(!refused){messageAnalyserLoadBalancer.insertResult(res, messageId);}
+  }
+}
+
+
+interface SentimentAnalyser_LoadBalancerInterface extends LoadBalancer {
+  Unit connectInstance(SentimentAnalyserInterface newInstance);
+  SentimentAnalyserInterface disconnectInstance();
+  Maybe<Fut<String>> newRequest (String messageBody, String messageId);
+  Unit connectPlan(SentimentAnalyserPlan p);
+  Unit removeMessage();
+}
+
+//[SmartDeployCost : "{\"class\" : \"SentimentAnalyser_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"SentimentAnalyserInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"SentimentAnalyserInterface\"}}]}]}"]
+class SentimentAnalyser_LoadBalancer(DBInterface dbObj)  implements SentimentAnalyser_LoadBalancerInterface {
+  List<SentimentAnalyserInterface> instancesConnected = list[];
+  Int nextInstance = -1;
+  SentimentAnalyserPlan plan;
+  Int inbound_workload = 0;
+  Int pending = 0;
+  Rat buffer_size = 50 * 5/2;
+  Int deplTimes = 0;
+
+  Unit connectInstance(SentimentAnalyserInterface newInstance){
+    if(plan != null) {deplTimes = deplTimes + 1;}
+    instancesConnected = appendright(instancesConnected, newInstance);
+  }
+
+  SentimentAnalyserInterface disconnectInstance(){
+    deplTimes = deplTimes - 1;
+    SentimentAnalyserInterface removedInstance = nth(instancesConnected, length(instancesConnected)-1);
+    instancesConnected = without(instancesConnected, removedInstance);
+    return removedInstance;
+  }
+
+  Rat getCost() {
+    Rat totalCost = 0;
+    List<DeploymentComponent> dcs = plan.getDeploymentComponent();
+    if(length(dcs) > 0) {
+      DeploymentComponent dc = nth(dcs,0);
+      Rat cost = dc.getCostPerInterval();
+      totalCost = deplTimes * cost;
+    }
+    return totalCost;
+  }
+
+  Unit connectPlan(SentimentAnalyserPlan p) {plan = p;}
+
+  Unit resetMetrics() {inbound_workload = 0;}
+
+  String getInstanceNumberDescription() {return "SA" + toString(length(instancesConnected)) + " ";}
+
+  Unit deploy() {plan!deploy();}
+
+  Unit undeploy() {plan!undeploy();}
+
+  Int getInstancesNumber() {return length(instancesConnected);}
+
+  Int returninbound_workload() {return inbound_workload;}
+
+  Maybe<Fut<String>> newRequest (String messageBody, String messageId){
+      Maybe<Fut<String>> res = Nothing;
+      inbound_workload = inbound_workload + 1;
+      if(pending < buffer_size) {
+        pending = pending + 1;
+        nextInstance = (nextInstance + 1) % length(instancesConnected);
+        SentimentAnalyserInterface selectedInstance = nth(instancesConnected, nextInstance);
+        Fut<String> fut = selectedInstance!analyzeSentiments(messageBody,this);
+        res = Just(fut);
+      } else {dbObj.messageLoss(messageId);}
+      return res;
+  }
+
+  Unit removeMessage() {pending = pending - 1;}
+
+}
+
+interface SentimentAnalyserInterface   {
+  String analyzeSentiments(String messageBody, SentimentAnalyser_LoadBalancerInterface balancer);
+}
+
+////[SmartDeployCost : "{\"class\" : \"SentimentAnalyser\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 4,\"Memory\" : 250},\"sig\" : [],\"methods\" : []}]}"]
+class SentimentAnalyser() implements SentimentAnalyserInterface {
+  Int speed_res = 20;
+  Int mcl = 100;
+
+  String analyzeSentiments (String messageBody, SentimentAnalyser_LoadBalancerInterface balancer){
+    [Cost: speed_res * 30 / mcl] skip;
+    balancer.removeMessage();
+    return "SentimentAnalysis result of: " + messageBody + " by SentimentAnalyser in " + toString(thisDC());
+  }
+}
+
+interface VirusScanner_LoadBalancerInterface extends LoadBalancer {
+  Unit connectInstance(VirusScannerInterface newInstance);
+  VirusScannerInterface disconnectInstance();
+  Unit newRequest (String attachment, String messageId);
+  Unit connectPlan(VirusScannerPlan p);
+  Unit removeMessage();
+}
+
+//[SmartDeployCost : "{\"class\" : \"VirusScanner_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"VirusScannerInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"VirusScannerInterface\"}}]}]}"]
+class VirusScanner_LoadBalancer(DBInterface db)  implements VirusScanner_LoadBalancerInterface {
+  List<VirusScannerInterface> instancesConnected = list[];
+  Int nextInstance = -1;
+  Int pending = 0;
+  Rat buffer_size = 50 *  2;
+  Int inbound_workload = 0;
+  Map<Int,Rat> messagesTime = map[];
+  VirusScannerPlan plan;
+  Int deplTimes = 0;
+
+  Unit connectInstance(VirusScannerInterface newInstance){
+    if(plan != null) {deplTimes = deplTimes + 1;}
+    instancesConnected = appendright(instancesConnected, newInstance);
+  }
+
+  VirusScannerInterface disconnectInstance(){
+    deplTimes = deplTimes - 1;
+    VirusScannerInterface removedInstance = nth(instancesConnected, length(instancesConnected)-1);
+    instancesConnected = without(instancesConnected, removedInstance);
+    return removedInstance;
+  }
+
+  Rat getCost() {
+    Rat totalCost = 0;
+    List<DeploymentComponent> dcs = plan.getDeploymentComponent();
+    if(length(dcs) > 0) {
+      DeploymentComponent dc = nth(dcs,0);
+      Rat cost = dc.getCostPerInterval();
+      totalCost = deplTimes * cost;
+    }
+    return totalCost;
+  }
+
+  Unit connectPlan(VirusScannerPlan p) {plan = p;}
+
+  Unit resetMetrics() {inbound_workload = 0;}
+
+  String getInstanceNumberDescription() {return "VS" + toString(length(instancesConnected)) + " ";}
+
+  Unit deploy() {plan!deploy();}
+
+  Unit undeploy() {plan!undeploy();}
+
+  Int getInstancesNumber() {return length(instancesConnected);}
+
+  Int returninbound_workload() {return inbound_workload;}
+
+  Unit newRequest (String attachment, String messageId){
+    inbound_workload = inbound_workload + 1;
+    if(pending < buffer_size) {
+      nextInstance = (nextInstance + 1) % length(instancesConnected);
+      VirusScannerInterface selectedInstance = nth(instancesConnected, nextInstance);
+      pending = pending + 1;
+      selectedInstance!scanAttachment(attachment, messageId, this);
+    } else {db.messageLoss(messageId);}
+  }
+
+  Unit removeMessage() {pending = pending - 1;}
+}
+
+interface VirusScannerInterface {
+  Unit scanAttachment (String attachment, String messageId, VirusScanner_LoadBalancerInterface balancer);
+}
+
+////[SmartDeployCost : "{\"class\" : \"VirusScanner\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 4,\"Memory\" : 600},\"sig\" : [{ \"kind\" : \"require\",\"type\" : \"AttachmentsManager_LoadBalancerInterface\" }, { \"kind\" : \"require\",\"type\" : \"MessageAnalyser_LoadBalancerInterface\" }],\"methods\" : []}]}"]
+class VirusScanner(AttachmentsManager_LoadBalancerInterface attachmentsManagerLoadBalancer, MessageAnalyser_LoadBalancerInterface messageAnalyserLoadBalancer) implements VirusScannerInterface {
+  Int speed_res = 20;
+  Int mcl = 120;
+
+
+  Unit scanAttachment (String attachment, String messageId, VirusScanner_LoadBalancerInterface balancer){
+    //scan attachment
+    [Cost: speed_res * 30 / mcl] skip;
+    balancer.removeMessage();
+    Bool virusFound = random(4) == 0;
+    if(virusFound){messageAnalyserLoadBalancer.insertResult("VirusFound from VirusScanner in attachment: " + attachment + " by VirusScanner in " + toString(thisDC()), messageId);}
+    else{attachmentsManagerLoadBalancer.newRequest(attachment, messageId);}
+  }
+}
+
+interface AttachmentsManager_LoadBalancerInterface extends LoadBalancer {
+  Unit connectInstance(AttachmentsManagerInterface newInstance);
+  AttachmentsManagerInterface disconnectInstance();
+  Unit newRequest (String attachment, String messageId);
+  Unit connectPlan(AttachmentsManagerPlan p);
+  Unit removeMessage();
+}
+
+//[SmartDeployCost : "{\"class\" : \"AttachmentsManager_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"AttachmentsManagerInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"AttachmentsManagerInterface\"}}]}]}"]
+class AttachmentsManager_LoadBalancer(DBInterface db)  implements AttachmentsManager_LoadBalancerInterface {
+  List<AttachmentsManagerInterface> instancesConnected = list[];
+  Int nextInstance = -1;
+  Int pending = 0;
+  Rat buffer_size = 50 * 3/2;
+  Int inbound_workload = 0;
+  Map<Int,Rat> messagesTime = map[];
+  AttachmentsManagerPlan plan;
+  Int deplTimes = 0;
+
+  Unit connectInstance(AttachmentsManagerInterface newInstance){
+    if(plan != null) {deplTimes = deplTimes + 1;}
+    instancesConnected = appendright(instancesConnected, newInstance);
+  }
+
+  AttachmentsManagerInterface disconnectInstance(){
+    deplTimes = deplTimes - 1;
+    AttachmentsManagerInterface removedInstance = nth(instancesConnected, length(instancesConnected)-1);
+    instancesConnected = without(instancesConnected, removedInstance);
+    return removedInstance;
+  }
+
+  Unit connectPlan(AttachmentsManagerPlan p) {plan = p;}
+
+  Rat getCost() {
+    Rat totalCost = 0;
+    List<DeploymentComponent> dcs = plan.getDeploymentComponent();
+    if(length(dcs) > 0) {
+      DeploymentComponent dc = nth(dcs,0);
+      Rat cost = dc.getCostPerInterval();
+      totalCost = deplTimes * cost;
+    }
+    return totalCost;
+  }
+
+  Unit resetMetrics() {inbound_workload = 0;}
+
+  String getInstanceNumberDescription() {return "AM" + toString(length(instancesConnected)) + " ";}
+
+  Unit deploy() {plan!deploy();}
+
+  Unit undeploy() {plan!undeploy();}
+
+  Int getInstancesNumber() {return length(instancesConnected);}
+
+  Int returninbound_workload() {return inbound_workload;}
+
+  Unit newRequest (String attachment, String messageId){
+    inbound_workload = inbound_workload + 1;
+    if(pending < buffer_size) {
+      nextInstance = (nextInstance + 1) % length(instancesConnected);
+      AttachmentsManagerInterface selectedInstance = nth(instancesConnected, nextInstance);
+      pending = pending + 1;
+      selectedInstance!manageAttachments(attachment, messageId, this);
+    } else {db.messageLoss(messageId);}
+  }
+
+  Unit removeMessage() {pending = pending - 1;}
+}
+
+interface AttachmentsManagerInterface   {
+  Unit manageAttachments(String attachment, String messageId, AttachmentsManager_LoadBalancerInterface balancer);
+}
+
+////[SmartDeployCost : "{\"class\" : \"AttachmentsManager\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 1,\"Memory\" : 100},\"sig\" : [ { \"kind\" : \"require\",\"type\" : \"ImageAnalyser_LoadBalancerInterface\" }],\"methods\" : []}]}"]
+class AttachmentsManager(ImageAnalyser_LoadBalancerInterface imageAnalyserLoadBalancer) implements AttachmentsManagerInterface {
+  Int speed_res = 5;
+  Int mcl = 231;
+
+  Unit manageAttachments(String attachment, String messageId, AttachmentsManager_LoadBalancerInterface balancer){
+    [Cost: speed_res * 30 / mcl] skip;
+    balancer.removeMessage();
+    imageAnalyserLoadBalancer!newRequest(attachment, messageId);
+  }
+}
+
+interface ImageAnalyser_LoadBalancerInterface extends LoadBalancer {
+  Unit connectInstance(ImageAnalyserInterface newInstance);
+  ImageAnalyserInterface disconnectInstance();
+  Unit newRequest (String image, String messageId);
+  Unit removeMessage();
+  Unit connectPlan(ImageAnalyserPlan p);
+}
+
+//[SmartDeployCost : "{\"class\" : \"ImageAnalyser_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"ImageAnalyserInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"ImageAnalyserInterface\"}}]}]}"]
+class ImageAnalyser_LoadBalancer(DBInterface db)  implements ImageAnalyser_LoadBalancerInterface {
+  List<ImageAnalyserInterface> instancesConnected = list[];
+  Int nextInstance = -1;
+  Int pending = 0;
+  Rat buffer_size = 50 * 3/2;
+  ImageAnalyserPlan plan;
+  Int inbound_workload = 0;
+  Int deplTimes = 0;
+
+  Unit connectInstance(ImageAnalyserInterface newInstance){
+    if(plan != null) {deplTimes = deplTimes + 1;}
+    instancesConnected = appendright(instancesConnected, newInstance);
+  }
+
+  ImageAnalyserInterface disconnectInstance(){
+    deplTimes = deplTimes - 1;
+    ImageAnalyserInterface removedInstance = nth(instancesConnected, length(instancesConnected)-1);
+    instancesConnected = without(instancesConnected, removedInstance);
+    return removedInstance;
+  }
+
+  Unit connectPlan(ImageAnalyserPlan p) {plan = p;}
+
+  Rat getCost() {
+    Rat totalCost = 0;
+    List<DeploymentComponent> dcs = plan.getDeploymentComponent();
+    if(length(dcs) > 0) {
+      DeploymentComponent dc = nth(dcs,0);
+      Rat cost = dc.getCostPerInterval();
+      totalCost = deplTimes * cost;
+    }
+    return totalCost;
+  }
+
+  Unit newRequest (String image, String messageId){
+    inbound_workload = inbound_workload + 1;
+    if(pending < buffer_size) {
+      nextInstance = (nextInstance + 1) % length(instancesConnected);
+      ImageAnalyserInterface selectedInstance = nth(instancesConnected, nextInstance);
+      pending = pending + 1;
+      selectedInstance!analyzeImage(image, messageId, this, db);
+    } else {db.messageLoss(messageId);}
+  }
+
+  Unit resetMetrics() {inbound_workload = 0;}
+
+  String getInstanceNumberDescription() {return "IA" + toString(length(instancesConnected)) + " ";}
+
+  Unit deploy() {plan!deploy();}
+
+  Unit undeploy() {plan!undeploy();}
+
+  Int getInstancesNumber() {return length(instancesConnected);}
+
+  Int returninbound_workload() {return inbound_workload;}
+
+  Unit removeMessage() {pending = pending - 1;}
+}
+
+interface ImageAnalyserInterface {
+  Unit analyzeImage (String image, String messageId, ImageAnalyser_LoadBalancerInterface balancer,  DBInterface db);
+}
+
+////[SmartDeployCost : "{\"class\" : \"ImageAnalyser\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 1,\"Memory\" : 200},\"sig\" : [{ \"kind\" : \"require\",\"type\" : \"NSFWDetector_LoadBalancerInterface\" }, { \"kind\" : \"require\",\"type\" : \"ImageRecognizer_LoadBalancerInterface\" }, { \"kind\" : \"require\",\"type\" : \"MessageAnalyser_LoadBalancerInterface\" }],\"methods\" : []}]}"]
+class ImageAnalyser(NSFWDetector_LoadBalancerInterface nsfwDetectorLoadBalancer, ImageRecognizer_LoadBalancerInterface imageRecognizerLoadBalancer, MessageAnalyser_LoadBalancerInterface messageAnalyserLoadBalancer) implements ImageAnalyserInterface {
+  Int speed_res = 5;
+  Int mcl = 231;
+
+  Unit analyzeImage (String image, String messageId, ImageAnalyser_LoadBalancerInterface balancer, DBInterface db){
+    [Cost: speed_res * 30 / mcl] skip;
+    balancer.removeMessage();
+    Maybe<Fut<Bool>> maybeNSFW = nsfwDetectorLoadBalancer.newRequest(image, messageId);
+    Maybe<Fut<String>> maybeImageCategory = imageRecognizerLoadBalancer.newRequest(image, messageId);
+    if(isJust(maybeNSFW) && isJust(maybeImageCategory)) {
+      Fut<Bool> futNSFW = fromJust(maybeNSFW);
+      await futNSFW?;
+      Bool nsfwResult = futNSFW.get;
+      Fut<String> futImageCategory = fromJust(maybeImageCategory);
+      await futImageCategory?;
+      String imageRecognitionResult = futImageCategory.get;
+      String res = "";
+      if(nsfwResult){res = "Image (" + image + ") not safe for work by ImageAnalyser in " + toString(thisDC());}
+      else{res = "Results of ImageAnalysis (" + image + ") - " + imageRecognitionResult + " by ImageAnalyser in " + toString(thisDC());}
+      messageAnalyserLoadBalancer.insertResult(res, messageId);
+    }
+  }
+}
+
+
+interface NSFWDetector_LoadBalancerInterface extends LoadBalancer {
+  Unit connectInstance(NSFWDetectorInterface newInstance);
+  NSFWDetectorInterface disconnectInstance();
+  Maybe<Fut<Bool>> newRequest (String image, String messageId);
+  Unit connectPlan(NSFWDetectorPlan p);
+  Unit removeMessage();
+}
+
+//[SmartDeployCost : "{\"class\" : \"NSFWDetector_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"NSFWDetectorInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"NSFWDetectorInterface\"}}]}]}"]
+class NSFWDetector_LoadBalancer(DBInterface db)  implements NSFWDetector_LoadBalancerInterface {
+  List<NSFWDetectorInterface> instancesConnected = list[];
+  Int nextInstance = -1;
+  NSFWDetectorPlan plan;
+  Int inbound_workload = 0;
+  Int pending = 0;
+  Rat buffer_size = 50 * 3/2;
+  Int deplTimes = 0;
+
+
+  Unit connectInstance(NSFWDetectorInterface newInstance){
+    if(plan != null) {deplTimes = deplTimes + 1;}
+    instancesConnected = appendright(instancesConnected, newInstance);
+  }
+
+  NSFWDetectorInterface disconnectInstance(){
+    deplTimes = deplTimes - 1;
+    NSFWDetectorInterface removedInstance = nth(instancesConnected, length(instancesConnected)-1);
+    instancesConnected = without(instancesConnected, removedInstance);
+    return removedInstance;
+  }
+
+  Rat getCost() {
+    Rat totalCost = 0;
+    List<DeploymentComponent> dcs = plan.getDeploymentComponent();
+    if(length(dcs) > 0) {
+      DeploymentComponent dc = nth(dcs,0);
+      Rat cost = dc.getCostPerInterval();
+      totalCost = deplTimes * cost;
+    }
+    return totalCost;
+  }
+
+  Unit connectPlan(NSFWDetectorPlan p) {plan = p;}
+
+  Unit resetMetrics() {inbound_workload = 0;}
+
+  String getInstanceNumberDescription() {return "NSFW" + toString(length(instancesConnected)) + " ";}
+
+  Unit deploy() {plan!deploy();}
+
+  Unit undeploy() {plan!undeploy();}
+
+  Int getInstancesNumber() {return length(instancesConnected);}
+
+  Int returninbound_workload() {return inbound_workload;}
+
+  Maybe<Fut<Bool>> newRequest (String image, String messageId){
+    Maybe<Fut<Bool>> res = Nothing;
+    inbound_workload = inbound_workload + 1;
+    if(pending < buffer_size) {
+      pending = pending + 1;
+      nextInstance = (nextInstance + 1) % length(instancesConnected);
+      NSFWDetectorInterface selectedInstance = nth(instancesConnected, nextInstance);
+      Fut<Bool> fut = selectedInstance!nsfwDetection(image, this);
+      res = Just(fut);
+    } else {db.messageLoss(messageId);}
+    return res;
+  }
+
+  Unit removeMessage() {pending = pending - 1;}
+}
+
+interface NSFWDetectorInterface   {
+  Bool nsfwDetection(String image, NSFWDetector_LoadBalancerInterface balancer);
+}
+
+////[SmartDeployCost : "{\"class\" : \"NSFWDetector\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 6,\"Memory\" : 800},\"sig\" : [],\"methods\" : []}]}"]
+class NSFWDetector() implements NSFWDetectorInterface {
+  Int yesOrNot = -1;
+  Int speed_res = 30;
+  Int mcl = 90;
+
+  Bool nsfwDetection(String image, NSFWDetector_LoadBalancerInterface balancer){
+		[Cost: speed_res * 30 / mcl] skip;
+    balancer!removeMessage();
+    yesOrNot = yesOrNot + 1;
+    return yesOrNot%3 == 0;
+  }
+}
+
+interface ImageRecognizer_LoadBalancerInterface extends LoadBalancer {
+  Unit connectInstance(ImageRecognizerInterface newInstance);
+  ImageRecognizerInterface disconnectInstance();
+  Maybe<Fut<String>> newRequest (String image, String messageId);
+  Unit connectPlan(ImageRecognizerPlan p);
+  Unit removeMessage();
+
+}
+
+//[SmartDeployCost : "{\"class\" : \"ImageRecognizer_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"ImageRecognizerInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"ImageRecognizerInterface\"}}]}]}"]
+class ImageRecognizer_LoadBalancer(DBInterface db)  implements ImageRecognizer_LoadBalancerInterface {
+  List<ImageRecognizerInterface> instancesConnected = list[];
+  Int nextInstance = -1;
+  ImageRecognizerPlan plan;
+  Int inbound_workload = 0;
+  Int pending = 0;
+  Rat buffer_size = 50 * 3/2;
+  Int deplTimes = 0;
+
+  Unit connectInstance(ImageRecognizerInterface newInstance){
+    if(plan != null) {deplTimes = deplTimes + 1;}
+    instancesConnected = appendright(instancesConnected, newInstance);
+  }
+
+  ImageRecognizerInterface disconnectInstance(){
+    deplTimes = deplTimes - 1;
+    ImageRecognizerInterface removedInstance = nth(instancesConnected, length(instancesConnected)-1);
+    instancesConnected = without(instancesConnected, removedInstance);
+    return removedInstance;
+  }
+
+  Rat getCost() {
+    Rat totalCost = 0;
+    List<DeploymentComponent> dcs = plan.getDeploymentComponent();
+    if(length(dcs) > 0) {
+      DeploymentComponent dc = nth(dcs,0);
+      Rat cost = dc.getCostPerInterval();
+      totalCost = deplTimes * cost;
+    }
+    return totalCost;
+  }
+
+  Unit connectPlan(ImageRecognizerPlan p) {plan = p;}
+
+  Unit resetMetrics() {inbound_workload = 0;}
+
+  String getInstanceNumberDescription() {return "IR" + toString(length(instancesConnected)) + " ";}
+
+  Unit deploy() {plan!deploy();}
+
+  Unit undeploy() {plan!undeploy();}
+
+  Int getInstancesNumber() {return length(instancesConnected);}
+
+  Int returninbound_workload() {return inbound_workload;}
+
+  Maybe<Fut<String>> newRequest (String image, String messageId){
+    Maybe<Fut<String>> res = Nothing;
+    inbound_workload = inbound_workload + 1;
+    if(pending < buffer_size) {
+      pending = pending + 1;
+      nextInstance = (nextInstance + 1) % length(instancesConnected);
+      ImageRecognizerInterface selectedInstance = nth(instancesConnected, nextInstance);
+      Fut<String> fut = selectedInstance!recognizeImage(image, this);
+      res = Just(fut);
+    } else {db.messageLoss(messageId);}
+    return res;
+  }
+
+  Unit removeMessage() {pending = pending - 1;}
+}
+
+interface ImageRecognizerInterface   {
+  String recognizeImage(String image, ImageRecognizer_LoadBalancerInterface balancer);
+}
+
+////[SmartDeployCost : "{\"class\" : \"ImageRecognizer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 6,\"Memory\" : 800},\"sig\" : [],\"methods\" : []}]}"]
+class ImageRecognizer() implements ImageRecognizerInterface {
+  Int category = -1;
+  Int speed_res = 30;
+  Int mcl = 90;
+
+  String recognizeImage(String image, ImageRecognizer_LoadBalancerInterface balancer){
+		[Cost: speed_res * 30 / mcl] skip;
+    balancer.removeMessage();
+    category = category + 1;
+    return "Category Recognized: " + toString(category) + " by ImageRecognizer in " + toString(thisDC()) ;
+  }
+}
+
+interface MessageAnalyser_LoadBalancerInterface extends LoadBalancer {
+  Unit connectInstance(MessageAnalyserInterface newInstance);
+  MessageAnalyserInterface disconnectInstance();
+  Unit insertResult(String res, String id);
+  Unit removeMessage();
+  Unit connectPlan(MessageAnalyserPlan p);
+}
+
+//[SmartDeployCost : "{\"class\" : \"MessageAnalyser_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"MessageAnalyserInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"MessageAnalyserInterface\"}}]}]}"]
+class MessageAnalyser_LoadBalancer(DBInterface db)  implements MessageAnalyser_LoadBalancerInterface {
+  List<MessageAnalyserInterface> instancesConnected = list[];
+  Int nextInstance = -1;
+  Rat buffer_size = 50 * 5;
+  Int pending = 0;
+  Int inbound_workload = 0;
+  MessageAnalyserPlan plan;
+  Int deplTimes = 0;
+
+  Unit connectInstance(MessageAnalyserInterface newInstance){
+    if(plan != null) {deplTimes = deplTimes + 1;}
+    instancesConnected = appendright(instancesConnected, newInstance);
+  }
+
+  MessageAnalyserInterface disconnectInstance(){
+    deplTimes = deplTimes - 1;
+    MessageAnalyserInterface removedInstance = nth(instancesConnected, length(instancesConnected)-1);
+    instancesConnected = without(instancesConnected, removedInstance);
+    return removedInstance;
+  }
+
+  Rat getCost() {
+    Rat totalCost = 0;
+    List<DeploymentComponent> dcs = plan.getDeploymentComponent();
+    if(length(dcs) > 0) {
+      DeploymentComponent dc = nth(dcs,0);
+      Rat cost = dc.getCostPerInterval();
+      totalCost = deplTimes * cost;
+    }
+    return totalCost;
+  }
+
+  Unit connectPlan(MessageAnalyserPlan p) {plan = p;}
+
+  Unit resetMetrics() {inbound_workload = 0;}
+
+  String getInstanceNumberDescription() {return "MA" + toString(length(instancesConnected)) + " ";}
+
+  Unit deploy() {plan!deploy();}
+
+  Unit undeploy() {plan!undeploy();}
+
+  Int getInstancesNumber() {return length(instancesConnected);}
+
+  Int returninbound_workload() {return inbound_workload;}
+
+  Unit insertResult(String res, String id){
+    inbound_workload = inbound_workload + 1;
+    if(pending < buffer_size) {
+      nextInstance = (nextInstance + 1) % length(instancesConnected);
+      MessageAnalyserInterface selectedInstance = nth(instancesConnected, nextInstance);
+      pending = pending + 1;
+      selectedInstance!insertResult(res,id,this);
+    } else {db.messageLoss(id);}
+  }
+
+  Unit removeMessage(){pending = pending - 1;}
+}
+
+interface MessageAnalyserInterface {
+    Unit insertResult(String res, String id, MessageAnalyser_LoadBalancerInterface balancer);
+}
+
+////[SmartDeployCost : "{\"class\" : \"MessageAnalyser\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 1,\"Memory\" : 300},\"sig\" : [{ \"kind\" : \"require\",\"type\" : \"DBInterface\" }],\"methods\" : []}]}"]
+class MessageAnalyser(DBInterface db) implements MessageAnalyserInterface {
+  Int speed_res = 5;
+  Int mcl = 300;
+
+  Unit insertResult(String res, String id, MessageAnalyser_LoadBalancerInterface balancer) {
+    [Cost: speed_res * 30 / mcl] skip;
+    balancer.removeMessage();
+		Int numberOfActivityWaiting = db.insertResult(res, id);
+    if(numberOfActivityWaiting == 0){this.takeFinalDecision(id);}
+  }
+
+  Unit takeFinalDecision(String messageId){
+    //use the information in the db for messageId to take the final decision
+    MessageResultInterface finalResults = db.returnMessageResults(messageId);
+    String res = finalResults.getRes();
+    String printString = "";
+    printString = printString + 	"Results of message \"" + messageId + "\" analysis:" 	  + "\n";
+    printString = printString +    "\t" + res;
+  }
+}
+
+
+interface DBInterface {
+  Unit messageArrived();
+  Unit insertMessageInformation (String messageId, Int attachmentsNumber);
+  Int insertResult(String res, String id);
+  MessageResultInterface returnMessageResults(String messageId);
+  Int returninbound_workload();
+  Int messageCompleted();
+  Int pendingMessages();
+  Float returnAverageAnalysisTime();
+  Unit resetMetrics();
+  Int rejectedMessages();
+  Unit messageLoss(String messageId);
+}
+
+class DB() implements DBInterface {
+  Map<String,Pair<MessageResultInterface,Rat>> messageInfo = map[];
+  Int inbound_workload = 0;
+	Rat totalTime = 0;
+  Int totalMessages = 0;
+  Int rejected = 0;
+
+  Unit messageLoss(String messageId) {
+    if(messageId == "") {rejected = rejected + 1;}
+    else if(isJust(lookup(messageInfo,messageId))) {rejected = rejected + 1; messageInfo = removeKey(messageInfo, messageId);}
+  }
+
+  Unit messageArrived() {inbound_workload = inbound_workload + 1;}
+
+  Int returninbound_workload(){return inbound_workload;}
+
+  Int pendingMessages() {return length(entries(messageInfo));}
+
+  Int messageCompleted() {return totalMessages;}
+
+  Int rejectedMessages() {return rejected;}
+
+  Unit insertMessageInformation (String messageId, Int attachmentsNumber){
+    MessageResultInterface newResults = new MessageResult(3+attachmentsNumber);
+		messageInfo = insert(messageInfo,Pair(messageId,Pair(newResults,timeValue(now()))));
+  }
+
+  Int insertResult(String res, String id) {
+    Int numberOfActivityWaiting = -1;
+    Maybe<Pair<MessageResultInterface,Rat>> maybe = lookup(messageInfo, id);
+    if(isJust(maybe)){
+      MessageResultInterface actualResults = fst(fromJust(maybe));
+      Rat analysisTime = snd(fromJust(maybe));
+      actualResults.insertRes(res);
+      numberOfActivityWaiting = actualResults.getActivityWaiting();
+    }
+    return numberOfActivityWaiting;
+  }
+
+  MessageResultInterface returnMessageResults(String messageId){
+    MessageResultInterface messageResults = null;
+    Maybe<Pair<MessageResultInterface,Rat>> maybe = lookup(messageInfo, messageId);
+    if(isJust(maybe)){
+      messageResults = fst(fromJust(maybe));
+      Rat startTime = snd(fromJust(maybe));
+      messageInfo = removeKey(messageInfo, messageId);
+      totalTime = totalTime + (timeValue(now()) - startTime);
+      totalMessages = totalMessages + 1;
+    }
+    return messageResults;
+  }
+
+  Float returnAverageAnalysisTime(){
+    Rat averageTime = 1000000;
+    if(totalMessages != 0){averageTime = totalTime/totalMessages;}
+    return float(averageTime);
+  }
+
+
+  Unit resetMetrics(){
+    totalMessages = 0;
+    totalTime = 0;
+    inbound_workload = 0;
+    rejected = 0;
+  }
+}
+
+interface MonitorInterface {}
+//this class has an active behaviour so the monitoring operations start when the object is created in an automatic way
+class Monitor(DBInterface db, List<LoadBalancer> balancers, List<LoadBalancerMonitorInterface> monitors, Rat windowDim, Rat initialCost) implements MonitorInterface {
+  //dimension of the time window for monitoring controls
+  Rat monitoringWindowDimension = windowDim;
+  Int i = 10;
+
+  Rat computeCost() {
+    Rat totalCost = 0;
+    foreach(b in balancers) {
+      Rat cost = b.getCost();
+      totalCost = totalCost + cost;
+    }
+    return totalCost;
+  }
+
+  String getInstances() {
+    String res = "";
+    foreach(b in balancers) {
+      String toAdd = b.getInstanceNumberDescription();
+      res = res + toAdd;
+    }
+    return res;
+  }
+
+  Unit checkBalancers() {foreach(monitor in monitors) {monitor.check();}}
+
+  Int getTotalInstances() {
+    Int total = 0;
+    foreach(b in balancers) {
+      Int n = b.getInstancesNumber();
+      total = total + n;
+    }
+    return total;
+  }
+
+	// active behavior
+	Unit run() {
+    while(True){
+      //wait the monitoring time
+			await duration(monitoringWindowDimension,monitoringWindowDimension);
+			Float averageAnalysisTime = db.returnAverageAnalysisTime();
+      Rat completed = db.messageCompleted();
+      completed = completed / 10;
+      Rat inbound_workload = db.returninbound_workload();
+      inbound_workload = inbound_workload / 10;
+      Rat rejected = db.rejectedMessages();
+      rejected = rejected / 10;
+      Int totalInstances = this.getTotalInstances();
+      String instances = this.getInstances();
+      Rat totalCost = this.computeCost();
+      String toPrint = toString(i) + "  " + toString(float(100/3) * averageAnalysisTime) + " #MSG:" + toString(float(inbound_workload)) + " COMPLETED:" + toString(float(completed)) + " REJECTED: " + toString(float(rejected)) + " COST: " + toString(float((totalCost + initialCost) / 1000)) + " INST: " + toString(totalInstances + 3) +" " + instances;
+      this.checkBalancers();
+      db.resetMetrics();
+      println(toPrint);
+      i = i + 10;
+    }
+  }
+}
+
+
+
+interface SetUpSystemInterface {
+	MessageReceiver_LoadBalancerInterface initializeSystem();
+}
+
+class SetUpSystem() implements SetUpSystemInterface {
+
+  Rat windowDim = 300;
+
+  Rat computeInitialCost(List<DeploymentComponent> dcs) {
+    Rat cost = 0;
+    foreach(dc in dcs) {
+      Rat singleCost = dc.getCostPerInterval();
+      cost = cost + singleCost;
+    }
+    return cost;
+  }
+
+	MessageReceiver_LoadBalancerInterface initializeSystem(){
+
+    CloudProvider cp = new CloudProvider("CloudProvider");
+    DBInterface dbObj = new DB();
+    InvariantsDeployer c1 = new InvariantsDeployer(cp,dbObj);
+		c1.deploy();
+    List<DeploymentComponent> invariants_dcs = c1.getDeploymentComponent();
+    Rat invariants_cost = this.computeInitialCost(invariants_dcs);
+
+		//obtain the necessary object from the initial deployment to create scaling policy
+    List<MessageReceiver_LoadBalancerInterface> messageReceiver_LoadBalancerList = c1.getMessageReceiver_LoadBalancerInterface();
+		List<MessageParser_LoadBalancerInterface> messageParser_LoadBalancerList = c1.getMessageParser_LoadBalancerInterface();
+		List<HeaderAnalyser_LoadBalancerInterface> headerAnalyser_LoadBalancerList = c1.getHeaderAnalyser_LoadBalancerInterface();
+		List<LinkAnalyser_LoadBalancerInterface> linkAnalyser_LoadBalancerList = c1.getLinkAnalyser_LoadBalancerInterface();
+		List<TextAnalyser_LoadBalancerInterface> textAnalyser_LoadBalancerList = c1.getTextAnalyser_LoadBalancerInterface();
+		List<SentimentAnalyser_LoadBalancerInterface> sentimentAnalyser_LoadBalancerList = c1.getSentimentAnalyser_LoadBalancerInterface();
+		List<VirusScanner_LoadBalancerInterface> virusScanner_LoadBalancerList = c1.getVirusScanner_LoadBalancerInterface();
+		List<AttachmentsManager_LoadBalancerInterface> attachmentsManager_LoadBalancerList = c1.getAttachmentsManager_LoadBalancerInterface();
+		List<ImageAnalyser_LoadBalancerInterface> imageAnalyser_LoadBalancerList = c1.getImageAnalyser_LoadBalancerInterface();
+		List<NSFWDetector_LoadBalancerInterface> nsfwDetector_LoadBalancerList = c1.getNSFWDetector_LoadBalancerInterface();
+		List<ImageRecognizer_LoadBalancerInterface> imageRecognizer_LoadBalancerList = c1.getImageRecognizer_LoadBalancerInterface();
+		List<MessageAnalyser_LoadBalancerInterface> messageAnalyser_LoadBalancerList = c1.getMessageAnalyser_LoadBalancerInterface();
+
+    BaseScale c2 = new BaseScale(cp, head(messageReceiver_LoadBalancerList), head(messageParser_LoadBalancerList), head(headerAnalyser_LoadBalancerList), head(linkAnalyser_LoadBalancerList), head(textAnalyser_LoadBalancerList), head(sentimentAnalyser_LoadBalancerList), head(virusScanner_LoadBalancerList), head(attachmentsManager_LoadBalancerList), head(imageAnalyser_LoadBalancerList), head(nsfwDetector_LoadBalancerList), head(imageRecognizer_LoadBalancerList), head(messageAnalyser_LoadBalancerList), dbObj);
+    c2.deploy();
+    List<DeploymentComponent> base_dcs = c2.getDeploymentComponent();
+    Rat base_cost = this.computeInitialCost(base_dcs);
+
+    List<LoadBalancer> balancers = c1.getLoadBalancer();
+
+    MessageReceiverPlan receiverPlan = new MessageReceiverPlan(cp, head(messageReceiver_LoadBalancerList), head(messageParser_LoadBalancerList));
+    MessageParserPlan parserPlan = new MessageParserPlan(cp, head(messageParser_LoadBalancerList), head(headerAnalyser_LoadBalancerList), head(linkAnalyser_LoadBalancerList), head(textAnalyser_LoadBalancerList), head(virusScanner_LoadBalancerList), dbObj, head(messageAnalyser_LoadBalancerList));
+    SentimentAnalyserPlan sentimentPlan = new SentimentAnalyserPlan(cp, head(sentimentAnalyser_LoadBalancerList));
+    VirusScannerPlan virusPlan = new VirusScannerPlan(cp, head(virusScanner_LoadBalancerList), head(messageAnalyser_LoadBalancerList), head(attachmentsManager_LoadBalancerList));
+    AttachmentsManagerPlan attachmentsManagerPlan = new AttachmentsManagerPlan(cp, head(attachmentsManager_LoadBalancerList), head(imageAnalyser_LoadBalancerList));
+    ImageAnalyserPlan imageAnalyserPlan = new ImageAnalyserPlan(cp, head(imageAnalyser_LoadBalancerList), head(nsfwDetector_LoadBalancerList), head(messageAnalyser_LoadBalancerList), head(imageRecognizer_LoadBalancerList));
+    NSFWDetectorPlan nsfwDetectorPlan = new NSFWDetectorPlan(cp, head(nsfwDetector_LoadBalancerList));
+    ImageRecognizerPlan imageRecognizerPlan = new ImageRecognizerPlan(cp, head(imageRecognizer_LoadBalancerList));
+    MessageAnalyserPlan messageAnalyserPlan = new MessageAnalyserPlan(cp, head(messageAnalyser_LoadBalancerList), dbObj);
+    head(messageReceiver_LoadBalancerList).connectPlan(receiverPlan);
+    head(messageParser_LoadBalancerList).connectPlan(parserPlan);
+    head(sentimentAnalyser_LoadBalancerList).connectPlan(sentimentPlan);
+    head(virusScanner_LoadBalancerList).connectPlan(virusPlan);
+    head(attachmentsManager_LoadBalancerList).connectPlan(attachmentsManagerPlan);
+    head(imageAnalyser_LoadBalancerList).connectPlan(imageAnalyserPlan);
+    head(nsfwDetector_LoadBalancerList).connectPlan(nsfwDetectorPlan);
+    head(imageRecognizer_LoadBalancerList).connectPlan(imageRecognizerPlan);
+    head(messageAnalyser_LoadBalancerList).connectPlan(messageAnalyserPlan);
+    List<LoadBalancerMonitorInterface> monitors = list[];
+    LoadBalancerMonitorInterface receiverMonitor = new LoadBalancerMonitor(head(messageReceiver_LoadBalancerList), "MR", 116, 1, 1);
+    monitors = appendright(monitors,receiverMonitor);
+    LoadBalancerMonitorInterface parserMonitor = new LoadBalancerMonitor(head(messageParser_LoadBalancerList), "MP", 110, 1, 1);
+    monitors = appendright(monitors,parserMonitor);
+    LoadBalancerMonitorInterface sentimentMonitor = new LoadBalancerMonitor(head(sentimentAnalyser_LoadBalancerList), "SA", 100, 2, 5/2);
+    monitors = appendright(monitors,sentimentMonitor);
+    LoadBalancerMonitorInterface virusMonitor = new LoadBalancerMonitor(head(virusScanner_LoadBalancerList), "VS", 120, 1, 2);
+    monitors = appendright(monitors,virusMonitor);
+    LoadBalancerMonitorInterface attachMonitor = new LoadBalancerMonitor(head(attachmentsManager_LoadBalancerList), "AM", 231, 1, 3/2);
+    monitors = appendright(monitors,attachMonitor);
+    LoadBalancerMonitorInterface imageAnalyserMonitor = new LoadBalancerMonitor(head(imageAnalyser_LoadBalancerList), "IA", 231, 1, 3/2);
+    monitors = appendright(monitors,imageAnalyserMonitor);
+    LoadBalancerMonitorInterface nsfwMonitor = new LoadBalancerMonitor(head(nsfwDetector_LoadBalancerList), "NSFW", 90, 1, 3/2);
+    monitors = appendright(monitors,nsfwMonitor);
+    LoadBalancerMonitorInterface imageRecMonitor = new LoadBalancerMonitor(head(imageRecognizer_LoadBalancerList), "IR", 90, 1, 3/2);
+    monitors = appendright(monitors,imageRecMonitor);
+    LoadBalancerMonitorInterface messageAnalyserMonitor = new LoadBalancerMonitor(head(messageAnalyser_LoadBalancerList), "MA", 300, 1, 5);
+    monitors = appendright(monitors,messageAnalyserMonitor);
+    MonitorInterface monitor = new Monitor(dbObj, balancers, monitors, windowDim, base_cost + invariants_cost);
+		return head(messageReceiver_LoadBalancerList);
+	}
+
+}
+
+
+interface MailGeneratorInterface{}
+
+class MailGenerator(MessageReceiver_LoadBalancerInterface entryPoint) implements MailGeneratorInterface {
+  Rat windowDim = 30;
+	Unit run() {
+    //new workload
+    List<Int> realWorkload = list[82, 84, 85, 90, 93, 96, 100, 104, 108, 114,
+                                  118, 122, 128, 133, 138, 142, 147, 150, 150, 151,
+                                  151, 152, 152, 153, 153, 153, 153, 153, 154, 154,
+                                  154, 154, 154, 155, 155, 155, 155, 155, 155, 155,
+                                  155, 155, 155, 155, 155, 155, 155, 156, 156, 156,
+                                  156, 157, 157, 157, 157, 163, 173, 180, 196, 210,
+                                  220, 234, 242, 246, 254, 261, 271, 280, 295, 287,
+                                  279, 268, 258, 250, 242, 234, 225, 220, 215, 205,
+                                  200, 196, 190, 187, 184, 187, 190, 193, 197, 200,
+                                  203, 206, 209, 212, 216, 220, 224, 219, 214, 210,
+                                  204, 192, 188, 184, 180, 175, 170, 165, 160, 157,
+                                  154, 150, 152, 154, 156, 158, 162, 168, 174, 182,
+                                  191, 200, 209, 219, 228, 237, 247, 256, 266, 275,
+                                  284, 294, 303, 313, 322, 331, 341, 355, 369, 374,
+                                  386, 398, 416, 427, 445, 455, 496, 515, 496, 480,
+                                  470, 455, 440, 420, 399, 388, 378, 368, 358, 348,
+                                  337, 327, 317, 307, 297, 286, 276, 266, 256, 246,
+                                  235, 225, 215, 205, 195, 185, 175, 164, 155, 145,
+                                  134, 124, 114, 104, 97, 96, 93, 88, 85, 84];
+    //primo workload
+    /*List<Int> realWorkload = list[47,47,47,47,54,54,54,46,46,46,
+                                  50,50,50,50,65,65,84,84,68,90,
+                                  112,137,137,143,167,188,188,210,231,231,
+                                  251,251,274,294,311,311,311,332,355,375,
+                                  375,393,393,416,422,422,422,427,427,431,
+                                  431,431,431,418,418,418,413,413,399,396,
+                                  414,390,390,392,412,412,412,412,390,393,
+                                  393,414,440,425,404,384,403,403,403,388,
+                                  408,427,427,405,420,420,440,430,416,416,
+                                  405,405,413,413,413,413,427,427,447,447,
+                                  438,438,438,418,407,433,449,420,405,405,
+                                  405,412,412,412,393,393,345,323,317,305,
+                                  294,272,250,272,250,227,208,192,182,169,
+                                  154,145,133,125,112,112,94,92,88,85,
+                                  83,80,75,72,61,59,55,52,52,52,
+                                  52,43,43,43,40,40,40,40,44,42,
+                                  47,47,47,47,54,54,54,46,46,46];*/
+		Int i = 0;
+    while(True) {
+      Rat currentMessageNumber = nth(realWorkload, i);
+      i = (i + 1) % length(realWorkload);
+      Int j = 0;
+      while(j < currentMessageNumber) {
+        entryPoint!newMessage("Message");
+        await duration(windowDim / currentMessageNumber, windowDim / currentMessageNumber);
+        j = j + 1;
+      }
+    }
+  }
+}
+
+{
+	SetUpSystemInterface setupSystem = new SetUpSystem();
+	MessageReceiver_LoadBalancerInterface entryPoint = setupSystem.initializeSystem();
+	MailGeneratorInterface testProcess = new MailGenerator(entryPoint);
+}

@@ -1,0 +1,37 @@
+module Test1;
+export *;
+import * from ABS.DC;
+
+interface Service {
+	Unit receive(String input);
+}
+
+class ServiceImpl() implements Service {
+
+	Unit receive(String input) {
+		[Cost: 45] skip;
+	}
+}
+
+interface Monitor{
+	Unit execute(Service service);
+}
+
+class MonitorImpl() implements Monitor {
+	Unit execute(Service service) {
+		println("GLOBAL TIME: " + toString(timeValue(now())));
+		service!receive("hello world");
+		duration(3/2,3/2);
+		println("GLOBAL TIME: " + toString(timeValue(now())));
+	}
+}
+
+{
+  CloudProvider cp = new CloudProvider("CloudProvider");
+	cp.addInstanceDescription(Pair("c4_xlarge", map[Pair(Memory,750),Pair(Cores,4),Pair(Speed,20)]));
+	DeploymentComponent vm = cp.launchInstanceNamed("c4_xlarge");
+	DeploymentComponent vm1 = cp.launchInstanceNamed("c4_xlarge");
+	[DC: vm] Monitor m = new MonitorImpl();
+	[DC: vm1] Service service = new ServiceImpl();
+	while(True){await duration(3/2,3/2); m.execute(service);}
+}
