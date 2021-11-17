@@ -1,4 +1,5 @@
 abstools/
-globalScalingSimulation/gen/
-punctualScalingSimulation/gen/
-globalScalingSimulation/testing/gen/
+globalScaling/gen/
+localScaling/gen/
+globalScaling/testing/gen/
+predictiveGlobalScaling/gen/
