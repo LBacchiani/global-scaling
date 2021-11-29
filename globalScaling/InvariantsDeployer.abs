@@ -52,7 +52,7 @@ class InvariantsDeployer(CloudProvider cloudProvider, DBInterface dbObj) impleme
 	Rat waiting_time = 100;
 	{
 		cloudProvider.addInstanceDescription(Pair("c4_xlarge",
-			map[Pair(CostPerInterval,237)
+			map[Pair(CostPerInterval,199)
 			,Pair(PaymentInterval,1)
 			,Pair(Bandwidth,750)
 			,Pair(Memory,750)
@@ -60,7 +60,7 @@ class InvariantsDeployer(CloudProvider cloudProvider, DBInterface dbObj) impleme
 			,Pair(Speed,20)
 			]));
 		cloudProvider.addInstanceDescription(Pair("c4_large",
-			map[Pair(CostPerInterval,119)
+			map[Pair(CostPerInterval,100)
 			,Pair(PaymentInterval,1)
 			,Pair(Bandwidth,500)
 			,Pair(Memory,375)
@@ -68,7 +68,7 @@ class InvariantsDeployer(CloudProvider cloudProvider, DBInterface dbObj) impleme
 			,Pair(Speed,10)
 			]));
 		cloudProvider.addInstanceDescription(Pair("c4_2xlarge",
-			map[Pair(CostPerInterval,476)
+			map[Pair(CostPerInterval,398)
 			,Pair(PaymentInterval,1)
 			,Pair(Bandwidth,1000)
 			,Pair(Memory,1500)
