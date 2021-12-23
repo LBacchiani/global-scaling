@@ -12,3 +12,13 @@ RUN apt update
 RUN apt install -y erlang
 RUN apt install -y git
 RUN apt install -y python3.6
+RUN apt install -y python3-pip
+RUN chmod +x init.sh
+RUN ./init.sh
+WORKDIR /usr/local/simulation_env/ABS-Simulations-Comparison/globalScaling
+RUN ../../abstools/frontend/bin/bash/absc --erlang *.abs
+WORKDIR /usr/local/simulation_env/ABS-Simulations-Comparison/predictiveGlobalScaling
+RUN ../../abstools/frontend/bin/bash/absc --erlang *.abs
+WORKDIR /usr/local/simulation_env/ABS-Simulations-Comparison/oracleScaling
+RUN ../../abstools/frontend/bin/bash/absc --erlang *.abs
+WORKDIR /usr/local/simulation_env
