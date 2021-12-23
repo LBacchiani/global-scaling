@@ -11,7 +11,7 @@ import * from Scale3;
 import * from Scale4;
 
 //////////////////////////////////CLOUD PROVIDER/////////////////////////
-[SmartDeployCloudProvider: "{ \"c4_large\" : { \"cost\" : 100, \"payment_interval\" : 1, \"resources\" : { \"Cores\" : 2, \"Memory\" : 375, \"Bandwidth\" : 500, \"Speed\" : 10, \"Startupduration\" : 100}} , \"c4_xlarge\" : { \"cost\" : 199, \"payment_interval\" : 1, \"resources\" : { \"Cores\" : 4, \"Memory\" : 750, \"Bandwidth\" : 750, \"Speed\" : 20, \"Startupduration\" : 100}} , \"c4_2xlarge\" : { \"cost\" : 398, \"payment_interval\" : 1, \"resources\" : { \"Cores\" : 8, \"Memory\" : 1500, \"Bandwidth\" : 1000, \"Speed\" : 40, \"Startupduration\" : 100}}, \"c4_4xlarge\" : { \"cost\" : 796, \"payment_interval\" : 1, \"resources\" : { \"Cores\" : 16, \"Memory\" : 3000, \"Bandwidth\" : 2000, \"Speed\" : 80, \"Startupduration\" : 100}}}"]
+[SmartDeployCloudProvider: "{\"c4_large\" : {\"cost\" : 100, \"payment_interval\" : 1, \"resources\" : { \"Cores\" : 2, \"Memory\" : 375, \"Bandwidth\" : 500, \"Speed\" : 10, \"Startupduration\" : 100}} , \"c4_xlarge\" : { \"cost\" : 199, \"payment_interval\" : 1, \"resources\" : { \"Cores\" : 4, \"Memory\" : 750, \"Bandwidth\" : 750, \"Speed\" : 20, \"Startupduration\" : 100}} , \"c4_2xlarge\" : { \"cost\" : 398, \"payment_interval\" : 1, \"resources\" : { \"Cores\" : 8, \"Memory\" : 1500, \"Bandwidth\" : 1000, \"Speed\" : 40, \"Startupduration\" : 100}}, \"c4_4xlarge\" : { \"cost\" : 796, \"payment_interval\" : 1, \"resources\" : { \"Cores\" : 16, \"Memory\" : 3000, \"Bandwidth\" : 2000, \"Speed\" : 80, \"Startupduration\" : 100}}}"]
 ///////////////////////////////////////////////////////////////////////
 
 /////////////////////INVARIANTS ANNOTATION/////////////////////////////////////
@@ -745,11 +745,12 @@ interface DBInterface {
   Unit insertMessageInformation (String messageId, Int attachmentsNumber);
   Int insertResult(String res, String id);
   MessageResultInterface returnMessageResults(String messageId);
-  Int returninbound_workload();
+  Int get_inbound_workload();
+  Int get_one_sec_workload();
   Int messageCompleted();
-  Int pendingMessages();
   Float returnAverageAnalysisTime();
   Unit resetMetrics();
+  Unit one_sec_timeout();
   Int rejectedMessages();
   Unit messageLoss(String messageId);
 }
@@ -760,17 +761,21 @@ class DB() implements DBInterface {
 	Rat totalTime = 0;
   Int totalMessages = 0;
   Int rejected = 0;
+  Int one_sec_workload = 0;
 
   Unit messageLoss(String messageId) {
     if(messageId == "") {rejected = rejected + 1;}
     else if(isJust(lookup(messageInfo,messageId))) {rejected = rejected + 1; messageInfo = removeKey(messageInfo, messageId);}
   }
 
-  Unit messageArrived() {inbound_workload = inbound_workload + 1;}
+  Unit messageArrived() {
+    inbound_workload = inbound_workload + 1;
+    one_sec_workload = one_sec_workload + 1;
+  }
 
-  Int returninbound_workload(){return inbound_workload;}
+  Int get_inbound_workload(){return inbound_workload;}
 
-  Int pendingMessages() {return length(entries(messageInfo));}
+  Int get_one_sec_workload() {return one_sec_workload;}
 
   Int messageCompleted() {return totalMessages;}
 
@@ -812,6 +817,7 @@ class DB() implements DBInterface {
     return float(averageTime);
   }
 
+  Unit one_sec_timeout() {one_sec_workload = 0;}
 
   Unit resetMetrics(){
     totalMessages = 0;
@@ -867,13 +873,13 @@ class WrapperScale(Scale1 s1, Scale2 s2, Scale3 s3, Scale4 s4, Int nInst) implem
 interface MonitorInterface {}
 
 //this class has an active behaviour so the monitoring operations start when the object is created in an automatic way
-class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int kbig, Int k) implements MonitorInterface {
+class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int kbig, Int k, Int ratio) implements MonitorInterface {
   //dimension of the time window for monitoring controls
   Int monitoringWindowDimension = windowDim;
-  Int time = 10;
+  Int time = 0;
 
    List<Int> inbound_workload_list= list[
-                      /*25, 2, 12, 32, 2, 0, 10, 20, 0, 25,*/
+                      // 25, 2, 12, 32, 2, 0, 10, 20, 0, 25,
                        50, 62, 0, 75, 62, 40, 0, 27, 47, 92,
                        45, 37, 55, 60, 72, 7, 267, 512, 485, 522,
                        520, 522, 512, 540, 575, 570, 575, 632, 620, 630,
@@ -893,13 +899,12 @@ class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int 
                        187, 115, 97, 82, 82, 65, 55, 35, 80, 77,
                        92, 140, 150, 37, 117, 82, 155, 147, 262, 395,
                        402, 437, 430, 447, 437, 452, 475, 480, 442, 402];
-
   Int sum (Int n){
     Int i = time - n;
     Int sum = 0;
     while(i < time){
       if(i < length(inbound_workload_list)) sum = sum + nth(inbound_workload_list,i);
-      i=i+1;
+      i = i + 1;
     }
     return sum;
   }
@@ -907,27 +912,31 @@ class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int 
 	// active behavior
 	Unit run() {
     while(True){
+      Rat max_pred = 0;
+      Rat max_true = 0;
+      Int i = 0;
       //wait the monitoring time
-			await duration(monitoringWindowDimension, monitoringWindowDimension);
+      while(i < ratio) {
+        await duration(monitoringWindowDimension/ratio, monitoringWindowDimension/ratio);
+        Rat chunk_pred = nth(inbound_workload_list, (i + time) % length(inbound_workload_list));
+        Rat chunk_real = db.get_one_sec_workload();
+        db.one_sec_timeout();
+        if(chunk_pred > max_pred) max_pred = chunk_pred;
+        if(chunk_real > max_true) max_true = chunk_real;
+        i = i + 1;
+      }
       Float averageAnalysisTime = db.returnAverageAnalysisTime();
       Rat completed = db.messageCompleted();
-      completed = completed / 10;
-      Rat y_true = db.returninbound_workload();
-      y_true = y_true / 10;
-      Rat y_pred = this.sum(10);
-      y_pred = y_pred/10;
-      Rat pending = db.pendingMessages();
-      pending = pending / 10;
       Rat rejected = db.rejectedMessages();
-      rejected = rejected / 10;
-      Rat totalCost = scaler.computeTotalCost();
+      Rat totalMsg = db.get_inbound_workload();
+      Rat totalCost = scaler.computeTotalCost(ratio);
       Rat nInst = scaler.computeInstanceNumber();
       Rat mcl = scaler.getSystemMCL();
-      String toPrint = toString(time) + "  " + toString(float(100/3) * averageAnalysisTime) + " #y_true: " + toString(float(y_true)) + " y_pred: "+toString(float(y_pred))+" COMPLETED: " + toString(float(completed)) + " REJECTED: " + toString(float(rejected)) + " SUPP: " + toString(mcl) + " COST: " + toString(float(totalCost)) + " INST: " + toString(nInst);
-      if(y_pred - (mcl - kbig) > k || (mcl - kbig)  - y_pred > k) scaler.scale(y_pred);
+      time = time + ratio;
+      String toPrint = toString(time) + "  " + toString(float(100/3) * averageAnalysisTime) + " #next_max: " + toString(max_pred) + " curr_max: " + toString(max_true) + " TOT: " + toString(totalMsg) + " COMP: " + toString(completed) + " REJ: " + toString(rejected) + " SUPP: " + toString(mcl) + " COST: " + toString(float(totalCost)) + " INST: " + toString(nInst);
+      if(max_pred - (mcl - kbig) > k || (mcl - kbig) - max_pred > k) scaler.scale(max_pred);
       String scalingAct = scaler.getScalingActions();
       toPrint = toPrint + scalingAct;
-      time = time + 10;
       db.resetMetrics();
       println(toPrint);
     }
@@ -941,7 +950,7 @@ interface ScalerServiceInterface {
   Rat getSystemMCL();
   String getScalingActions();
   Rat computeInstanceNumber();
-  Rat computeTotalCost();
+  Rat computeTotalCost(Int ratio);
 }
 
 class ScalerService(Int kbig, Rat initialCost, Int initInstancesNumber) implements ScalerServiceInterface {
@@ -1004,10 +1013,7 @@ class ScalerService(Int kbig, Rat initialCost, Int initInstancesNumber) implemen
     scalingTrace = printableconfig;
   }
 
-  Rat getSystemMCL() {
-    if(mcl == 0) mcl = this.mcl(baseConfig);
-    return mcl;
-  }
+  Rat getSystemMCL() {return mcl;}
 
   String getScalingActions() {
     String tmp = scalingAct;
@@ -1015,7 +1021,7 @@ class ScalerService(Int kbig, Rat initialCost, Int initInstancesNumber) implemen
     return tmp;
   }
 
-  Rat computeTotalCost() {
+  Rat computeTotalCost(Int ratio) {
     Rat totalCost = initialCost;
     foreach(orch in orchestrationDeltas) {
       WrapperScaleInterface wrapper = orch;
@@ -1024,7 +1030,7 @@ class ScalerService(Int kbig, Rat initialCost, Int initInstancesNumber) implemen
       scaleCost = scaleCost * deplTimes;
       totalCost = totalCost + scaleCost;
     }
-    return totalCost/(100*3600);
+    return totalCost*ratio/(1000*3600);
   }
 
   Rat computeInstanceNumber() {
@@ -1051,12 +1057,12 @@ class ScalerService(Int kbig, Rat initialCost, Int initInstancesNumber) implemen
   }
 
   Rat mcl(List<Int> microserviceInstances) {
-    Rat mcl = 1000000000;
+    Rat mcl = 0;
     Int i = 0;
     while(i < length(microserviceInstances)) {
       Rat n_inst = nth(microserviceInstances,i);
       Rat handled_frequency = n_inst * nth(mcls,i) / nth(mfs,i);
-      if(handled_frequency < mcl){mcl = handled_frequency;}
+      if(handled_frequency < mcl || mcl == 0){mcl = handled_frequency;}
       i = i + 1;
     }
     return mcl;
@@ -1148,7 +1154,6 @@ class SetUpSystem() implements SetUpSystemInterface{
   }
 
 	MessageReceiver_LoadBalancerInterface initializeSystem(){
-    Int windowDim = 300;
 		CloudProvider cp = new CloudProvider("CloudProvider");
     DBInterface dbObj = new DB();
     InvariantsDeployer c1 = new InvariantsDeployer(cp,dbObj);
@@ -1253,8 +1258,11 @@ class SetUpSystem() implements SetUpSystemInterface{
     scaler.insertScalingElements(s3config, wrapperS3, "Scale3");
     scaler.insertScalingElements(s4config, wrapperS4, "Scale4");
     scaler.scale(initial_inbound_workload);
+    String scalingAct = scaler.getScalingActions();
+    println("Initial Configuration: Basex1 " + scalingAct);
+    await duration(200,200);
     //create the monitor
-	  MonitorInterface monitor = new Monitor(scaler, dbObj, windowDim, kbig, k);
+	  MonitorInterface monitor = new Monitor(scaler, dbObj, windowDim, kbig, k, ratio);
 		return head(messageReceiver_LoadBalancerList);
 	}
 }

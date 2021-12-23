@@ -1,9 +1,8 @@
 abstools/
 globalScaling/gen/
 localScaling/gen/
-globalScaling/testing/gen/
+predictiveGlobalScaling/testing/gen/
 predictiveGlobalScaling/gen/
 oracleScaling/gen/
 init.sh
 process_checker.py
-requirements.txt
