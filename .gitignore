@@ -6,3 +6,4 @@ predictiveGlobalScaling/gen/
 oracleScaling/gen/
 init.sh
 process_checker.py
+requirements.txt
