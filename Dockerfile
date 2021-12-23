@@ -1,5 +1,7 @@
 FROM ubuntu:18.04
 WORKDIR /usr/local/simulation_env
+COPY process_checker.py .
+COPY init.sh .
 RUN apt-get update
 RUN apt install -y wget
 RUN apt install -y openjdk-11-jdk
@@ -9,5 +11,4 @@ RUN echo "deb https://packages.erlang-solutions.com/ubuntu bionic contrib" | tee
 RUN apt update
 RUN apt install -y erlang
 RUN apt install -y git
-RUN git clone https://github.com/LBacchiani/ABS-Simulations-Comparison.git
-RUN git clone https://github.com/abstools/abstools.git
+RUN apt install -y python3.6
