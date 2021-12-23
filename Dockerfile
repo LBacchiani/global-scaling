@@ -3,12 +3,15 @@ ENV TZ=Europe/Rome
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 WORKDIR /usr/local/simulation_env
 COPY process_checker.py .
-RUN apt-get update
-RUN apt install -y wget
-RUN apt install -y openjdk-11-jdk
-RUN apt install -y git
-RUN apt install -y python3.6
-RUN apt install -y python3-pip
+
+RUN apt update
+RUN apt install -y wget \
+openjdk-11-jdk \
+git \
+python3.6 \
+python3-pip \
+software-properties-common apt-transport-https
+
 RUN pip3 install psutil
 
 RUN apt install -y software-properties-common apt-transport-https

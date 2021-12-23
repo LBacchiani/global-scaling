@@ -1252,6 +1252,7 @@ class SetUpSystem() implements SetUpSystemInterface{
     Int kbig = 20;
     Int k = 10;
     Rat initial_inbound_workload = 32;
+    Int windowDim = 300;
     Int ratio = 10; //ratio between monitoring window and generation window
     ScalerServiceInterface scaler = new ScalerService(kbig, base_cost + invariants_cost, 13);
     scaler.insertScalingElements(s1config, wrapperS1, "Scale1");
