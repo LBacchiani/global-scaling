@@ -1338,7 +1338,7 @@ class MailGenerator(MessageReceiver_LoadBalancerInterface entryPoint) implements
                                   430, 440, 440, 445, 455, 475, 457, 447, 447, 420];
 		Int i = 0;
     Int round = 0;
-    while(round < 23) {
+    while(round < 230) {
       Rat currentMessageNumber = nth(realWorkload, i);
       i = (i + 1) % length(realWorkload);
       round = round + 1;

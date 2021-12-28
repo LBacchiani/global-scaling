@@ -20,8 +20,8 @@ RUN echo "deb https://packages.erlang-solutions.com/ubuntu bionic contrib" | tee
 RUN apt update
 RUN apt install -y erlang
 
-RUN git clone https://github.com/LBacchiani/ABS-Simulations-Comparison.git
 RUN git clone https://github.com/abstools/abstools.git
+RUN git clone https://github.com/LBacchiani/ABS-Simulations-Comparison.git
 COPY init.sh .
 RUN chmod +x init.sh
 RUN ./init.sh
