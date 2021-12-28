@@ -2,7 +2,7 @@ FROM ubuntu:18.04
 ENV TZ=Europe/Rome
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 WORKDIR /usr/local/simulation_env
-COPY process_checker.py .
+
 
 RUN apt update
 RUN apt install -y wget \
@@ -25,3 +25,6 @@ RUN git clone https://github.com/abstools/abstools.git
 COPY init.sh .
 RUN chmod +x init.sh
 RUN ./init.sh
+COPY process_checker.py .
+
+ENTRYPOINT ["tail", "-f", "/dev/null"]

@@ -876,11 +876,11 @@ interface MonitorInterface {}
 class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int kbig, Int k, Int ratio) implements MonitorInterface {
   //dimension of the time window for monitoring controls
   Int monitoringWindowDimension = windowDim;
-  Int time = ratio;
+  Int time = 0;
 
 	// active behavior
 	Unit run() {
-    while(True){
+    while(time < 230){
       Rat max_true = 0;
       Int i = 0;
       //wait the monitoring time
@@ -898,11 +898,11 @@ class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int 
       Rat totalCost = scaler.computeTotalCost(ratio);
       Rat nInst = scaler.computeInstanceNumber();
       Rat mcl = scaler.getSystemMCL();
+      time = time + ratio;
       String toPrint = toString(time) + "  " + toString(float(100/3) * averageAnalysisTime) + " #true_max: " + toString(max_true) + " TOT: " + toString(totalMsg) + " COMP: " + toString(completed) + " REJ: " + toString(rejected) + " SUPP: " + toString(mcl) + " COST: " + toString(float(totalCost)) + " INST: " + toString(nInst);
       if(max_true - (mcl - kbig) > k || (mcl - kbig) - max_true > k) scaler.scale(max_true);
       String scalingAct = scaler.getScalingActions();
       toPrint = toPrint + scalingAct;
-      time = time + ratio;
       db.resetMetrics();
       println(toPrint);
     }
@@ -1302,9 +1302,11 @@ class MailGenerator(MessageReceiver_LoadBalancerInterface entryPoint) implements
                                    45, 132, 130, 47, 92, 95, 150, 157, 255, 400,
                                    430, 440, 440, 445, 455, 475, 457, 447, 447, 420];
 		Int i = 0;
-    while(True) {
+    Int round = 0;
+    while(round < 23) {
       Rat currentMessageNumber = nth(realWorkload, i);
       i = (i + 1) % length(realWorkload);
+      round = round + 1;
       Int j = 0;
       while(j < currentMessageNumber) {
         entryPoint!newMessage("Message");
