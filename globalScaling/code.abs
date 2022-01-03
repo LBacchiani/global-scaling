@@ -1308,6 +1308,7 @@ class MailGenerator(MessageReceiver_LoadBalancerInterface entryPoint) implements
       i = (i + 1) % length(realWorkload);
       round = round + 1;
       Int j = 0;
+      println("alive");
       while(j < currentMessageNumber) {
         entryPoint!newMessage("Message");
         await duration(windowDim / currentMessageNumber, windowDim / currentMessageNumber);
