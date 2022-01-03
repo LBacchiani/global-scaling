@@ -43,6 +43,6 @@ if not os.path.exists("ABS-test"): os.makedirs("ABS-test")
 if not os.path.exists("ABS-test/K20"): os.makedirs("ABS-test/K20")
 check(sys.argv[1], sys.argv[2], int(sys.argv[3]))
 
-#K4/global globalScaling 0
-#K4/predictiveGlobal predictiveGlobalScaling 0
-#K4/oracle oracleScaling 0
+#K20/global globalScaling 0
+#K20/predictiveGlobal predictiveGlobalScaling 0
+#K20/oracle oracleScaling 0
