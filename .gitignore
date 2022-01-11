@@ -4,5 +4,4 @@ localScaling/gen/
 predictiveGlobalScaling/testing/gen/
 predictiveGlobalScaling/gen/
 oracleScaling/gen/
-init.sh
-process_checker.py
+process_checker.sh

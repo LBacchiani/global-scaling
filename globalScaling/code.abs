@@ -50,8 +50,6 @@ import * from Scale4;
 //////////////////////////////////////////////////////////////////////////////////////////////
 
 
-exception MessageNotInstantiatedInTheMap;
-
 interface MessageResultInterface{
   Unit insertRes(String r);
   Int getActivityWaiting();
@@ -1308,9 +1306,8 @@ class MailGenerator(MessageReceiver_LoadBalancerInterface entryPoint) implements
       i = (i + 1) % length(realWorkload);
       round = round + 1;
       Int j = 0;
-      println("alive");
       while(j < currentMessageNumber) {
-        entryPoint!newMessage("Message");
+        entryPoint!newMessage("message");
         await duration(windowDim / currentMessageNumber, windowDim / currentMessageNumber);
         j = j + 1;
       }
