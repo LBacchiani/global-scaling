@@ -7,6 +7,9 @@ cd ../ ;
 cd predictiveGlobalScaling ;
 ../../abstools/frontend/bin/bash/absc --erlang *.abs ;
 cd ../ ;
-cd oracleScaling ;
+cd oracleGlobalScaling ;
+../../abstools/frontend/bin/bash/absc --erlang *.abs ;
+cd ../ ;
+cd localScaling ;
 ../../abstools/frontend/bin/bash/absc --erlang *.abs ;
 cd ../../

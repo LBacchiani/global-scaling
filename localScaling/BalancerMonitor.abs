@@ -5,6 +5,8 @@ import * from EmailProcessingPipelineArchitecture;
 
 interface LoadBalancerMonitorInterface{
   Unit check();
+  Unit tick();
+  Unit printReqs();
 }
 
 class LoadBalancerMonitor(LoadBalancer balancer, String balancerName, Rat mcl, Int baseInstanceN, Rat mf) implements LoadBalancerMonitorInterface {
@@ -12,13 +14,22 @@ class LoadBalancerMonitor(LoadBalancer balancer, String balancerName, Rat mcl, I
   ScalingWrapper sw;
   Rat k = 10 * mf;
   Rat kbig =  20 * mf;
+  Int max = 0;
+  List<Int> reqs = list[];
+
   {sw = new ScalingWrapperImpl(balancer);}
 
+  Unit tick() {balancer.tick();}
+
+  Unit printReqs() {println(balancerName + ": " + toString(reqs));}
+
   Unit check() {
-    Rat inbound_workload = balancer.returninbound_workload();
-    inbound_workload = inbound_workload / 10;
-    if(inbound_workload - (mcl * deplInstances - kbig)  > k || (mcl * deplInstances - kbig) - inbound_workload > k) {
-      Int configInstances = ceil(float((inbound_workload + kbig)/ mcl));
+    //Rat inbound_workload = balancer.returninbound_workload();
+    //inbound_workload = inbound_workload / 10;
+    Int max = balancer.get_one_sec_workload();
+    reqs = appendright(reqs,max);
+    if(max - (mcl * deplInstances - kbig)  > k || (mcl * deplInstances - kbig) - max > k) {
+      Int configInstances = ceil(float((max + kbig)/ mcl));
       if(configInstances > deplInstances) {sw!deploy(configInstances - deplInstances);}
       else if(configInstances < deplInstances && deplInstances >= baseInstanceN) {sw!undeploy(deplInstances - configInstances);}
       deplInstances = configInstances;
