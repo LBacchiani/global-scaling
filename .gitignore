@@ -3,5 +3,7 @@ globalScaling/gen/
 localScaling/gen/
 predictiveGlobalScaling/testing/gen/
 predictiveGlobalScaling/gen/
-oracleScaling/gen/
+oracleGlobalScaling/gen/
+oracleLocalScaling/gen/
+test/
 process_checker.sh
