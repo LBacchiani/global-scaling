@@ -895,7 +895,7 @@ class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int 
       Rat totalMsg = db.get_inbound_workload();
       Rat totalCost = scaler.computeTotalCost(ratio);
       Rat nInst = scaler.computeInstanceNumber();
-      Int mcl = scaler.getSystemMCL();
+      Rat mcl = scaler.getSystemMCL();
       time = time + ratio;
       String toPrint = toString(time) + "  " + toString(float(100/3) * averageAnalysisTime) + " #true_max: " + toString(max_true) + " TOT: " + toString(totalMsg) + " COMP: " + toString(completed) + " REJ: " + toString(rejected) + " SUPP: " + toString(mcl) + " COST: " + toString(float(totalCost)) + " INST: " + toString(nInst);
       if(max_true - (mcl - kbig) > k || (mcl - kbig) - max_true > k) scaler.scale(max_true);
