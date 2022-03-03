@@ -115,7 +115,7 @@ interface MessageReceiverInterface {
 [SmartDeployCost : "{\"class\" : \"MessageReceiver\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 1,\"Memory\" : 100},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"MessageParser_LoadBalancerInterface\"}],\"methods\" : []}]}"]
 class MessageReceiver(MessageParser_LoadBalancerInterface parserLoadBalancer) implements MessageReceiverInterface {
   Int speed_res = 5;
-  Rat mcl = 116 / 2;
+  Int mcl = 116;
   Unit newMessage (String mailData, MessageReceiver_LoadBalancerInterface balancer) {
     [Cost: speed_res * 30 / mcl] skip;
     balancer.removeMessage();
@@ -168,7 +168,7 @@ interface MessageParserInterface {
 [SmartDeployCost : "{\"class\" : \"MessageParser\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 1,\"Memory\" : 100},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"HeaderAnalyser_LoadBalancerInterface\"}, {\"kind\" : \"require\",\"type\" : \"LinkAnalyser_LoadBalancerInterface\"}, {\"kind\" : \"require\",\"type\" : \"TextAnalyser_LoadBalancerInterface\"}, {\"kind\" : \"require\",\"type\" : \"VirusScanner_LoadBalancerInterface\"}, {\"kind\" : \"require\",\"type\" : \"MessageAnalyser_LoadBalancerInterface\"}, {\"kind\" : \"require\",\"type\" : \"DBInterface\"}],\"methods\" : []}]}"]
 class MessageParser(HeaderAnalyser_LoadBalancerInterface headerAnalyserLoadBalancer, LinkAnalyser_LoadBalancerInterface linkAnalyserLoadBalancer, TextAnalyser_LoadBalancerInterface textAnalyserLoadBalancer, VirusScanner_LoadBalancerInterface virusScannerLoadBalancer, MessageAnalyser_LoadBalancerInterface messageAnalyserLoadBalancer, DBInterface db) implements MessageParserInterface {
   Int speed_res = 5;
-  Rat mcl = 110 / 2;
+  Int mcl = 110;
   Unit parseMessage (String mailData, MessageParser_LoadBalancerInterface balancer, Int id){
 		//cost to parse the message
 		[Cost: speed_res * 30 / mcl] skip;
@@ -393,7 +393,7 @@ interface SentimentAnalyserInterface {
 [SmartDeployCost : "{\"class\" : \"SentimentAnalyser\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 4,\"Memory\" : 250},\"sig\" : [],\"methods\" : []}]}"]
 class SentimentAnalyser() implements SentimentAnalyserInterface {
   Int speed_res = 20;
-  Rat mcl = 100 / 2;
+  Int mcl = 100;
 
   String analyzeSentiments (String messageBody, SentimentAnalyser_LoadBalancerInterface balancer){
     //analyze message body and return the results
@@ -444,7 +444,7 @@ interface VirusScannerInterface {
 [SmartDeployCost : "{\"class\" : \"VirusScanner\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 4,\"Memory\" : 600},\"sig\" : [{ \"kind\" : \"require\",\"type\" : \"AttachmentsManager_LoadBalancerInterface\" }, { \"kind\" : \"require\",\"type\" : \"MessageAnalyser_LoadBalancerInterface\" }],\"methods\" : []}]}"]
 class VirusScanner(AttachmentsManager_LoadBalancerInterface attachmentsManagerLoadBalancer, MessageAnalyser_LoadBalancerInterface messageAnalyserLoadBalancer) implements VirusScannerInterface {
   Int speed_res = 20;
-  Rat mcl = 120 / 2;
+  Int mcl = 120;
 
 
   Unit scanAttachment (String attachment, String messageId, VirusScanner_LoadBalancerInterface balancer){
@@ -498,7 +498,7 @@ interface AttachmentsManagerInterface {
 [SmartDeployCost : "{\"class\" : \"AttachmentsManager\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 1,\"Memory\" : 100},\"sig\" : [ { \"kind\" : \"require\",\"type\" : \"ImageAnalyser_LoadBalancerInterface\" }],\"methods\" : []}]}"]
 class AttachmentsManager(ImageAnalyser_LoadBalancerInterface imageAnalyserLoadBalancer) implements AttachmentsManagerInterface {
   Int speed_res = 5;
-  Rat mcl = 231 / 2 ;
+  Int mcl = 231;
 
   Unit manageAttachments(String attachment, String messageId, AttachmentsManager_LoadBalancerInterface balancer){
     //cost to decide the extension/type of an attachment
@@ -549,7 +549,7 @@ interface ImageAnalyserInterface {
 [SmartDeployCost : "{\"class\" : \"ImageAnalyser\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 1,\"Memory\" : 200},\"sig\" : [{ \"kind\" : \"require\",\"type\" : \"NSFWDetector_LoadBalancerInterface\" }, { \"kind\" : \"require\",\"type\" : \"ImageRecognizer_LoadBalancerInterface\" }, { \"kind\" : \"require\",\"type\" : \"MessageAnalyser_LoadBalancerInterface\" }],\"methods\" : []}]}"]
 class ImageAnalyser(NSFWDetector_LoadBalancerInterface nsfwDetectorLoadBalancer, ImageRecognizer_LoadBalancerInterface imageRecognizerLoadBalancer, MessageAnalyser_LoadBalancerInterface messageAnalyserLoadBalancer) implements ImageAnalyserInterface {
   Int speed_res = 5;
-  Rat mcl = 231 / 2;
+  Int mcl = 231;
 
   Unit analyzeImage (String image, String messageId, ImageAnalyser_LoadBalancerInterface balancer, DBInterface db){
     [Cost: speed_res * 30 / mcl] skip;
@@ -616,7 +616,7 @@ interface NSFWDetectorInterface {
 class NSFWDetector() implements NSFWDetectorInterface {
   Int yesOrNot = -1;
   Int speed_res = 30;
-  Rat mcl = 90 / 2;
+  Int mcl = 902;
   Bool nsfwDetection(String image, NSFWDetector_LoadBalancerInterface balancer){
 		[Cost: speed_res * 30 / mcl] skip;
     balancer.removeMessage();
@@ -669,7 +669,7 @@ interface ImageRecognizerInterface {
 [SmartDeployCost : "{\"class\" : \"ImageRecognizer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 6,\"Memory\" : 800},\"sig\" : [],\"methods\" : []}]}"]
 class ImageRecognizer() implements ImageRecognizerInterface {
   Int speed_res = 30;
-  Rat mcl = 90 / 2;
+  Int mcl = 90;
   String recognizeImage(String image, ImageRecognizer_LoadBalancerInterface balancer){
 		[Cost: speed_res * 30 / mcl] skip;
     balancer.removeMessage();
@@ -719,7 +719,7 @@ interface MessageAnalyserInterface {
 [SmartDeployCost : "{\"class\" : \"MessageAnalyser\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 1,\"Memory\" : 300},\"sig\" : [{ \"kind\" : \"require\",\"type\" : \"DBInterface\" }],\"methods\" : []}]}"]
 class MessageAnalyser(DBInterface db) implements MessageAnalyserInterface {
   Int speed_res = 5;
-  Rat mcl = 300 / 2;
+  Int mcl = 300;
 
   Unit insertResult(String res, String id, MessageAnalyser_LoadBalancerInterface balancer){
 		[Cost: speed_res * 30 / mcl] skip;
@@ -895,7 +895,7 @@ class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int 
       Rat totalMsg = db.get_inbound_workload();
       Rat totalCost = scaler.computeTotalCost(ratio);
       Rat nInst = scaler.computeInstanceNumber();
-      Rat mcl = scaler.getSystemMCL();
+      Int mcl = scaler.getSystemMCL();
       time = time + ratio;
       String toPrint = toString(time) + "  " + toString(float(100/3) * averageAnalysisTime) + " #true_max: " + toString(max_true) + " TOT: " + toString(totalMsg) + " COMP: " + toString(completed) + " REJ: " + toString(rejected) + " SUPP: " + toString(mcl) + " COST: " + toString(float(totalCost)) + " INST: " + toString(nInst);
       if(max_true - (mcl - kbig) > k || (mcl - kbig) - max_true > k) scaler.scale(max_true);
@@ -919,7 +919,7 @@ interface ScalerServiceInterface {
 
 class ScalerService(Int kbig, Rat initialCost, Int initInstancesNumber) implements ScalerServiceInterface {
 
-  List<Rat> mcls = list[116/2, 110/2, 100/2, 120/2, 231/2, 231/2, 90/2, 90/2, 300/2];
+  List<Int> mcls = list[116, 110, 100, 120, 231, 231, 90, 90, 300];
   List<Rat> mfs = list[1, 1, 5/2, 2, 3/2, 3/2, 3/2, 3/2, 5];
   List<Int> baseConfig = list[1, //MR
                               1, //MP
@@ -938,7 +938,7 @@ class ScalerService(Int kbig, Rat initialCost, Int initInstancesNumber) implemen
   List<WrapperScaleInterface> orchestrationDeltas = list[];
   List<String> scaleNames = list[];
   List<Int> scalingTrace = list[];
-  Rat mcl = 0;
+  Int mcl = 0;
   Int numScales = 0;
   String scalingAct = "";
 
@@ -1023,8 +1023,8 @@ class ScalerService(Int kbig, Rat initialCost, Int initInstancesNumber) implemen
     return cost;
   }
 
-  Rat mcl(List<Int> microserviceInstances) {
-    Rat mcl = 0;
+  Int mcl(List<Int> microserviceInstances) {
+    Int mcl = 0;
     Int i = 0;
     while(i < length(microserviceInstances)) {
       Rat n_inst = nth(microserviceInstances,i);
@@ -1240,7 +1240,7 @@ class MailGenerator(MessageReceiver_LoadBalancerInterface entryPoint) implements
   Rat windowDim = 30;
 	Unit run() {
     //new workload
-    /*List<Int> realWorkload = list[82, 84, 85, 90, 93, 96, 100, 104, 108, 114,
+    List<Int> realWorkload = list[82, 84, 85, 90, 93, 96, 100, 104, 108, 114,
                                   118, 122, 128, 133, 138, 142, 147, 150, 150, 151,
                                   151, 152, 152, 153, 153, 153, 153, 153, 154, 154,
                                   154, 154, 154, 155, 155, 155, 155, 155, 155, 155,
@@ -1258,7 +1258,7 @@ class MailGenerator(MessageReceiver_LoadBalancerInterface entryPoint) implements
                                   470, 455, 440, 420, 399, 388, 378, 368, 358, 348,
                                   337, 327, 317, 307, 297, 286, 276, 266, 256, 246,
                                   235, 225, 215, 205, 195, 185, 175, 164, 155, 145,
-                                  134, 124, 114, 104, 97, 96, 93, 88, 85, 84];*/
+                                  134, 124, 114, 104, 97, 96, 93, 88, 85, 84];
 
     //primo workload
     /*List<Int> realWorkload = list[47,47,47,47,54,54,54,46,46,46,
@@ -1279,7 +1279,7 @@ class MailGenerator(MessageReceiver_LoadBalancerInterface entryPoint) implements
                                   52,43,43,43,40,40,40,40,44,42,
                                   47,47,47,47,54,54,54,46,46,46];*/
     //enron
-     List<Int> realWorkload = list[10, 5, 2, 2, 25, 22, 17, 20, 22, 27,
+     /*List<Int> realWorkload = list[10, 5, 2, 2, 25, 22, 17, 20, 22, 27,
                                    7, 17, 12, 50, 52, 30, 22, 17, 90, 120,
                                    40, 37, 35, 80, 75, 15, 165, 535, 497, 507,
                                    522, 507, 510, 557, 610, 617, 610, 675, 665, 640,
@@ -1298,7 +1298,7 @@ class MailGenerator(MessageReceiver_LoadBalancerInterface entryPoint) implements
                                    232, 230, 217, 210, 200, 192, 187, 167, 152, 167,
                                    150, 137, 127, 65, 62, 55, 52, 50, 50, 50,
                                    45, 132, 130, 47, 92, 95, 150, 157, 255, 400,
-                                   430, 440, 440, 445, 455, 475, 457, 447, 447, 420];
+                                   430, 440, 440, 445, 455, 475, 457, 447, 447, 420];*/
 		Int i = 0;
     Int round = 0;
     while(round < 230) {
