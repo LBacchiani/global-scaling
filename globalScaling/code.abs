@@ -115,7 +115,7 @@ interface MessageReceiverInterface {
 [SmartDeployCost : "{\"class\" : \"MessageReceiver\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 1,\"Memory\" : 100},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"MessageParser_LoadBalancerInterface\"}],\"methods\" : []}]}"]
 class MessageReceiver(MessageParser_LoadBalancerInterface parserLoadBalancer) implements MessageReceiverInterface {
   Int speed_res = 5;
-  Rat mcl = 116;
+  Int mcl = 116;
   Unit newMessage (String mailData, MessageReceiver_LoadBalancerInterface balancer) {
     [Cost: speed_res * 30 / mcl] skip;
     balancer.removeMessage();
@@ -168,7 +168,7 @@ interface MessageParserInterface {
 [SmartDeployCost : "{\"class\" : \"MessageParser\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 1,\"Memory\" : 100},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"HeaderAnalyser_LoadBalancerInterface\"}, {\"kind\" : \"require\",\"type\" : \"LinkAnalyser_LoadBalancerInterface\"}, {\"kind\" : \"require\",\"type\" : \"TextAnalyser_LoadBalancerInterface\"}, {\"kind\" : \"require\",\"type\" : \"VirusScanner_LoadBalancerInterface\"}, {\"kind\" : \"require\",\"type\" : \"MessageAnalyser_LoadBalancerInterface\"}, {\"kind\" : \"require\",\"type\" : \"DBInterface\"}],\"methods\" : []}]}"]
 class MessageParser(HeaderAnalyser_LoadBalancerInterface headerAnalyserLoadBalancer, LinkAnalyser_LoadBalancerInterface linkAnalyserLoadBalancer, TextAnalyser_LoadBalancerInterface textAnalyserLoadBalancer, VirusScanner_LoadBalancerInterface virusScannerLoadBalancer, MessageAnalyser_LoadBalancerInterface messageAnalyserLoadBalancer, DBInterface db) implements MessageParserInterface {
   Int speed_res = 5;
-  Rat mcl = 110;
+  Int mcl = 110;
   Unit parseMessage (String mailData, MessageParser_LoadBalancerInterface balancer, Int id){
 		//cost to parse the message
 		[Cost: speed_res * 30 / mcl] skip;
@@ -393,7 +393,7 @@ interface SentimentAnalyserInterface {
 [SmartDeployCost : "{\"class\" : \"SentimentAnalyser\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 4,\"Memory\" : 250},\"sig\" : [],\"methods\" : []}]}"]
 class SentimentAnalyser() implements SentimentAnalyserInterface {
   Int speed_res = 20;
-  Rat mcl = 100;
+  Int mcl = 100;
 
   String analyzeSentiments (String messageBody, SentimentAnalyser_LoadBalancerInterface balancer){
     //analyze message body and return the results
@@ -444,7 +444,7 @@ interface VirusScannerInterface {
 [SmartDeployCost : "{\"class\" : \"VirusScanner\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 4,\"Memory\" : 600},\"sig\" : [{ \"kind\" : \"require\",\"type\" : \"AttachmentsManager_LoadBalancerInterface\" }, { \"kind\" : \"require\",\"type\" : \"MessageAnalyser_LoadBalancerInterface\" }],\"methods\" : []}]}"]
 class VirusScanner(AttachmentsManager_LoadBalancerInterface attachmentsManagerLoadBalancer, MessageAnalyser_LoadBalancerInterface messageAnalyserLoadBalancer) implements VirusScannerInterface {
   Int speed_res = 20;
-  Rat mcl = 120;
+  Int mcl = 120;
 
 
   Unit scanAttachment (String attachment, String messageId, VirusScanner_LoadBalancerInterface balancer){
@@ -498,7 +498,7 @@ interface AttachmentsManagerInterface {
 [SmartDeployCost : "{\"class\" : \"AttachmentsManager\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 1,\"Memory\" : 100},\"sig\" : [ { \"kind\" : \"require\",\"type\" : \"ImageAnalyser_LoadBalancerInterface\" }],\"methods\" : []}]}"]
 class AttachmentsManager(ImageAnalyser_LoadBalancerInterface imageAnalyserLoadBalancer) implements AttachmentsManagerInterface {
   Int speed_res = 5;
-  Rat mcl = 231;
+  Int mcl = 231;
 
   Unit manageAttachments(String attachment, String messageId, AttachmentsManager_LoadBalancerInterface balancer){
     //cost to decide the extension/type of an attachment
@@ -549,7 +549,7 @@ interface ImageAnalyserInterface {
 [SmartDeployCost : "{\"class\" : \"ImageAnalyser\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 1,\"Memory\" : 200},\"sig\" : [{ \"kind\" : \"require\",\"type\" : \"NSFWDetector_LoadBalancerInterface\" }, { \"kind\" : \"require\",\"type\" : \"ImageRecognizer_LoadBalancerInterface\" }, { \"kind\" : \"require\",\"type\" : \"MessageAnalyser_LoadBalancerInterface\" }],\"methods\" : []}]}"]
 class ImageAnalyser(NSFWDetector_LoadBalancerInterface nsfwDetectorLoadBalancer, ImageRecognizer_LoadBalancerInterface imageRecognizerLoadBalancer, MessageAnalyser_LoadBalancerInterface messageAnalyserLoadBalancer) implements ImageAnalyserInterface {
   Int speed_res = 5;
-  Rat mcl = 231;
+  Int mcl = 231;
 
   Unit analyzeImage (String image, String messageId, ImageAnalyser_LoadBalancerInterface balancer, DBInterface db){
     [Cost: speed_res * 30 / mcl] skip;
@@ -616,7 +616,7 @@ interface NSFWDetectorInterface {
 class NSFWDetector() implements NSFWDetectorInterface {
   Int yesOrNot = -1;
   Int speed_res = 30;
-  Rat mcl = 902;
+  Int mcl = 90;
   Bool nsfwDetection(String image, NSFWDetector_LoadBalancerInterface balancer){
 		[Cost: speed_res * 30 / mcl] skip;
     balancer.removeMessage();
@@ -669,7 +669,7 @@ interface ImageRecognizerInterface {
 [SmartDeployCost : "{\"class\" : \"ImageRecognizer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 6,\"Memory\" : 800},\"sig\" : [],\"methods\" : []}]}"]
 class ImageRecognizer() implements ImageRecognizerInterface {
   Int speed_res = 30;
-  Rat mcl = 90;
+  Int mcl = 90;
   String recognizeImage(String image, ImageRecognizer_LoadBalancerInterface balancer){
 		[Cost: speed_res * 30 / mcl] skip;
     balancer.removeMessage();
@@ -719,7 +719,7 @@ interface MessageAnalyserInterface {
 [SmartDeployCost : "{\"class\" : \"MessageAnalyser\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 1,\"Memory\" : 300},\"sig\" : [{ \"kind\" : \"require\",\"type\" : \"DBInterface\" }],\"methods\" : []}]}"]
 class MessageAnalyser(DBInterface db) implements MessageAnalyserInterface {
   Int speed_res = 5;
-  Rat mcl = 300;
+  Int mcl = 300;
 
   Unit insertResult(String res, String id, MessageAnalyser_LoadBalancerInterface balancer){
 		[Cost: speed_res * 30 / mcl] skip;
