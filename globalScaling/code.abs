@@ -1024,7 +1024,7 @@ class ScalerService(Int kbig, Rat initialCost, Int initInstancesNumber) implemen
   }
 
   Int mcl(List<Int> microserviceInstances) {
-    Int mcl = 0;
+    Rat mcl = 0;
     Int i = 0;
     while(i < length(microserviceInstances)) {
       Rat n_inst = nth(microserviceInstances,i);
