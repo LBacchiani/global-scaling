@@ -877,8 +877,8 @@ class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int 
   //dimension of the time window for monitoring controls
   Int monitoringWindowDimension = windowDim;
   Int time = 0;
-
-   List<Int> inbound_workload_list= list[//10, 5, 2, 2, 25, 22, 17, 20, 22, 27,
+   //enron
+   List<Int> inbound_workload_list = list[//10, 5, 2, 2, 25, 22, 17, 20, 22, 27,
                                                      7, 17, 12, 50, 52, 30, 22, 17, 90, 120,
                                                      40, 37, 35, 80, 75, 15, 165, 535, 497, 507,
                                                      522, 507, 510, 557, 610, 617, 610, 675, 665, 640,
@@ -1251,7 +1251,7 @@ class SetUpSystem() implements SetUpSystemInterface{
 
     Int kbig = 20;
     Int k = 10;
-    Rat initial_inbound_workload = 27;
+    Rat initial_inbound_workload = 114;//27;
     Int windowDim = 300;
     Int ratio = 10; //ratio between monitoring window and generation window
     ScalerServiceInterface scaler = new ScalerService(kbig, base_cost + invariants_cost, 13);
@@ -1315,7 +1315,7 @@ class MailGenerator(MessageReceiver_LoadBalancerInterface entryPoint) implements
                                   83,80,75,72,61,59,55,52,52,52,
                                   52,43,43,43,40,40,40,40,44,42,
                                   47,47,47,47,54,54,54,46,46,46];*/
-    //workload to forecast
+    //enron
     List<Int> realWorkload = list[10, 5, 2, 2, 25, 22, 17, 20, 22, 27,
                                   7, 17, 12, 50, 52, 30, 22, 17, 90, 120,
                                   40, 37, 35, 80, 75, 15, 165, 535, 497, 507,
