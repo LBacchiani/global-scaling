@@ -878,8 +878,7 @@ class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int 
   Int monitoringWindowDimension = windowDim;
   Int time = 0;
    //enron
-   List<Int> inbound_workload_list = list[//10, 5, 2, 2, 25, 22, 17, 20, 22, 27,
-                                                     7, 17, 12, 50, 52, 30, 22, 17, 90, 120,
+   List<Int> inbound_workload_list = list[           7, 17, 12, 50, 52, 30, 22, 17, 90, 120,
                                                      40, 37, 35, 80, 75, 15, 165, 535, 497, 507,
                                                      522, 507, 510, 557, 610, 617, 610, 675, 665, 640,
                                                      635, 612, 602, 597, 575, 585, 560, 555, 597, 590,
@@ -897,7 +896,8 @@ class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int 
                                                      232, 230, 217, 210, 200, 192, 187, 167, 152, 167,
                                                      150, 137, 127, 65, 62, 55, 52, 50, 50, 50,
                                                      45, 132, 130, 47, 92, 95, 150, 157, 255, 400,
-                                                     430, 440, 440, 445, 455, 475, 457, 447, 447, 420];
+                                                     430, 440, 440, 445, 455, 475, 457, 447, 447, 420,
+                                                     10, 5, 2, 2, 25, 22, 17, 20, 22, 27];
 
   Int sum (Int n){
     Int i = time - n;
@@ -911,7 +911,7 @@ class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int 
 
 	// active behavior
 	Unit run() {
-    while(time < 230){
+    while(time < 200){
       Rat max_pred = 0;
       Rat max_true = 0;
       Int i = 0;
@@ -1338,7 +1338,7 @@ class MailGenerator(MessageReceiver_LoadBalancerInterface entryPoint) implements
                                   430, 440, 440, 445, 455, 475, 457, 447, 447, 420];
 		Int i = 0;
     Int round = 0;
-    while(round < 230) {
+    while(round < 200) {
       Rat currentMessageNumber = nth(realWorkload, i);
       i = (i + 1) % length(realWorkload);
       round = round + 1;

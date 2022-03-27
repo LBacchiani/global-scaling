@@ -873,12 +873,14 @@ class WrapperScale(Scale1 s1, Scale2 s2, Scale3 s3, Scale4 s4, Int nInst) implem
 interface MonitorInterface {}
 
 //this class has an active behaviour so the monitoring operations start when the object is created in an automatic way
-class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int kbig, Int k, Int ratio) implements MonitorInterface {
+class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int kbig, Int k, Int ratio, List<Int> conf) implements MonitorInterface {
   //dimension of the time window for monitoring controls
   Int monitoringWindowDimension = windowDim;
   Int time = 0;
+  List<Int> current_config = conf;
 
-   List<Int> inbound_workload_list= list[
+
+  List<Int> inbound_workload_list= list[
                        50, 62, 0, 75, 62, 40, 0, 27, 47, 92,
                        45, 37, 55, 60, 72, 7, 267, 512, 485, 522,
                        520, 522, 512, 540, 575, 570, 575, 632, 620, 630,
@@ -909,22 +911,48 @@ class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int 
     return sum;
   }
 
+  Rat compute_weight(List<Int> pred_conf, List<Int> actual_conf) {
+    Rat dev_factor = 1/4;
+    Int i = length(pred_conf) - 1;
+    Rat weight = 0;
+    while(i > 0) {
+      Rat pred_score = nth(pred_conf,i) * dev_factor;
+      Rat react_score = -nth(actual_conf, i) * dev_factor;
+      weight = weight + pred_score + react_score;
+      i = i - 1;
+    }
+    if(abs(weight) > 1) weight = 1;
+    return abs(weight);
+  }
+
+  Pair<Rat,Rat> find_maxes() {
+    Rat max_pred = 0;
+    Rat max_true = 0;
+    Int i = 0;
+    //wait the monitoring time
+    while(i < ratio) {
+      await duration(monitoringWindowDimension/ratio, monitoringWindowDimension/ratio);
+      Rat chunk_pred = nth(inbound_workload_list, (i + time) % length(inbound_workload_list));
+      Rat chunk_real = db.get_one_sec_workload();
+      db.one_sec_timeout();
+      if(chunk_pred > max_pred) max_pred = chunk_pred;
+      if(chunk_real > max_true) max_true = chunk_real;
+      i = i + 1;
+    }
+    return Pair(max_pred, max_true);
+  }
+
 	// active behavior
 	Unit run() {
     while(time < 200){
-      Rat max_pred = 0;
-      Rat max_true = 0;
-      Int i = 0;
-      //wait the monitoring time
-      while(i < ratio) {
-        await duration(monitoringWindowDimension/ratio, monitoringWindowDimension/ratio);
-        Rat chunk_pred = nth(inbound_workload_list, (i + time) % length(inbound_workload_list));
-        Rat chunk_real = db.get_one_sec_workload();
-        db.one_sec_timeout();
-        if(chunk_pred > max_pred) max_pred = chunk_pred;
-        if(chunk_real > max_true) max_true = chunk_real;
-        i = i + 1;
-      }
+      Pair<Rat,Rat> maxes = this.find_maxes();
+      Rat max_pred = fst(maxes);
+      Rat max_true = snd(maxes);
+      time = time + ratio;
+      List<Int> actual_conf = scaler.computeConfiguration(max_true);
+      Rat react_score = this.compute_weight(current_config, actual_conf);
+      Rat pred_score = 1 - react_score;
+      Rat scale_target = (react_score * max_true) + (pred_score * max_pred);
       Float averageAnalysisTime = db.returnAverageAnalysisTime();
       Rat completed = db.messageCompleted();
       Rat rejected = db.rejectedMessages();
@@ -932,9 +960,11 @@ class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int 
       Rat totalCost = scaler.computeTotalCost(ratio);
       Rat nInst = scaler.computeInstanceNumber();
       Rat mcl = scaler.getSystemMCL();
-      time = time + ratio;
-      String toPrint = toString(time) + "  " + toString(float(100/3) * averageAnalysisTime) + " #next_max: " + toString(max_pred) + " curr_max: " + toString(max_true) + " TOT: " + toString(totalMsg) + " COMP: " + toString(completed) + " REJ: " + toString(rejected) + " SUPP: " + toString(mcl) + " COST: " + toString(float(totalCost)) + " INST: " + toString(nInst);
-      if(max_pred - (mcl - kbig) > k || (mcl - kbig) - max_pred > k) scaler.scale(max_pred);
+      String toPrint = toString(time) + "  " + toString(float(100/3) * averageAnalysisTime) + " #next_max: " + toString(max_pred) + " curr_max: " + toString(max_true) + " scale_target: " + toString(float(scale_target)) + " TOT: " + toString(totalMsg) + " COMP: " + toString(completed) + " REJ: " + toString(rejected) + " SUPP: " + toString(mcl) + " COST: " + toString(float(totalCost)) + " INST: " + toString(nInst);
+      if(scale_target - (mcl - kbig) > k || (mcl - kbig) - scale_target > k) {
+        current_config = scaler.computeConfiguration(scale_target);
+        scaler.scale(current_config);
+      }
       String scalingAct = scaler.getScalingActions();
       toPrint = toPrint + scalingAct;
       db.resetMetrics();
@@ -946,11 +976,12 @@ class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int 
 
 interface ScalerServiceInterface {
   Unit insertScalingElements(List<Int> components, WrapperScaleInterface scalingObj, String scalingName);
-  Unit scale(Rat inbound_workload);
+  Unit scale(List<Int> configDeltas);
   Rat getSystemMCL();
   String getScalingActions();
   Rat computeInstanceNumber();
   Rat computeTotalCost(Int ratio);
+  List<Int> computeConfiguration(Rat inbound_workload);
 }
 
 class ScalerService(Int kbig, Rat initialCost, Int initInstancesNumber) implements ScalerServiceInterface {
@@ -974,6 +1005,7 @@ class ScalerService(Int kbig, Rat initialCost, Int initInstancesNumber) implemen
   List<WrapperScaleInterface> orchestrationDeltas = list[];
   List<String> scaleNames = list[];
   List<Int> scalingTrace = list[];
+  List<Int> printableconfig = list[];
   Rat mcl = 0;
   Int numScales = 0;
   String scalingAct = "";
@@ -987,10 +1019,9 @@ class ScalerService(Int kbig, Rat initialCost, Int initInstancesNumber) implemen
     numScales = numScales + 1;
   }
 
-
-  Unit scale(Rat inbound_workload) {
+  List<Int> computeConfiguration(Rat inbound_workload) {
     List<Int> configDeltas = this.createEmpty(numScales);
-    List<Int> printableconfig = configDeltas;
+    printableconfig = configDeltas;
     List<Int> config = baseConfig;
     mcl = this.mcl(config);
     Bool configFound = (mcl - kbig) - inbound_workload  >= 0;
@@ -1007,6 +1038,11 @@ class ScalerService(Int kbig, Rat initialCost, Int initInstancesNumber) implemen
       printableconfig = this.incrementValue(i,printableconfig);
       configDeltas = this.addDeltas(i,configDeltas);
     }
+    return configDeltas;
+  }
+
+
+  Unit scale(List<Int> configDeltas) {
     this.reconfigure(deployedDeltas, configDeltas);
     scalingAct = this.recordAction(scalingTrace, printableconfig);
     deployedDeltas = configDeltas;
@@ -1259,12 +1295,13 @@ class SetUpSystem() implements SetUpSystemInterface{
     scaler.insertScalingElements(s2config, wrapperS2, "Scale2");
     scaler.insertScalingElements(s3config, wrapperS3, "Scale3");
     scaler.insertScalingElements(s4config, wrapperS4, "Scale4");
-    scaler.scale(initial_inbound_workload);
+    List<Int> config = scaler.computeConfiguration(initial_inbound_workload);
+    scaler.scale(config);
     String scalingAct = scaler.getScalingActions();
     println("Initial Configuration: Basex1 " + scalingAct);
     await duration(200,200);
     //create the monitor
-	  MonitorInterface monitor = new Monitor(scaler, dbObj, windowDim, kbig, k, ratio);
+	  MonitorInterface monitor = new Monitor(scaler, dbObj, windowDim, kbig, k, ratio, config);
 		return head(messageReceiver_LoadBalancerList);
 	}
 }
