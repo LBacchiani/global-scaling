@@ -6,5 +6,6 @@ predictiveGlobalScaling/gen/
 predictiveGlobalScaling/workload_predictor/data/*
 oracleGlobalScaling/gen/
 oracleLocalScaling/gen/
+predictiveGlobalScaling++/gen/
 test/
 process_checker.sh

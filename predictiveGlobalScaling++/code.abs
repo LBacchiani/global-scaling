@@ -912,12 +912,12 @@ class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int 
   }
 
   Rat compute_weight(List<Int> pred_conf, List<Int> actual_conf) {
-    Rat dev_factor = 1/4;
+    List<Rat> dev_factors = list[12/61, 24/61, 9/61, 16/61];
     Int i = length(pred_conf) - 1;
     Rat weight = 0;
     while(i > 0) {
-      Rat pred_score = nth(pred_conf,i) * dev_factor;
-      Rat react_score = -nth(actual_conf, i) * dev_factor;
+      Rat pred_score = nth(pred_conf,i) * nth(dev_factors,i);
+      Rat react_score = -nth(actual_conf, i) * nth(dev_factors,i);
       weight = weight + pred_score + react_score;
       i = i - 1;
     }
