@@ -4,6 +4,7 @@ localScaling/gen/
 predictiveGlobalScaling/testing/gen/
 predictiveGlobalScaling/gen/
 predictiveGlobalScaling/workload_predictor/data/*
+predictiveGlobalScaling/workload_predictor/lightning_logs/*
 oracleGlobalScaling/gen/
 oracleLocalScaling/gen/
 predictiveGlobalScaling++/gen/
