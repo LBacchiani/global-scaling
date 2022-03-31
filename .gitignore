@@ -3,6 +3,7 @@ globalScaling/gen/
 localScaling/gen/
 predictiveGlobalScaling/testing/gen/
 predictiveGlobalScaling/gen/
+predictiveGlobalScaling/workload_predictor/data/*
 oracleGlobalScaling/gen/
 oracleLocalScaling/gen/
 predictiveGlobalScaling++/gen/
