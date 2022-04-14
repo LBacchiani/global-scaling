@@ -3,10 +3,12 @@ globalScaling/gen/
 localScaling/gen/
 predictiveGlobalScaling/testing/gen/
 predictiveGlobalScaling/gen/
-predictiveGlobalScaling/workload_predictor/data/*
+predictiveGlobalScaling/workload_predictor/data/archive.zip
+workload_predictor/data/emails.csv
 predictiveGlobalScaling/workload_predictor/lightning_logs/*
 oracleGlobalScaling/gen/
 oracleLocalScaling/gen/
 predictiveGlobalScaling++/gen/
 test/
 process_checker.sh
+predictiveGlobalScaling/workload_predictor/data/emails.csv
