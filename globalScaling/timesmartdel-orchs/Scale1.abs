@@ -1,7 +1,8 @@
 module Scale1;
 export *;
 import * from ABS.DC;
-import * from EmailProcessingPipelineArchitecture;
+import * from Architecture;
+import * from DB;
 
 interface Scale1{
 	List<MessageReceiverInterface> getMessageReceiverInterface();

@@ -1,0 +1,289 @@
+module Proactive;
+
+export *;
+import * from ABS.DC;
+import * from MailGen;
+import * from Architecture;
+import * from Sys_init;
+import * from Wrapper;
+import * from DB;
+
+interface MonitorInterface {}
+
+//this class has an active behaviour so the monitoring operations start when the object is created in an automatic way
+class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int kbig, Int k, Int ratio) implements MonitorInterface {
+  //dimension of the time window for monitoring controls
+  Int monitoringWindowDimension = windowDim;
+  Int time = 0;
+
+   List<Int> inbound_workload_list= list[
+                       50, 62, 0, 75, 62, 40, 0, 27, 47, 92,
+                       45, 37, 55, 60, 72, 7, 267, 512, 485, 522,
+                       520, 522, 512, 540, 575, 570, 575, 632, 620, 630,
+                       617, 610, 577, 600, 592, 555, 550, 570, 567, 562,
+                       562, 562, 550, 537, 537, 552, 565, 580, 640, 665,
+                       665, 737, 725, 722, 735, 725, 695, 732, 737, 732,
+                       715, 690, 712, 707, 710, 695, 697, 730, 722, 727,
+                       670, 572, 585, 580, 580, 575, 540, 525, 522, 520,
+                       517, 525, 502, 507, 507, 507, 500, 500, 500, 487,
+                       500, 470, 455, 427, 427, 420, 407, 400, 400, 392,
+                       425, 430, 397, 367, 365, 337, 315, 325, 332, 322,
+                       312, 315, 317, 315, 312, 317, 292, 280, 282, 272,
+                       272, 275, 287, 305, 305, 297, 305, 317, 330, 320,
+                       312, 325, 322, 320, 312, 327, 310, 300, 280, 262,
+                       262, 257, 252, 252, 247, 260, 240, 230, 220, 230,
+                       222, 232, 217, 217, 190, 190, 180, 175, 175, 175,
+                       187, 115, 97, 82, 82, 65, 55, 35, 80, 77,
+                       92, 140, 150, 37, 117, 82, 155, 147, 262, 395,
+                       402, 437, 430, 447, 437, 452, 475, 480, 442, 402,
+                       25, 2, 12, 32, 2, 0, 10, 20, 0, 25];
+  Int sum (Int n){
+    Int i = time - n;
+    Int sum = 0;
+    while(i < time){
+      if(i < length(inbound_workload_list)) sum = sum + nth(inbound_workload_list,i);
+      i = i + 1;
+    }
+    return sum;
+  }
+
+	// active behavior
+	Unit run() {
+    while(time < 200){
+      Rat max_pred = 0;
+      Rat max_true = 0;
+      Int i = 0;
+      //wait the monitoring time
+      while(i < ratio) {
+        await duration(monitoringWindowDimension/ratio, monitoringWindowDimension/ratio);
+        Rat chunk_pred = nth(inbound_workload_list, (i + time) % length(inbound_workload_list));
+        Rat chunk_real = db.get_one_sec_workload();
+        db.one_sec_timeout();
+        if(chunk_pred > max_pred) max_pred = chunk_pred;
+        if(chunk_real > max_true) max_true = chunk_real;
+        i = i + 1;
+      }
+      Float averageAnalysisTime = db.returnAverageAnalysisTime();
+      Rat completed = db.messageCompleted();
+      Rat rejected = db.rejectedMessages();
+      Rat totalMsg = db.get_inbound_workload();
+      Rat totalCost = scaler.computeTotalCost(ratio);
+      Rat nInst = scaler.computeInstanceNumber();
+      Rat mcl = scaler.getSystemMCL();
+      time = time + ratio;
+      String toPrint = toString(time) + "  " + toString(float(100/3) * averageAnalysisTime) + " #next_max: " + toString(max_pred) + " curr_max: " + toString(max_true) + " TOT: " + toString(totalMsg) + " COMP: " + toString(completed) + " REJ: " + toString(rejected) + " SUPP: " + toString(mcl) + " COST: " + toString(float(totalCost)) + " INST: " + toString(nInst);
+      if(max_pred - (mcl - kbig) > k || (mcl - kbig) - max_pred > k) scaler.scale(max_pred);
+      String scalingAct = scaler.getScalingActions();
+      toPrint = toPrint + scalingAct;
+      db.resetMetrics();
+      println(toPrint);
+    }
+  }
+}
+
+
+interface ScalerServiceInterface {
+  Unit insertScalingElements(List<Int> components, WrapperScaleInterface scalingObj, String scalingName);
+  Unit scale(Rat inbound_workload);
+  Rat getSystemMCL();
+  String getScalingActions();
+  Rat computeInstanceNumber();
+  Rat computeTotalCost(Int ratio);
+}
+
+class ScalerService(Int kbig, Rat initialCost, Int initInstancesNumber) implements ScalerServiceInterface {
+
+  List<Int> mcls = list[116, 110, 100, 120, 231, 231, 90, 90, 300];
+  List<Rat> mfs = list[1, 1, 5/2, 2, 3/2, 3/2, 3/2, 3/2, 5];
+  List<Int> baseConfig = list[1, //MR
+                              1, //MP
+                              //0, //HA
+                              //0, //LA
+                              //0, //TA
+                              2, //SA
+                              1,  //VS
+                              1, //AM
+                              1, //IA
+                              1,  //NSFW
+                              1,  //IR
+                              1]; //MA
+  List<List<Int>> scaleComponents = list[];
+  List<Int> deployedDeltas = list[];
+  List<WrapperScaleInterface> orchestrationDeltas = list[];
+  List<String> scaleNames = list[];
+  List<Int> scalingTrace = list[];
+  Rat mcl = 0;
+  Int numScales = 0;
+  String scalingAct = "";
+
+  Unit insertScalingElements(List<Int> components, WrapperScaleInterface scalingObj, String scalingName) {
+    scaleComponents = appendright(scaleComponents, components);
+    deployedDeltas = appendright(deployedDeltas, 0);
+    orchestrationDeltas = appendright(orchestrationDeltas, scalingObj);
+    scalingTrace = appendright(scalingTrace, 0);
+    scaleNames = appendright(scaleNames, scalingName);
+    numScales = numScales + 1;
+  }
+
+
+  Unit scale(Rat inbound_workload) {
+    List<Int> configDeltas = this.createEmpty(numScales);
+    List<Int> printableconfig = configDeltas;
+    List<Int> config = baseConfig;
+    mcl = this.mcl(config);
+    Bool configFound = (mcl - kbig) - inbound_workload  >= 0;
+    while(!configFound) {
+      List<Int> candidateConfig = baseConfig;
+      Int i = -1;
+      while(i < numScales - 1 && !configFound) {
+        i = i + 1;
+        candidateConfig = this.vSum(config, nth(scaleComponents,i));
+        mcl = this.mcl(candidateConfig);
+        configFound = (mcl - kbig) - inbound_workload  >= 0;
+      }
+      config = candidateConfig;
+      printableconfig = this.incrementValue(i,printableconfig);
+      configDeltas = this.addDeltas(i,configDeltas);
+    }
+    this.reconfigure(deployedDeltas, configDeltas);
+    scalingAct = this.recordAction(scalingTrace, printableconfig);
+    deployedDeltas = configDeltas;
+    scalingTrace = printableconfig;
+  }
+
+  Rat getSystemMCL() {return mcl;}
+
+  String getScalingActions() {
+    String tmp = scalingAct;
+    if(scalingAct != "") scalingAct = "";
+    return tmp;
+  }
+
+  Rat computeTotalCost(Int ratio) {
+    Rat totalCost = initialCost;
+    foreach(orch in orchestrationDeltas) {
+      WrapperScaleInterface wrapper = orch;
+      Rat scaleCost = this.computeCostPerScaling(wrapper);
+      Int deplTimes = wrapper.getDeplTimes();
+      scaleCost = scaleCost * deplTimes;
+      totalCost = totalCost + scaleCost;
+    }
+    return totalCost*ratio/(1000*3600);
+  }
+
+  Rat computeInstanceNumber() {
+    Rat nInstances = initInstancesNumber;
+    foreach(orch in orchestrationDeltas) {
+      WrapperScaleInterface wrapper = orch;
+      Int n = wrapper.getDeployedInstances();
+      Int deplTimes = wrapper.getDeplTimes();
+      nInstances = nInstances + (n * deplTimes);
+    }
+    return nInstances;
+  }
+
+  ////private methods/////
+
+  Rat computeCostPerScaling(WrapperScaleInterface wrapper) {
+    List<DeploymentComponent> dcs = wrapper.getDeploymentComponent();
+    Rat cost = 0;
+    foreach(dc in dcs) {
+      Rat singleCost = dc.getCostPerInterval();
+      cost = cost + singleCost;
+    }
+    return cost;
+  }
+
+  Rat mcl(List<Int> microserviceInstances) {
+    Rat mcl = 0;
+    Int i = 0;
+    while(i < length(microserviceInstances)) {
+      Rat n_inst = nth(microserviceInstances,i);
+      Rat handled_frequency = n_inst * nth(mcls,i) / nth(mfs,i);
+      if(handled_frequency < mcl || mcl == 0){mcl = handled_frequency;}
+      i = i + 1;
+    }
+    return mcl;
+  }
+
+  List<Int> vSum(List<Int> v1, List<Int> v2) {
+    Int i = 0;
+    List<Int> res = list[];
+    while(i < length(v1)) {
+      Int e1 = nth(v1,i);
+      Int e2 = nth(v2,i);
+      res = appendright(res, e1 + e2);
+      i = i + 1;
+    }
+    return res;
+  }
+
+  List<Int> createEmpty(Int nDeltas) {
+    Int n = nDeltas;
+    List<Int> empty = list[];
+    while(n > 0) {empty = appendright(empty, 0); n = n - 1;}
+    return empty;
+  }
+
+  List<Int> incrementValue(Int index, List<Int> list) {
+    List<Int> updatedList = list[];
+    Int i = 0;
+    while(i < length(list)) {
+      if(i == index){updatedList = appendright(updatedList, nth(list, i) + 1);}
+      else{updatedList = appendright(updatedList, nth(list, i));}
+      i = i + 1;
+    }
+    return updatedList;
+  }
+
+  List<Int> addDeltas(Int scaleIndex, List<Int> currentPoliciesConfig) {
+    List<Int> configDeltas = this.incrementValue(scaleIndex, currentPoliciesConfig);
+    Int i = 0;
+    while(i < scaleIndex) {
+      configDeltas = this.incrementValue(i, configDeltas);
+      i = i + 1;
+    }
+    return configDeltas;
+  }
+
+  String recordAction(List<Int> scalingTrace, List<Int> printableconfig) {
+    String toPrint = "";
+    Int i = 0;
+    while(i < numScales) {
+      Int diff = nth(printableconfig,i) - nth(scalingTrace,i);
+      String name = nth(scaleNames, i);
+      if (diff > 0) {toPrint = toPrint + " " + name + "-upx" + toString(diff);}
+      else if (diff < 0) {toPrint = toPrint + " " + name + "-downx" + toString(-diff);}
+      i = i + 1;
+    }
+    return toPrint;
+  }
+
+  Unit reconfigure(List<Int> deployedDeltas, List<Int> configDeltas) {
+    Int i = 0;
+    while(i < numScales) {
+      Int diff = nth(configDeltas,i) - nth(deployedDeltas,i);
+      Rat num = abs(diff);
+      while(num > 0) {
+         if (diff > 0) {nth(orchestrationDeltas,i)!deploy();}
+         else {nth(orchestrationDeltas,i)!undeploy();}
+         num = num - 1;
+      }
+      i = i + 1;
+    }
+  }
+
+}
+
+
+
+
+
+
+
+
+{
+  SetUpSystemInterface setupSystem = new SetUpSystem();
+	MessageReceiver_LoadBalancerInterface entryPoint = setupSystem.initializeSystem();
+  MailGeneratorInterface testProcess = new MailGenerator(entryPoint);
+}

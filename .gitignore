@@ -10,4 +10,5 @@ oracleLocalScaling/gen/
 predictiveGlobalScaling++/gen/
 test/
 process_checker.sh
+*_compiler.sh
 predictiveGlobalScaling/workload_predictor/data/emails.csv

@@ -1,0 +1,92 @@
+module DB;
+
+export *;
+
+import * from MsgRes;
+
+interface DBInterface {
+  Unit messageArrived();
+  Unit insertMessageInformation (String messageId, Int attachmentsNumber);
+  Int insertResult(String res, String id);
+  MessageResultInterface returnMessageResults(String messageId);
+  Int get_inbound_workload();
+  Int get_one_sec_workload();
+  Int messageCompleted();
+  Float returnAverageAnalysisTime();
+  Unit resetMetrics();
+  Unit one_sec_timeout();
+  Int rejectedMessages();
+  Unit messageLoss(String messageId);
+}
+
+class DB() implements DBInterface {
+  Map<String,Pair<MessageResultInterface,Rat>> messageInfo = map[];
+  Int inbound_workload = 0;
+	Rat totalTime = 0;
+  Int totalMessages = 0;
+  Int rejected = 0;
+  Int one_sec_workload = 0;
+
+  Unit messageLoss(String messageId) {
+    if(messageId == "") {rejected = rejected + 1;}
+    else if(isJust(lookup(messageInfo,messageId))) {rejected = rejected + 1; messageInfo = removeKey(messageInfo, messageId);}
+  }
+
+  Unit messageArrived() {
+    inbound_workload = inbound_workload + 1;
+    one_sec_workload = one_sec_workload + 1;
+  }
+
+  Int get_inbound_workload(){return inbound_workload;}
+
+  Int get_one_sec_workload() {return one_sec_workload;}
+
+  Int messageCompleted() {return totalMessages;}
+
+  Int rejectedMessages() {return rejected;}
+
+  Unit insertMessageInformation (String messageId, Int attachmentsNumber){
+    MessageResultInterface newResults = new MessageResult(3+attachmentsNumber);
+		messageInfo = insert(messageInfo,Pair(messageId,Pair(newResults,timeValue(now()))));
+  }
+
+  Int insertResult(String res, String id){
+    Int numberOfActivityWaiting = -1;
+    Maybe<Pair<MessageResultInterface,Rat>> maybe = lookup(messageInfo, id);
+    if(isJust(maybe)){
+      MessageResultInterface actualResults = fst(fromJust(maybe));
+      Rat analysisTime = snd(fromJust(maybe));
+      actualResults.insertRes(res);
+      numberOfActivityWaiting = actualResults.getActivityWaiting();
+    }
+    return numberOfActivityWaiting;
+  }
+
+  MessageResultInterface returnMessageResults(String messageId){
+    MessageResultInterface messageResults = null;
+    Maybe<Pair<MessageResultInterface,Rat>> maybe = lookup(messageInfo, messageId);
+    if(isJust(maybe)){
+      messageResults = fst(fromJust(maybe));
+      Rat startTime = snd(fromJust(maybe));
+      messageInfo = removeKey(messageInfo, messageId);
+      totalTime = totalTime + (timeValue(now()) - startTime);
+      totalMessages = totalMessages + 1;
+    }
+    return messageResults;
+  }
+
+  Float returnAverageAnalysisTime(){
+    Rat averageTime = 1000000;
+    if(totalMessages != 0){averageTime = totalTime/totalMessages;}
+    return float(averageTime);
+  }
+
+  Unit one_sec_timeout() {one_sec_workload = 0;}
+
+  Unit resetMetrics(){
+    totalMessages = 0;
+    totalTime = 0;
+    inbound_workload = 0;
+    rejected = 0;
+  }
+}
