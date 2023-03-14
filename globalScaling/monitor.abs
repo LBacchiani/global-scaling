@@ -101,22 +101,22 @@ class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int 
       if(mixing) target = this.mix(max_true, max_pred);
       time = time + ratio;
       Rat mcl = scaler.getSystemMCL();
+      Int nInst = scaler.computeInstanceNumber();
       if(target - (mcl - kbig) > k || (mcl - kbig) - target > k) {
         List<Int> target_config = scaler.computeConfiguration(target);
         scaler.scale(target_config);
       }
-      this.log(max_true, max_pred, mcl, target); //debug purpose
+      this.log(max_true, max_pred, mcl, target, nInst); //debug purpose
       db.resetMetrics();
     }
   }
 
-  Unit log(Rat max_true, Rat max_pred, Rat mcl, Rat target) {
+  Unit log(Rat max_true, Rat max_pred, Rat mcl, Rat target, Int nInst) {
       Float averageAnalysisTime = db.returnAverageAnalysisTime();
       Rat completed = db.messageCompleted();
       Rat rejected = db.rejectedMessages();
       Rat totalMsg = db.get_inbound_workload();
       Rat totalCost = scaler.computeTotalCost(ratio);
-      Rat nInst = scaler.computeInstanceNumber();
       String toPrint = toString(time) + "  " + toString(float(100/3) * averageAnalysisTime);
       if(proactiveness) toPrint = toPrint + " #next_max: " + toString(max_pred);
       toPrint = toPrint + " curr_max: "; 

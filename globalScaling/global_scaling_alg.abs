@@ -10,7 +10,7 @@ interface ScalerServiceInterface {
   Unit scale(List<Int> configDeltas);
   Rat getSystemMCL();
   String getScalingActions();
-  Rat computeInstanceNumber();
+  Int computeInstanceNumber();
   Rat computeTotalCost(Int ratio);
   List<Int> computeConfiguration(Rat inbound_workload);
 }
@@ -80,7 +80,10 @@ class ScalerService(Int kbig, Rat initialCost, Int initInstancesNumber) implemen
     scalingTrace = printableconfig;
   }
 
-  Rat getSystemMCL() {return mcl;}
+  Rat getSystemMCL() {
+    if(mcl == 0) mcl = this.mcl(baseConfig);
+    return mcl;
+  }
 
   String getScalingActions() {
     String tmp = scalingAct;
@@ -100,8 +103,8 @@ class ScalerService(Int kbig, Rat initialCost, Int initInstancesNumber) implemen
     return totalCost*ratio/(1000*3600);
   }
 
-  Rat computeInstanceNumber() {
-    Rat nInstances = initInstancesNumber;
+  Int computeInstanceNumber() {
+    Int nInstances = initInstancesNumber;
     foreach(orch in orchestrationDeltas) {
       WrapperScaleInterface wrapper = orch;
       Int n = wrapper.getDeployedInstances();
