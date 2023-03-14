@@ -1,94 +1,18 @@
-module Proactive;
+module Scaler;
 
 export *;
 import * from ABS.DC;
-import * from MailGen;
-import * from Architecture;
-import * from Sys_init;
 import * from Wrapper;
-import * from DB;
-
-interface MonitorInterface {}
-
-//this class has an active behaviour so the monitoring operations start when the object is created in an automatic way
-class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int kbig, Int k, Int ratio) implements MonitorInterface {
-  //dimension of the time window for monitoring controls
-  Int monitoringWindowDimension = windowDim;
-  Int time = 0;
-
-   List<Int> inbound_workload_list= list[
-                       50, 62, 0, 75, 62, 40, 0, 27, 47, 92,
-                       45, 37, 55, 60, 72, 7, 267, 512, 485, 522,
-                       520, 522, 512, 540, 575, 570, 575, 632, 620, 630,
-                       617, 610, 577, 600, 592, 555, 550, 570, 567, 562,
-                       562, 562, 550, 537, 537, 552, 565, 580, 640, 665,
-                       665, 737, 725, 722, 735, 725, 695, 732, 737, 732,
-                       715, 690, 712, 707, 710, 695, 697, 730, 722, 727,
-                       670, 572, 585, 580, 580, 575, 540, 525, 522, 520,
-                       517, 525, 502, 507, 507, 507, 500, 500, 500, 487,
-                       500, 470, 455, 427, 427, 420, 407, 400, 400, 392,
-                       425, 430, 397, 367, 365, 337, 315, 325, 332, 322,
-                       312, 315, 317, 315, 312, 317, 292, 280, 282, 272,
-                       272, 275, 287, 305, 305, 297, 305, 317, 330, 320,
-                       312, 325, 322, 320, 312, 327, 310, 300, 280, 262,
-                       262, 257, 252, 252, 247, 260, 240, 230, 220, 230,
-                       222, 232, 217, 217, 190, 190, 180, 175, 175, 175,
-                       187, 115, 97, 82, 82, 65, 55, 35, 80, 77,
-                       92, 140, 150, 37, 117, 82, 155, 147, 262, 395,
-                       402, 437, 430, 447, 437, 452, 475, 480, 442, 402,
-                       25, 2, 12, 32, 2, 0, 10, 20, 0, 25];
-  Int sum (Int n){
-    Int i = time - n;
-    Int sum = 0;
-    while(i < time){
-      if(i < length(inbound_workload_list)) sum = sum + nth(inbound_workload_list,i);
-      i = i + 1;
-    }
-    return sum;
-  }
-
-	// active behavior
-	Unit run() {
-    while(time < 200){
-      Rat max_pred = 0;
-      Rat max_true = 0;
-      Int i = 0;
-      //wait the monitoring time
-      while(i < ratio) {
-        await duration(monitoringWindowDimension/ratio, monitoringWindowDimension/ratio);
-        Rat chunk_pred = nth(inbound_workload_list, (i + time) % length(inbound_workload_list));
-        Rat chunk_real = db.get_one_sec_workload();
-        db.one_sec_timeout();
-        if(chunk_pred > max_pred) max_pred = chunk_pred;
-        if(chunk_real > max_true) max_true = chunk_real;
-        i = i + 1;
-      }
-      Float averageAnalysisTime = db.returnAverageAnalysisTime();
-      Rat completed = db.messageCompleted();
-      Rat rejected = db.rejectedMessages();
-      Rat totalMsg = db.get_inbound_workload();
-      Rat totalCost = scaler.computeTotalCost(ratio);
-      Rat nInst = scaler.computeInstanceNumber();
-      Rat mcl = scaler.getSystemMCL();
-      time = time + ratio;
-      String toPrint = toString(time) + "  " + toString(float(100/3) * averageAnalysisTime) + " #next_max: " + toString(max_pred) + " curr_max: " + toString(max_true) + " TOT: " + toString(totalMsg) + " COMP: " + toString(completed) + " REJ: " + toString(rejected) + " SUPP: " + toString(mcl) + " COST: " + toString(float(totalCost)) + " INST: " + toString(nInst);
-      if(max_pred - (mcl - kbig) > k || (mcl - kbig) - max_pred > k) scaler.scale(max_pred);
-      String scalingAct = scaler.getScalingActions();
-      toPrint = toPrint + scalingAct;
-      db.resetMetrics();
-      println(toPrint);
-    }
-  }
-}
 
 
 interface ScalerServiceInterface {
   Unit insertScalingElements(List<Int> components, WrapperScaleInterface scalingObj, String scalingName);
-  Unit scale(Rat inbound_workload);
+  Unit scale(List<Int> configDeltas);
   Rat getSystemMCL();
   String getScalingActions();
   Rat computeInstanceNumber();
   Rat computeTotalCost(Int ratio);
+  List<Int> computeConfiguration(Rat inbound_workload);
 }
 
 class ScalerService(Int kbig, Rat initialCost, Int initInstancesNumber) implements ScalerServiceInterface {
@@ -112,6 +36,7 @@ class ScalerService(Int kbig, Rat initialCost, Int initInstancesNumber) implemen
   List<WrapperScaleInterface> orchestrationDeltas = list[];
   List<String> scaleNames = list[];
   List<Int> scalingTrace = list[];
+  List<Int> printableconfig = list[];
   Rat mcl = 0;
   Int numScales = 0;
   String scalingAct = "";
@@ -125,10 +50,9 @@ class ScalerService(Int kbig, Rat initialCost, Int initInstancesNumber) implemen
     numScales = numScales + 1;
   }
 
-
-  Unit scale(Rat inbound_workload) {
+  List<Int> computeConfiguration(Rat inbound_workload) {
     List<Int> configDeltas = this.createEmpty(numScales);
-    List<Int> printableconfig = configDeltas;
+    printableconfig = configDeltas;
     List<Int> config = baseConfig;
     mcl = this.mcl(config);
     Bool configFound = (mcl - kbig) - inbound_workload  >= 0;
@@ -145,6 +69,11 @@ class ScalerService(Int kbig, Rat initialCost, Int initInstancesNumber) implemen
       printableconfig = this.incrementValue(i,printableconfig);
       configDeltas = this.addDeltas(i,configDeltas);
     }
+    return configDeltas;
+  }
+
+
+  Unit scale(List<Int> configDeltas) {
     this.reconfigure(deployedDeltas, configDeltas);
     scalingAct = this.recordAction(scalingTrace, printableconfig);
     deployedDeltas = configDeltas;
@@ -273,17 +202,4 @@ class ScalerService(Int kbig, Rat initialCost, Int initInstancesNumber) implemen
     }
   }
 
-}
-
-
-
-
-
-
-
-
-{
-  SetUpSystemInterface setupSystem = new SetUpSystem();
-	MessageReceiver_LoadBalancerInterface entryPoint = setupSystem.initializeSystem();
-  MailGeneratorInterface testProcess = new MailGenerator(entryPoint);
 }

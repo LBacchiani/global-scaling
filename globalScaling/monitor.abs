@@ -1,0 +1,130 @@
+module Monitor;
+
+export *;
+import * from ABS.DC;
+import * from MailGen;
+import * from Architecture;
+import * from Sys_init;
+import * from Wrapper;
+import * from DB;
+import * from Scaler;
+
+interface MonitorInterface {}
+
+class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int kbig, Int k, Int ratio, List<Int> predicted_workload, List<Int> init_conf, Bool proactiveness, Bool mixing) implements MonitorInterface {
+  Int time = 0;
+  List<Int> last_pred_config = init_conf; //field for proactive-reactive global scaling
+  List<Rat> errors = list[]; //field for proactive-reactive global scaling
+  //Rat last_pred = 32; //uncomment when using literature mixing method
+
+
+  Rat compute_weight(List<Int> pred_conf, List<Int> actual_conf) {
+    List<Rat> dev_factors = list[2/11, 3/11, 3/11, 3/11];
+    Int i = length(pred_conf) - 1;
+    Rat curr_weight = 0;
+    while(i > 0) {
+      Rat pred_score = nth(pred_conf,i) * nth(dev_factors,i);
+      Rat react_score = -nth(actual_conf, i) * nth(dev_factors,i);
+      curr_weight = curr_weight + pred_score + react_score;
+      i = i - 1;
+    }
+    if(abs(curr_weight) > 1) curr_weight = 1;
+    errors = appendright(errors, abs(curr_weight));
+    if(length(errors) == 3) errors = tail(errors);
+    Rat weight = 0;
+    Int j = 0;
+    Int toDivide = 0;
+    while(j < length(errors)) {
+      weight = weight + nth(errors,j) * (j + 1);
+      j = j + 1;
+      toDivide = toDivide + j;
+    }
+    weight = weight / toDivide;
+    return weight;
+  }
+
+  Rat compute_diff(Rat pred, Rat obs) {
+    Rat diff = 0;
+    Int j = 0;
+    Int toDivide = 0;
+    errors = appendright(errors, max(0, obs - pred));
+    if(length(errors) == 3) errors = tail(errors);
+    while(j < length(errors)) {
+      diff = diff + nth(errors,j);
+      toDivide = toDivide + 1;
+      j = j + 1;
+    }
+    if(toDivide != 0) diff = diff / toDivide;
+    return diff;
+  }
+
+  Pair<Rat,Rat> find_maxes() {
+    Rat max_pred = -1;
+    Rat max_true = -1;
+    Int i = 0;
+    while(i < ratio) {
+      await duration(windowDim/ratio, windowDim/ratio);
+      Rat chunk_pred = -1;
+      if(proactiveness) chunk_pred = nth(predicted_workload, (i + time) % length(predicted_workload));
+      Rat chunk_real = db.get_one_sec_workload();
+      db.one_sec_timeout();
+      max_pred = max(chunk_pred,max_pred);
+      max_true = max(chunk_real,max_true);
+      i = i + 1;
+    }
+    return Pair(max_pred, max_true);
+  }
+
+  Rat mix(Rat max_true, Rat max_pred) {
+      //our mixing methods
+      List<Int> actual_conf = scaler.computeConfiguration(max_true);
+      Rat react_score = this.compute_weight(last_pred_config, actual_conf);
+      Rat pred_score = 1 - react_score;
+      Rat target_scale = (react_score * max_true) + (pred_score * max_pred);
+      last_pred_config = scaler.computeConfiguration(max_pred);
+      /////
+      //literature mixing methods
+      //Rat diff = this.compute_diff(last_pred, max_true);
+      //last_pred = max_pred;
+      //Rat target_scale = max_pred + diff;
+      /////
+      return target_scale;
+  }
+
+	Unit run() {
+    while(time < 200){
+      Pair<Rat,Rat> maxes = this.find_maxes();
+      Rat max_pred = fst(maxes);
+      Rat max_true = snd(maxes);
+      Rat target = max_true;
+      if(proactiveness) target = max_pred;
+      if(mixing) target = this.mix(max_true, max_pred);
+      time = time + ratio;
+      Rat mcl = scaler.getSystemMCL();
+      if(target - (mcl - kbig) > k || (mcl - kbig) - target > k) {
+        List<Int> target_config = scaler.computeConfiguration(target);
+        scaler.scale(target_config);
+      }
+      this.log(max_true, max_pred, mcl, target); //debug purpose
+      db.resetMetrics();
+    }
+  }
+
+  Unit log(Rat max_true, Rat max_pred, Rat mcl, Rat target) {
+      Float averageAnalysisTime = db.returnAverageAnalysisTime();
+      Rat completed = db.messageCompleted();
+      Rat rejected = db.rejectedMessages();
+      Rat totalMsg = db.get_inbound_workload();
+      Rat totalCost = scaler.computeTotalCost(ratio);
+      Rat nInst = scaler.computeInstanceNumber();
+      String toPrint = toString(time) + "  " + toString(float(100/3) * averageAnalysisTime);
+      if(proactiveness) toPrint = toPrint + " #next_max: " + toString(max_pred);
+      toPrint = toPrint + " curr_max: "; 
+      if(mixing) toPrint = toPrint + " target_scale: " + toString(float(target));
+      toPrint = toPrint + toString(max_true) + " TOT: " + toString(totalMsg) + " COMP: " + toString(completed) + " REJ: " + toString(rejected) + " SUPP: " + toString(mcl) + " COST: " + toString(float(totalCost)) + " INST: " + toString(nInst);
+      String scalingAct = scaler.getScalingActions();
+      toPrint = toPrint + scalingAct;
+      println(toPrint);
+  }
+}
+

@@ -1,15 +1,54 @@
-module MailGen;
+module Main;
 
 export *;
+import * from ABS.DC;
+import * from MailGen;
 import * from Architecture;
+import * from Sys_init;
+import * from Wrapper;
+import * from DB;
+import * from Scaler;
+import * from Monitor;
 
-interface MailGeneratorInterface{}
 
-class MailGenerator(MessageReceiver_LoadBalancerInterface entryPoint) implements MailGeneratorInterface {
-  Rat windowDim = 30;
-	Unit run() {
+
+{
+    ////SIMULATION PARAMETERS////
+
+    Int kbig = 20;
+    Int k = 10;
+    Rat fst_pred = 32;
+    Int monitoringWin = 300;
+    Int sendingWin = 30;
+    Int initInstancesNumber = 13;
+    Int ratio = truncate(monitoringWin / sendingWin);
+    Bool proactiveness = False;
+    Bool mixing = False;
+
+    List<Int> predicted_workload = list[
+                50, 62, 0, 75, 62, 40, 0, 27, 47, 92,
+                45, 37, 55, 60, 72, 7, 267, 512, 485, 522,
+                520, 522, 512, 540, 575, 570, 575, 632, 620, 630,
+                617, 610, 577, 600, 592, 555, 550, 570, 567, 562,
+                562, 562, 550, 537, 537, 552, 565, 580, 640, 665,
+                665, 737, 725, 722, 735, 725, 695, 732, 737, 732,
+                715, 690, 712, 707, 710, 695, 697, 730, 722, 727,
+                670, 572, 585, 580, 580, 575, 540, 525, 522, 520,
+                517, 525, 502, 507, 507, 507, 500, 500, 500, 487,
+                500, 470, 455, 427, 427, 420, 407, 400, 400, 392,
+                425, 430, 397, 367, 365, 337, 315, 325, 332, 322,
+                312, 315, 317, 315, 312, 317, 292, 280, 282, 272,
+                272, 275, 287, 305, 305, 297, 305, 317, 330, 320,
+                312, 325, 322, 320, 312, 327, 310, 300, 280, 262,
+                262, 257, 252, 252, 247, 260, 240, 230, 220, 230,
+                222, 232, 217, 217, 190, 190, 180, 175, 175, 175,
+                187, 115, 97, 82, 82, 65, 55, 35, 80, 77,
+                92, 140, 150, 37, 117, 82, 155, 147, 262, 395,
+                402, 437, 430, 447, 437, 452, 475, 480, 442, 402,
+                25, 2, 12, 32, 2, 0, 10, 20, 0, 25];
+
     //COORD FIG 2
-    /*List<Int> realWorkload = list[47,47,47,47,54,54,54,46,46,46,
+    /*List<Int> actual_workload = list[47,47,47,47,54,54,54,46,46,46,
                                   50,50,50,50,65,65,84,84,68,90,
                                   112,137,137,143,167,188,188,210,231,231,
                                   251,251,274,294,311,311,311,332,355,375,
@@ -28,7 +67,7 @@ class MailGenerator(MessageReceiver_LoadBalancerInterface entryPoint) implements
                                   47,47,47,47,54,54,54,46,46,46];*/
                 
     //COORD FIG 3
-    /*List<Int> realWorkload = list[82, 84, 85, 90, 93, 96, 100, 104, 108, 114,
+    /*List<Int> actual_workload = list[82, 84, 85, 90, 93, 96, 100, 104, 108, 114,
                                   118, 122, 128, 133, 138, 142, 147, 150, 150, 151,
                                   151, 152, 152, 153, 153, 153, 153, 153, 154, 154,
                                   154, 154, 154, 155, 155, 155, 155, 155, 155, 155,
@@ -48,7 +87,7 @@ class MailGenerator(MessageReceiver_LoadBalancerInterface entryPoint) implements
                                   235, 225, 215, 205, 195, 185, 175, 164, 155, 145,
                                   134, 124, 114, 104, 97, 96, 93, 88, 85, 84];*/
     //enron
-    /*List<Int> realWorkload = list[10, 5, 2, 2, 25, 22, 17, 20, 22, 27,
+    /*List<Int> actual_workload = list[10, 5, 2, 2, 25, 22, 17, 20, 22, 27,
                                   7, 17, 12, 50, 52, 30, 22, 17, 90, 120,
                                   40, 37, 35, 80, 75, 15, 165, 535, 497, 507,
                                   522, 507, 510, 557, 610, 617, 610, 675, 665, 640,
@@ -69,7 +108,7 @@ class MailGenerator(MessageReceiver_LoadBalancerInterface entryPoint) implements
                                   45, 132, 130, 47, 92, 95, 150, 157, 255, 400,
                                   430, 440, 440, 445, 455, 475, 457, 447, 447, 420];*/
     //outliers
-    List<Int> realWorkload = list[590, 590, 582, 542, 535, 557, 565, 587, 672, 710,
+    List<Int> actual_workload = list[590, 590, 582, 542, 535, 557, 565, 587, 672, 710,
                                   715, 750, 760, 750, 755, 747, 725, 747, 737, 730,
                                   722, 732, 725, 727, 720, 725, 722, 745, 740, 735,
                                   682, 690, 650, 635, 625, 590, 550, 510, 515, 532,
@@ -90,18 +129,17 @@ class MailGenerator(MessageReceiver_LoadBalancerInterface entryPoint) implements
                                   45, 132, 130, 47, 92, 95, 150, 157, 255, 400,
                                   430, 440, 440, 445, 455, 475, 457, 447, 447, 420];
 
-		Int i = 0;
-    Int round = 0;
-    while(round < 200) {
-      Rat currentMessageNumber = nth(realWorkload, i);
-      i = (i + 1) % length(realWorkload);
-      round = round + 1;
-      Int j = 0;
-      while(j < currentMessageNumber) {
-        entryPoint!newMessage("Message");
-        await duration(windowDim / currentMessageNumber, windowDim / currentMessageNumber);
-        j = j + 1;
-      }
-    }
-	}
+
+    ////////////////////////////
+
+    DBInterface db = new DB();
+    SetUpSystemInterface setupSystem = new SetUpSystem();
+    setupSystem.setupLoadBalancers(db);
+    setupSystem.setupServices(db);
+    MessageReceiver_LoadBalancerInterface entryPoint =  setupSystem.getEntrypoint();
+    ScalerServiceInterface scaler = setupSystem.deployGSAlg(db, kbig, k, initInstancesNumber);
+    List<Int> fst_conf = list[];
+    if(proactiveness) fst_conf = setupSystem.proactiveDeployment(fst_pred);
+    MonitorInterface monitor = new Monitor(scaler, db, monitoringWin, kbig, k, ratio, predicted_workload, fst_conf, proactiveness, mixing);
+    MailGeneratorInterface testProcess = new MailGenerator(entryPoint, sendingWin, actual_workload);
 }
