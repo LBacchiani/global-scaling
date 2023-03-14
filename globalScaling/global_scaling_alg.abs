@@ -13,6 +13,7 @@ interface ScalerServiceInterface {
   Int computeInstanceNumber();
   Rat computeTotalCost(Int ratio);
   List<Int> computeConfiguration(Rat inbound_workload);
+  List<Rat> getScores();
 }
 
 class ScalerService(Int kbig, Rat initialCost, Int initInstancesNumber) implements ScalerServiceInterface {
@@ -48,6 +49,17 @@ class ScalerService(Int kbig, Rat initialCost, Int initInstancesNumber) implemen
     scalingTrace = appendright(scalingTrace, 0);
     scaleNames = appendright(scaleNames, scalingName);
     numScales = numScales + 1;
+  }
+
+  List<Rat> getScores() {
+    List<Rat> scale_scores = list[];
+    Rat overall_inc = 0;
+    foreach(scale in scaleComponents) {
+      Rat single_mcl = this.mcl(scale);
+      scale_scores = appendright(scale_scores, single_mcl);
+      overall_inc = overall_inc + single_mcl;
+    }
+    return map((Rat x) => x / overall_inc)(scale_scores); 
   }
 
   List<Int> computeConfiguration(Rat inbound_workload) {
@@ -139,21 +151,18 @@ class ScalerService(Int kbig, Rat initialCost, Int initInstancesNumber) implemen
   }
 
   List<Int> vSum(List<Int> v1, List<Int> v2) {
-    Int i = 0;
     List<Int> res = list[];
-    while(i < length(v1)) {
-      Int e1 = nth(v1,i);
-      Int e2 = nth(v2,i);
-      res = appendright(res, e1 + e2);
-      i = i + 1;
+    while(!isEmpty(v1) && !isEmpty(v2)) {
+      res = appendright(res, head(v1) + head(v2));
+      v1 = tail(v1);
+      v2 = tail(v2);
     }
     return res;
   }
 
   List<Int> createEmpty(Int nDeltas) {
-    Int n = nDeltas;
     List<Int> empty = list[];
-    while(n > 0) {empty = appendright(empty, 0); n = n - 1;}
+    while(nDeltas > 0) {empty = appendright(empty, 0); nDeltas = nDeltas - 1;}
     return empty;
   }
 
@@ -204,5 +213,4 @@ class ScalerService(Int kbig, Rat initialCost, Int initInstancesNumber) implemen
       i = i + 1;
     }
   }
-
 }

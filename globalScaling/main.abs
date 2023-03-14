@@ -22,8 +22,9 @@ import * from Monitor;
     Int sendingWin = 30;
     Int initInstancesNumber = 13;
     Int ratio = truncate(monitoringWin / sendingWin);
-    Bool proactiveness = False;
-    Bool mixing = False;
+    Int memory = 3; //num of weights to remember
+    Bool proactiveness = True;
+    Bool mixing = True;
 
     List<Int> predicted_workload = list[
                 50, 62, 0, 75, 62, 40, 0, 27, 47, 92,
@@ -140,6 +141,6 @@ import * from Monitor;
     ScalerServiceInterface scaler = setupSystem.deployGSAlg(db, kbig, k, initInstancesNumber);
     List<Int> fst_conf = list[];
     if(proactiveness) fst_conf = setupSystem.proactiveDeployment(fst_pred);
-    MonitorInterface monitor = new Monitor(scaler, db, monitoringWin, kbig, k, ratio, predicted_workload, fst_conf, proactiveness, mixing);
+    MonitorInterface monitor = new Monitor(scaler, db, monitoringWin, kbig, k, ratio, predicted_workload, fst_conf, memory, proactiveness, mixing);
     MailGeneratorInterface testProcess = new MailGenerator(entryPoint, sendingWin, actual_workload);
 }

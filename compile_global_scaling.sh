@@ -1,1 +1,0 @@
-../abstools/frontend/bin/bash/absc globalScaling/*.abs globalScaling/timesmartdel-orchs/*.abs --erlang

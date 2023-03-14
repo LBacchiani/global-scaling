@@ -11,39 +11,69 @@ import * from Scaler;
 
 interface MonitorInterface {}
 
-class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int kbig, Int k, Int ratio, List<Int> predicted_workload, List<Int> init_conf, Bool proactiveness, Bool mixing) implements MonitorInterface {
+class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int kbig, Int k, Int ratio, List<Int> predicted_workload, List<Int> init_conf, Int memory, Bool proactiveness, Bool mixing) implements MonitorInterface {
   Int time = 0;
   List<Int> last_pred_config = init_conf; //field for proactive-reactive global scaling
   List<Rat> errors = list[]; //field for proactive-reactive global scaling
   //Rat last_pred = 32; //uncomment when using literature mixing method
 
-
-  Rat compute_weight(List<Int> pred_conf, List<Int> actual_conf) {
-    List<Rat> dev_factors = list[2/11, 3/11, 3/11, 3/11];
-    Int i = length(pred_conf) - 1;
-    Rat curr_weight = 0;
-    while(i > 0) {
-      Rat pred_score = nth(pred_conf,i) * nth(dev_factors,i);
-      Rat react_score = -nth(actual_conf, i) * nth(dev_factors,i);
-      curr_weight = curr_weight + pred_score + react_score;
-      i = i - 1;
+  //////MIXING TECHNIQUE//////////
+  List<Int> compute_diff(List<Int> pred_conf, List<Int> actual_conf) {
+    List<Int> diff = list[];
+    while(!isEmpty(pred_conf) && !isEmpty(actual_conf)) {
+      diff = appendright(diff, head(pred_conf) - head(actual_conf));
+      pred_conf = tail(pred_conf);
+      actual_conf = tail(pred_conf);
     }
-    if(abs(curr_weight) > 1) curr_weight = 1;
-    errors = appendright(errors, abs(curr_weight));
-    if(length(errors) == 3) errors = tail(errors);
-    Rat weight = 0;
-    Int j = 0;
-    Int toDivide = 0;
-    while(j < length(errors)) {
-      weight = weight + nth(errors,j) * (j + 1);
-      j = j + 1;
-      toDivide = toDivide + j;
-    }
-    weight = weight / toDivide;
-    return weight;
+    return diff;
   }
 
-  Rat compute_diff(Rat pred, Rat obs) {
+ Rat compute_weight(List<Int> pred_conf, List<Int> actual_conf) {
+    List<Rat> dev_factors = scaler.getScores();
+    Rat curr_weight = 0;
+    List<Int> diffs = this.compute_diff(pred_conf, actual_conf); 
+    while(!isEmpty(pred_conf) && !isEmpty(actual_conf)) {
+      curr_weight = curr_weight + abs(head(diffs) * head(dev_factors));
+      pred_conf = tail(pred_conf);
+      actual_conf = tail(pred_conf);
+      diffs = tail(diffs);
+      dev_factors = tail(dev_factors);
+    }
+    return min(curr_weight, 1);
+  }
+
+  Unit store_weights(Rat curr_weight) {
+    errors = appendright(errors, abs(curr_weight));
+    if(length(errors) == memory) errors = tail(errors);
+  }
+
+  Rat compute_distance() {
+    Rat weight = 0;
+    Int toDivide = 0;
+    foreach(e,i in errors) {
+      weight = weight + e * (i + 1);
+      toDivide = toDivide + (i + 1);
+    }
+    return weight / toDivide;
+  }
+
+
+  Rat mix(Rat max_true, Rat max_pred) {
+    List<Int> actual_conf = scaler.computeConfiguration(max_true);
+    Rat curr_weight = this.compute_weight(last_pred_config, actual_conf);
+    this.store_weights(curr_weight);
+    Rat react_score = this.compute_distance();
+    Rat pred_score = 1 - react_score;
+    Rat target_scale = (react_score * max_true) + (pred_score * max_pred);
+    last_pred_config = scaler.computeConfiguration(max_pred);
+    return target_scale;
+  }
+
+  //////END MIXING TECHNIQUE//////////
+
+
+  ////MIXING TECHNIQUE TAKEN FROM THE LITERATURE////
+ /*Rat compute_diff(Rat pred, Rat obs) {
     Rat diff = 0;
     Int j = 0;
     Int toDivide = 0;
@@ -57,6 +87,16 @@ class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int 
     if(toDivide != 0) diff = diff / toDivide;
     return diff;
   }
+
+
+  Rat mix(Rat max_true, Rat max_pred) {
+    Rat diff = this.compute_diff(last_pred, max_true);
+    last_pred = max_pred;
+    Rat target_scale = max_pred + diff;
+    return target_scale;
+  }*/
+
+  /////END MIXING TECHNIQUE TAKEN FROM THE LITERATURE////
 
   Pair<Rat,Rat> find_maxes() {
     Rat max_pred = -1;
@@ -73,22 +113,6 @@ class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int 
       i = i + 1;
     }
     return Pair(max_pred, max_true);
-  }
-
-  Rat mix(Rat max_true, Rat max_pred) {
-      //our mixing methods
-      List<Int> actual_conf = scaler.computeConfiguration(max_true);
-      Rat react_score = this.compute_weight(last_pred_config, actual_conf);
-      Rat pred_score = 1 - react_score;
-      Rat target_scale = (react_score * max_true) + (pred_score * max_pred);
-      last_pred_config = scaler.computeConfiguration(max_pred);
-      /////
-      //literature mixing methods
-      //Rat diff = this.compute_diff(last_pred, max_true);
-      //last_pred = max_pred;
-      //Rat target_scale = max_pred + diff;
-      /////
-      return target_scale;
   }
 
 	Unit run() {
@@ -119,9 +143,9 @@ class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int 
       Rat totalCost = scaler.computeTotalCost(ratio);
       String toPrint = toString(time) + "  " + toString(float(100/3) * averageAnalysisTime);
       if(proactiveness) toPrint = toPrint + " #next_max: " + toString(max_pred);
-      toPrint = toPrint + " curr_max: "; 
+      toPrint = toPrint + " curr_max: " + toString(max_true); 
       if(mixing) toPrint = toPrint + " target_scale: " + toString(float(target));
-      toPrint = toPrint + toString(max_true) + " TOT: " + toString(totalMsg) + " COMP: " + toString(completed) + " REJ: " + toString(rejected) + " SUPP: " + toString(mcl) + " COST: " + toString(float(totalCost)) + " INST: " + toString(nInst);
+      toPrint = toPrint + " TOT: " + toString(totalMsg) + " COMP: " + toString(completed) + " REJ: " + toString(rejected) + " SUPP: " + toString(mcl) + " COST: " + toString(float(totalCost)) + " INST: " + toString(nInst);
       String scalingAct = scaler.getScalingActions();
       toPrint = toPrint + scalingAct;
       println(toPrint);
