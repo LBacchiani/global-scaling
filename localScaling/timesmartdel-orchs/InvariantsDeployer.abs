@@ -1,7 +1,9 @@
 module InvariantsDeployer;
 export *;
 import * from ABS.DC;
-import * from EmailProcessingPipelineArchitecture;
+import * from Architecture;
+import * from DB;
+
 
 interface InvariantsDeployer{
 	List<HeaderAnalyser_LoadBalancerInterface> getHeaderAnalyser_LoadBalancerInterface();

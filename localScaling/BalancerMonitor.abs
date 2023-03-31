@@ -1,7 +1,8 @@
 module BalancerMonitor;
 
 export *;
-import * from EmailProcessingPipelineArchitecture;
+import * from Architecture;
+import * from Param;
 
 interface LoadBalancerMonitorInterface{
   Unit check();
@@ -12,8 +13,8 @@ interface LoadBalancerMonitorInterface{
 class LoadBalancerMonitor(LoadBalancer balancer, String balancerName, Rat mcl, Int baseInstanceN, Rat mf) implements LoadBalancerMonitorInterface {
   Int deplInstances = baseInstanceN;
   ScalingWrapper sw;
-  Rat k = 10 * mf;
-  Rat kbig =  20 * mf;
+  Rat k = k() * mf;
+  Rat kbig =  kbig() * mf;
   Int max = 0;
   List<Int> reqs = list[];
 
@@ -24,8 +25,6 @@ class LoadBalancerMonitor(LoadBalancer balancer, String balancerName, Rat mcl, I
   Unit printReqs() {println(balancerName + ": " + toString(reqs));}
 
   Unit check() {
-    //Rat inbound_workload = balancer.returninbound_workload();
-    //inbound_workload = inbound_workload / 10;
     Int max = balancer.get_one_sec_workload();
     reqs = appendright(reqs,max);
     if(max - (mcl * deplInstances - kbig)  > k || (mcl * deplInstances - kbig) - max > k) {

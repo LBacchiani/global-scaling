@@ -3,6 +3,7 @@ module Scaler;
 export *;
 import * from ABS.DC;
 import * from Wrapper;
+import * from Param;
 
 
 interface ScalerServiceInterface {
@@ -16,7 +17,7 @@ interface ScalerServiceInterface {
   List<Rat> getScores();
 }
 
-class ScalerService(Int kbig, Rat initialCost, Int initInstancesNumber) implements ScalerServiceInterface {
+class ScalerService(Rat initialCost) implements ScalerServiceInterface {
 
   List<Int> mcls = list[116, 110, 100, 120, 231, 231, 90, 90, 300];
   List<Rat> mfs = list[1, 1, 5/2, 2, 3/2, 3/2, 3/2, 3/2, 5];
@@ -67,7 +68,7 @@ class ScalerService(Int kbig, Rat initialCost, Int initInstancesNumber) implemen
     printableconfig = configDeltas;
     List<Int> config = baseConfig;
     mcl = this.mcl(config);
-    Bool configFound = (mcl - kbig) - inbound_workload  >= 0;
+    Bool configFound = (mcl - kbig()) - inbound_workload  >= 0;
     while(!configFound) {
       List<Int> candidateConfig = baseConfig;
       Int i = -1;
@@ -75,7 +76,7 @@ class ScalerService(Int kbig, Rat initialCost, Int initInstancesNumber) implemen
         i = i + 1;
         candidateConfig = this.vSum(config, nth(scaleComponents,i));
         mcl = this.mcl(candidateConfig);
-        configFound = (mcl - kbig) - inbound_workload  >= 0;
+        configFound = (mcl - kbig()) - inbound_workload  >= 0;
       }
       config = candidateConfig;
       printableconfig = this.incrementValue(i,printableconfig);
@@ -116,7 +117,7 @@ class ScalerService(Int kbig, Rat initialCost, Int initInstancesNumber) implemen
   }
 
   Int computeInstanceNumber() {
-    Int nInstances = initInstancesNumber;
+    Int nInstances = initInstancesNumber();
     foreach(orch in orchestrationDeltas) {
       WrapperScaleInterface wrapper = orch;
       Int n = wrapper.getDeployedInstances();

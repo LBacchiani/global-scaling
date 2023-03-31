@@ -1,19 +1,21 @@
-module AttachmentsManagerPlan;
+module ImageAnalyserPlan;
 export *;
 import * from ABS.DC;
-import * from EmailProcessingPipelineArchitecture;
+import * from Architecture;
+import * from DB;
 
-interface AttachmentsManagerPlan{
-	List<AttachmentsManagerInterface> getAttachmentsManagerInterface();
+
+interface ImageAnalyserPlan{
+	List<ImageAnalyserInterface> getImageAnalyserInterface();
 	List<DeploymentComponent> getDeploymentComponent();
 	Unit deploy();
 	Unit undeploy();
 }
 
-class AttachmentsManagerPlan(CloudProvider cloudProvider, AttachmentsManager_LoadBalancerInterface attachmentsManager_LoadBalancerObj, ImageAnalyser_LoadBalancerInterface imageAnalyser_LoadBalancerObj) implements AttachmentsManagerPlan{
+class ImageAnalyserPlan(CloudProvider cloudProvider, ImageAnalyser_LoadBalancerInterface imageAnalyser_LoadBalancerObj, NSFWDetector_LoadBalancerInterface nsfwDetector_LoadBalancerObj, MessageAnalyser_LoadBalancerInterface messageAnalyser_LoadBalancerObj, ImageRecognizer_LoadBalancerInterface imageRecognizer_LoadBalancerObj) implements ImageAnalyserPlan{
 
-	List<List<AttachmentsManagerInterface>> ls_ls_AttachmentsManagerInterface = Nil;
-	List<AttachmentsManagerInterface> ls_AttachmentsManagerInterface = Nil;
+	List<List<ImageAnalyserInterface>> ls_ls_ImageAnalyserInterface = Nil;
+	List<ImageAnalyserInterface> ls_ImageAnalyserInterface = Nil;
 	List<List<DeploymentComponent>> ls_ls_DeploymentComponent = Nil;
 	List<DeploymentComponent> ls_DeploymentComponent = Nil;
 	Rat waiting_time = 100;
@@ -44,12 +46,12 @@ class AttachmentsManagerPlan(CloudProvider cloudProvider, AttachmentsManager_Loa
 			]));
 	}
 
-	List<AttachmentsManagerInterface> getAttachmentsManagerInterface() { return ls_AttachmentsManagerInterface; }
+	List<ImageAnalyserInterface> getImageAnalyserInterface() { return ls_ImageAnalyserInterface; }
 	List<DeploymentComponent> getDeploymentComponent() { return ls_DeploymentComponent; }
 
 	Unit deploy() {
-		ls_ls_AttachmentsManagerInterface = Cons(ls_AttachmentsManagerInterface,ls_ls_AttachmentsManagerInterface);
-		ls_AttachmentsManagerInterface = Nil;
+		ls_ls_ImageAnalyserInterface = Cons(ls_ImageAnalyserInterface,ls_ls_ImageAnalyserInterface);
+		ls_ImageAnalyserInterface = Nil;
 		ls_ls_DeploymentComponent = Cons(ls_DeploymentComponent,ls_ls_DeploymentComponent);
 		ls_DeploymentComponent = Nil;
 		this.deploy_aux();
@@ -60,8 +62,8 @@ class AttachmentsManagerPlan(CloudProvider cloudProvider, AttachmentsManager_Loa
 			this.undeploy_aux();
 			ls_DeploymentComponent = head(ls_ls_DeploymentComponent);
 			ls_ls_DeploymentComponent = tail(ls_ls_DeploymentComponent);
-				ls_AttachmentsManagerInterface = head(ls_ls_AttachmentsManagerInterface);
-			ls_ls_AttachmentsManagerInterface = tail(ls_ls_AttachmentsManagerInterface);
+				ls_ImageAnalyserInterface = head(ls_ls_ImageAnalyserInterface);
+			ls_ls_ImageAnalyserInterface = tail(ls_ls_ImageAnalyserInterface);
 		}
 	}
 
@@ -71,18 +73,18 @@ class AttachmentsManagerPlan(CloudProvider cloudProvider, AttachmentsManager_Loa
 		DeploymentComponent c4_large_0 = cloudProvider.launchInstanceNamed("c4_large");
 		ls_DeploymentComponent = Cons(c4_large_0,ls_DeploymentComponent);
 		speedPatchMap = put(speedPatchMap,c4_large_0,0);
-		[DC: c4_large_0] AttachmentsManagerInterface odefault___AttachmentsManager_0_c4_large_0 = new AttachmentsManager(imageAnalyser_LoadBalancerObj);
-		Rat coreRequired_odefault___AttachmentsManager_0_c4_large_0 = 1;
-		speedPatchMap = put(speedPatchMap, c4_large_0, fromJust(lookup(speedPatchMap,c4_large_0)) + coreRequired_odefault___AttachmentsManager_0_c4_large_0);
-		ls_AttachmentsManagerInterface = Cons(odefault___AttachmentsManager_0_c4_large_0, ls_AttachmentsManagerInterface);
+		[DC: c4_large_0] ImageAnalyserInterface odefault___ImageAnalyser_0_c4_large_0 = new ImageAnalyser(nsfwDetector_LoadBalancerObj, imageRecognizer_LoadBalancerObj, messageAnalyser_LoadBalancerObj);
+		Rat coreRequired_odefault___ImageAnalyser_0_c4_large_0 = 1;
+		speedPatchMap = put(speedPatchMap, c4_large_0, fromJust(lookup(speedPatchMap,c4_large_0)) + coreRequired_odefault___ImageAnalyser_0_c4_large_0);
+		ls_ImageAnalyserInterface = Cons(odefault___ImageAnalyser_0_c4_large_0, ls_ImageAnalyserInterface);
 		this!patchSpeed(speedPatchMap);
 		await duration(waiting_time,waiting_time);
-		attachmentsManager_LoadBalancerObj.connectInstance(odefault___AttachmentsManager_0_c4_large_0);
+		imageAnalyser_LoadBalancerObj.connectInstance(odefault___ImageAnalyser_0_c4_large_0);
 	}
 
 	Unit undeploy_aux() {
-		AttachmentsManagerInterface odefault___AttachmentsManager_0_c4_large_0 = nth(ls_AttachmentsManagerInterface,0);
-		attachmentsManager_LoadBalancerObj.disconnectInstance();
+		ImageAnalyserInterface odefault___ImageAnalyser_0_c4_large_0 = nth(ls_ImageAnalyserInterface,0);
+		imageAnalyser_LoadBalancerObj.disconnectInstance();
 		while ( !isEmpty(ls_DeploymentComponent) ) {
 			cloudProvider.shutdownInstance(head(ls_DeploymentComponent));
 			ls_DeploymentComponent = tail(ls_DeploymentComponent);

@@ -1,0 +1,86 @@
+module DB;
+
+export *;
+
+interface DBInterface {
+  Unit messageArrived();
+  Unit insertMessageInformation (String messageId, Int attachmentsNumber);
+  Int insertResult(String id);
+  Int returninbound_workload();
+  Int messageCompleted();
+  Int pendingMessages();
+  Float returnAverageAnalysisTime();
+  Unit resetMetrics();
+  Int rejectedMessages();
+  Unit messageLoss(String messageId);
+  Int get_one_sec_workload();
+  Unit one_sec_timeout();
+  Unit analysisTimeTick(String messageId);
+}
+
+class DB() implements DBInterface {
+  Map<String,Pair<Int,Rat>> messageInfo = map[];
+  Int inbound_workload = 0;
+	Rat totalTime = 0;
+  Int totalMessages = 0;
+  Int rejected = 0;
+  Int one_sec_workload = 0;
+
+  Unit messageLoss(String messageId) {
+    if(messageId == "") {rejected = rejected + 1;}
+    else if(isJust(lookup(messageInfo,messageId))) {rejected = rejected + 1; messageInfo = removeKey(messageInfo, messageId);}
+  }
+
+  Unit messageArrived() {
+    inbound_workload = inbound_workload + 1;
+    one_sec_workload = one_sec_workload + 1;
+  }
+
+  Int get_one_sec_workload() {return one_sec_workload;}
+
+  Int returninbound_workload(){return inbound_workload;}
+
+  Int pendingMessages() {return length(entries(messageInfo));}
+
+  Int messageCompleted() {return totalMessages;}
+
+  Int rejectedMessages() {return rejected;}
+
+  Unit insertMessageInformation (String messageId, Int attachmentsNumber){messageInfo = insert(messageInfo,Pair(messageId,Pair(3+attachmentsNumber,timeValue(now()))));}
+
+  Int insertResult(String id) {
+    Int numberOfActivityWaiting = -1;
+    Maybe<Pair<Int,Rat>> maybe = lookup(messageInfo, id);
+    if(isJust(maybe)){
+      numberOfActivityWaiting = fst(fromJust(maybe)) - 1;
+      Rat analysisTime = snd(fromJust(maybe));
+      messageInfo = insert(messageInfo, Pair(id, Pair(numberOfActivityWaiting, analysisTime)));
+    }
+    return numberOfActivityWaiting;
+  }
+
+  Unit analysisTimeTick(String messageId){
+    Maybe<Pair<Int,Rat>> maybe = lookup(messageInfo, messageId);
+    if(isJust(maybe)){
+      Rat startTime = snd(fromJust(maybe));
+      messageInfo = removeKey(messageInfo, messageId);
+      totalTime = totalTime + (timeValue(now()) - startTime);
+      totalMessages = totalMessages + 1;
+    }
+  }
+
+  Float returnAverageAnalysisTime(){
+    Rat averageTime = 1000000;
+    if(totalMessages != 0){averageTime = totalTime/totalMessages;}
+    return float(averageTime);
+  }
+
+  Unit one_sec_timeout() {one_sec_workload = 0;}
+
+  Unit resetMetrics(){
+    totalMessages = 0;
+    totalTime = 0;
+    inbound_workload = 0;
+    rejected = 0;
+  }
+}

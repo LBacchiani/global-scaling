@@ -1,19 +1,21 @@
-module MessageParserPlan;
+module VirusScannerPlan;
 export *;
 import * from ABS.DC;
-import * from EmailProcessingPipelineArchitecture;
+import * from Architecture;
+import * from DB;
 
-interface MessageParserPlan{
-	List<MessageParserInterface> getMessageParserInterface();
+
+interface VirusScannerPlan{
+	List<VirusScannerInterface> getVirusScannerInterface();
 	List<DeploymentComponent> getDeploymentComponent();
 	Unit deploy();
 	Unit undeploy();
 }
 
-class MessageParserPlan(CloudProvider cloudProvider, MessageParser_LoadBalancerInterface messageParser_LoadBalancerObj, HeaderAnalyser_LoadBalancerInterface headerAnalyser_LoadBalancerObj, LinkAnalyser_LoadBalancerInterface linkAnalyser_LoadBalancerObj, TextAnalyser_LoadBalancerInterface textAnalyser_LoadBalancerObj, VirusScanner_LoadBalancerInterface virusScanner_LoadBalancerObj, DBInterface dbObj, MessageAnalyser_LoadBalancerInterface messageAnalyser_LoadBalancerObj) implements MessageParserPlan{
+class VirusScannerPlan(CloudProvider cloudProvider, VirusScanner_LoadBalancerInterface virusScanner_LoadBalancerObj, MessageAnalyser_LoadBalancerInterface messageAnalyser_LoadBalancerObj, AttachmentsManager_LoadBalancerInterface attachmentsManager_LoadBalancerObj) implements VirusScannerPlan{
 
-	List<List<MessageParserInterface>> ls_ls_MessageParserInterface = Nil;
-	List<MessageParserInterface> ls_MessageParserInterface = Nil;
+	List<List<VirusScannerInterface>> ls_ls_VirusScannerInterface = Nil;
+	List<VirusScannerInterface> ls_VirusScannerInterface = Nil;
 	List<List<DeploymentComponent>> ls_ls_DeploymentComponent = Nil;
 	List<DeploymentComponent> ls_DeploymentComponent = Nil;
 	Rat waiting_time = 100;
@@ -52,12 +54,12 @@ class MessageParserPlan(CloudProvider cloudProvider, MessageParser_LoadBalancerI
 			]));
 	}
 
-	List<MessageParserInterface> getMessageParserInterface() { return ls_MessageParserInterface; }
+	List<VirusScannerInterface> getVirusScannerInterface() { return ls_VirusScannerInterface; }
 	List<DeploymentComponent> getDeploymentComponent() { return ls_DeploymentComponent; }
 
 	Unit deploy() {
-		ls_ls_MessageParserInterface = Cons(ls_MessageParserInterface,ls_ls_MessageParserInterface);
-		ls_MessageParserInterface = Nil;
+		ls_ls_VirusScannerInterface = Cons(ls_VirusScannerInterface,ls_ls_VirusScannerInterface);
+		ls_VirusScannerInterface = Nil;
 		ls_ls_DeploymentComponent = Cons(ls_DeploymentComponent,ls_ls_DeploymentComponent);
 		ls_DeploymentComponent = Nil;
 		this.deploy_aux();
@@ -68,29 +70,29 @@ class MessageParserPlan(CloudProvider cloudProvider, MessageParser_LoadBalancerI
 			this.undeploy_aux();
 			ls_DeploymentComponent = head(ls_ls_DeploymentComponent);
 			ls_ls_DeploymentComponent = tail(ls_ls_DeploymentComponent);
-				ls_MessageParserInterface = head(ls_ls_MessageParserInterface);
-			ls_ls_MessageParserInterface = tail(ls_ls_MessageParserInterface);
+				ls_VirusScannerInterface = head(ls_ls_VirusScannerInterface);
+			ls_ls_VirusScannerInterface = tail(ls_ls_VirusScannerInterface);
 		}
 	}
 
 
 	Unit deploy_aux() {
 		Map<DeploymentComponent,Rat> speedPatchMap = map[];
-		DeploymentComponent c4_large_0 = cloudProvider.launchInstanceNamed("c4_large");
-		ls_DeploymentComponent = Cons(c4_large_0,ls_DeploymentComponent);
-		speedPatchMap = put(speedPatchMap,c4_large_0,0);
-		[DC: c4_large_0] MessageParserInterface odefault___MessageParser_0_c4_large_0 = new MessageParser(headerAnalyser_LoadBalancerObj, linkAnalyser_LoadBalancerObj, textAnalyser_LoadBalancerObj, virusScanner_LoadBalancerObj, messageAnalyser_LoadBalancerObj, dbObj);
-		Rat coreRequired_odefault___MessageParser_0_c4_large_0 = 1;
-		speedPatchMap = put(speedPatchMap, c4_large_0, fromJust(lookup(speedPatchMap,c4_large_0)) + coreRequired_odefault___MessageParser_0_c4_large_0);
-		ls_MessageParserInterface = Cons(odefault___MessageParser_0_c4_large_0, ls_MessageParserInterface);
+		DeploymentComponent c4_xlarge_0 = cloudProvider.launchInstanceNamed("c4_xlarge");
+		ls_DeploymentComponent = Cons(c4_xlarge_0,ls_DeploymentComponent);
+		speedPatchMap = put(speedPatchMap,c4_xlarge_0,0);
+		[DC: c4_xlarge_0] VirusScannerInterface odefault___VirusScanner_0_c4_xlarge_0 = new VirusScanner(attachmentsManager_LoadBalancerObj, messageAnalyser_LoadBalancerObj);
+		Rat coreRequired_odefault___VirusScanner_0_c4_xlarge_0 = 4;
+		speedPatchMap = put(speedPatchMap, c4_xlarge_0, fromJust(lookup(speedPatchMap,c4_xlarge_0)) + coreRequired_odefault___VirusScanner_0_c4_xlarge_0);
+		ls_VirusScannerInterface = Cons(odefault___VirusScanner_0_c4_xlarge_0, ls_VirusScannerInterface);
 		this!patchSpeed(speedPatchMap);
 		await duration(waiting_time,waiting_time);
-		messageParser_LoadBalancerObj.connectInstance(odefault___MessageParser_0_c4_large_0);
+		virusScanner_LoadBalancerObj.connectInstance(odefault___VirusScanner_0_c4_xlarge_0);
 	}
 
 	Unit undeploy_aux() {
-		MessageParserInterface odefault___MessageParser_0_c4_large_0 = nth(ls_MessageParserInterface,0);
-		messageParser_LoadBalancerObj.disconnectInstance();
+		VirusScannerInterface odefault___VirusScanner_0_c4_xlarge_0 = nth(ls_VirusScannerInterface,0);
+		virusScanner_LoadBalancerObj.disconnectInstance();
 		while ( !isEmpty(ls_DeploymentComponent) ) {
 			cloudProvider.shutdownInstance(head(ls_DeploymentComponent));
 			ls_DeploymentComponent = tail(ls_DeploymentComponent);

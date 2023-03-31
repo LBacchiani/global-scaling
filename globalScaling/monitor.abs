@@ -8,10 +8,11 @@ import * from Sys_init;
 import * from Wrapper;
 import * from DB;
 import * from Scaler;
+import * from Param;
 
 interface MonitorInterface {}
 
-class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int kbig, Int k, Int ratio, List<Int> predicted_workload, List<Int> init_conf, Int memory, Bool proactiveness, Bool mixing) implements MonitorInterface {
+class Monitor(ScalerServiceInterface scaler, DBInterface db, List<Int> init_conf) implements MonitorInterface {
   Int time = 0;
   List<Int> last_pred_config = init_conf; //field for proactive-reactive global scaling
   List<Rat> errors = list[]; //field for proactive-reactive global scaling
@@ -44,7 +45,7 @@ class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int 
 
   Unit store_weights(Rat curr_weight) {
     errors = appendright(errors, abs(curr_weight));
-    if(length(errors) == memory) errors = tail(errors);
+    if(length(errors) == memory()) errors = tail(errors);
   }
 
   Rat compute_distance() {
@@ -102,10 +103,10 @@ class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int 
     Rat max_pred = -1;
     Rat max_true = -1;
     Int i = 0;
-    while(i < ratio) {
-      await duration(windowDim/ratio, windowDim/ratio);
+    while(i < ratio()) {
+      await duration(monitoringWin()/ratio(), monitoringWin()/ratio());
       Rat chunk_pred = -1;
-      if(proactiveness) chunk_pred = nth(predicted_workload, (i + time) % length(predicted_workload));
+      if(proactiveness()) chunk_pred = nth(predicted_workload(), (i + time) % length(predicted_workload()));
       Rat chunk_real = db.get_one_sec_workload();
       db.one_sec_timeout();
       max_pred = max(chunk_pred,max_pred);
@@ -121,12 +122,12 @@ class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int 
       Rat max_pred = fst(maxes);
       Rat max_true = snd(maxes);
       Rat target = max_true;
-      if(proactiveness) target = max_pred;
-      if(mixing) target = this.mix(max_true, max_pred);
-      time = time + ratio;
+      if(proactiveness()) target = max_pred;
+      if(mixing()) target = this.mix(max_true, max_pred);
+      time = time + ratio();
       Rat mcl = scaler.getSystemMCL();
       Int nInst = scaler.computeInstanceNumber();
-      if(target - (mcl - kbig) > k || (mcl - kbig) - target > k) {
+      if(target - (mcl - kbig()) > k() || (mcl - kbig()) - target > k()) {
         List<Int> target_config = scaler.computeConfiguration(target);
         scaler.scale(target_config);
       }
@@ -140,11 +141,11 @@ class Monitor(ScalerServiceInterface scaler, DBInterface db, Int windowDim, Int 
       Rat completed = db.messageCompleted();
       Rat rejected = db.rejectedMessages();
       Rat totalMsg = db.get_inbound_workload();
-      Rat totalCost = scaler.computeTotalCost(ratio);
+      Rat totalCost = scaler.computeTotalCost(ratio());
       String toPrint = toString(time) + "  " + toString(float(100/3) * averageAnalysisTime);
-      if(proactiveness) toPrint = toPrint + " #next_max: " + toString(max_pred);
+      if(proactiveness()) toPrint = toPrint + " #next_max: " + toString(max_pred);
       toPrint = toPrint + " curr_max: " + toString(max_true); 
-      if(mixing) toPrint = toPrint + " target_scale: " + toString(float(target));
+      if(mixing()) toPrint = toPrint + " target_scale: " + toString(float(target));
       toPrint = toPrint + " TOT: " + toString(totalMsg) + " COMP: " + toString(completed) + " REJ: " + toString(rejected) + " SUPP: " + toString(mcl) + " COST: " + toString(float(totalCost)) + " INST: " + toString(nInst);
       String scalingAct = scaler.getScalingActions();
       toPrint = toPrint + scalingAct;

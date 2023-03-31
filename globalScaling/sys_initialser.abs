@@ -13,18 +13,19 @@ import * from Architecture;
 import * from DB;
 import * from Scaler;
 import * from Monitor;
+import * from Param;
 
 
 
 interface SetUpSystemInterface {
 	Unit setupServices(DBInterface db);
   Unit setupLoadBalancers(DBInterface db);
-  ScalerServiceInterface deployGSAlg(DBInterface db, Int kbig, Int k, Int initInstancesNumber);
+  ScalerServiceInterface deployGSAlg(DBInterface db);
   MessageReceiver_LoadBalancerInterface getEntrypoint();
-  List<Int> proactiveDeployment(Rat initial_inbound_workload);
+  List<Int> proactiveDeployment();
 }
 
-class SetUpSystem() implements SetUpSystemInterface {
+class SetUpSystem implements SetUpSystemInterface {
 
   MessageReceiver_LoadBalancerInterface entryPoint;
   CloudProvider cp;
@@ -61,7 +62,6 @@ class SetUpSystem() implements SetUpSystemInterface {
     c1.deploy();
     List<DeploymentComponent> dcs = c1.getDeploymentComponent();
     this.computeInitialCost(dcs);
-    //obtain the necessary object from the initial deployment to create scaling policy
     messageReceiver_LoadBalancerList = c1.getMessageReceiver_LoadBalancerInterface();
 		messageParser_LoadBalancerList = c1.getMessageParser_LoadBalancerInterface();
 		headerAnalyser_LoadBalancerList = c1.getHeaderAnalyser_LoadBalancerInterface();
@@ -84,7 +84,7 @@ class SetUpSystem() implements SetUpSystemInterface {
     this.computeInitialCost(dcs);
   }
 
-  ScalerServiceInterface deployGSAlg(DBInterface db, Int kbig, Int k, Int initInstancesNumber) {
+  ScalerServiceInterface deployGSAlg(DBInterface db) {
 
     ///////SCALING ORCHESTRATION CREATION///////////
 
@@ -154,8 +154,7 @@ class SetUpSystem() implements SetUpSystemInterface {
     //////END SCALING ORCHESTRATION CREATION///////
 
 
-    Int ratio = 10; //ratio between monitoring window and generation window
-    scaler = new ScalerService(kbig, setup_cost, initInstancesNumber);
+    scaler = new ScalerService(setup_cost);
     scaler.insertScalingElements(s1config, wrapperS1, "Scale1");
     scaler.insertScalingElements(s2config, wrapperS2, "Scale2");
     scaler.insertScalingElements(s3config, wrapperS3, "Scale3");
@@ -164,8 +163,8 @@ class SetUpSystem() implements SetUpSystemInterface {
 
   }
 
-   List<Int> proactiveDeployment(Rat initial_inbound_workload) {
-     List<Int> config = scaler.computeConfiguration(initial_inbound_workload);
+   List<Int> proactiveDeployment() {
+     List<Int> config = scaler.computeConfiguration(fst_pred());
      scaler.scale(config);
      String scalingAct = scaler.getScalingActions();
      println("Initial Configuration: Basex1 " + scalingAct);

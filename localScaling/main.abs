@@ -1,0 +1,25 @@
+module Main;
+
+import * from Gen;
+import * from Architecture;
+import * from Sys_init;
+import * from Param;
+import * from DB;
+import * from Monitor;
+import * from BalancerMonitor;
+
+
+{
+	DBInterface db = new DB();
+	SetUpSystemInterface setupSystem = new SetUpSystem();
+	setupSystem.setupLoadBalancers(db);
+	setupSystem.connectPlan(db);
+	setupSystem.createLocalMonitors();
+	setupSystem.setupServices(db);
+	MessageReceiver_LoadBalancerInterface entryPoint =  setupSystem.getEntrypoint();
+	List<LoadBalancerMonitorInterface> local_monitors = setupSystem.getLocalMonitors();
+	List<LoadBalancer> balancers = setupSystem.getLB();
+	Rat setup_cost = setupSystem.getSetupCost();
+	MonitorInterface monitor = new Monitor(db, balancers, local_monitors, setup_cost);
+	MailGeneratorInterface testProcess = new MailGenerator(entryPoint);
+}

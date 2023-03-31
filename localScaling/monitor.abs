@@ -1,0 +1,65 @@
+module Monitor;
+
+export *;
+
+import * from BalancerMonitor;
+import * from Architecture;
+import * from DB;
+import * from Param;
+
+interface MonitorInterface {}
+
+class Monitor(DBInterface db, List<LoadBalancer> balancers, List<LoadBalancerMonitorInterface> monitors, Rat initialCost) implements MonitorInterface {
+  Int time = 0;
+
+  String getInstances() {
+    String res = "";
+    foreach(b in balancers) {
+      String toAdd = b.getInstanceNumberDescription();
+      res = res + toAdd;
+    }
+    return res;
+  }
+
+  Unit checkBalancers() {foreach(monitor in monitors) {monitor.check();}}
+
+  Unit tick() {foreach(monitor in monitors) {monitor.tick();}}
+
+  Unit printReqs() {foreach(monitor in monitors) {monitor.printReqs();}}
+
+  Int getTotalInstances() {
+    Int total = 0;
+    foreach(b in balancers) {
+      Int n = b.getInstancesNumber();
+      total = total + n;
+    }
+    return total;
+  }
+
+	Unit run() {
+    while(time < 200){
+      Rat max_true = 0;
+      Int i = 0;
+      while(i < ratio()) {
+        await duration(monitoringWin()/ratio(), monitoringWin()/ratio());
+        Rat chunk_real = db.get_one_sec_workload();
+        db.one_sec_timeout();
+        if(chunk_real > max_true) max_true = chunk_real;
+        this.tick();
+        i = i + 1;
+      }
+      Float averageAnalysisTime = db.returnAverageAnalysisTime();
+      Rat completed = db.messageCompleted();
+      Rat inbound_workload = db.returninbound_workload();
+      Rat rejected = db.rejectedMessages();
+      Int totalInstances = this.getTotalInstances();
+      String instances = this.getInstances();
+      time = time + ratio();
+      String toPrint = toString(time) + "  " + toString(float(100/3) * averageAnalysisTime) + " #curr_max: " + toString(max_true) + " TOT:" + toString(inbound_workload) + " COMP:" + toString(completed) + " REJ: " + toString(rejected) + " INST: " + toString(totalInstances + 3) +" " + instances;
+      this.checkBalancers();
+      db.resetMetrics();
+      println(toPrint);
+    }
+    this.printReqs();
+  }
+}

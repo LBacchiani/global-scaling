@@ -1,6 +1,7 @@
-module MailGen;
+module Gen;
 
 export *;
+
 import * from Architecture;
 import * from Param;
 
@@ -16,10 +17,10 @@ class MailGenerator(MessageReceiver_LoadBalancerInterface entryPoint) implements
       round = round + 1;
       Int j = 0;
       while(j < currentMessageNumber) {
-        entryPoint!newMessage("Message");
+        entryPoint!newMessage();
         await duration(sendingWin() / currentMessageNumber, sendingWin() / currentMessageNumber);
         j = j + 1;
       }
     }
-	}
+  }
 }

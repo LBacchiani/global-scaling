@@ -1,23 +1,33 @@
-module ImageAnalyserPlan;
+module MessageParserPlan;
 export *;
 import * from ABS.DC;
-import * from EmailProcessingPipelineArchitecture;
+import * from Architecture;
+import * from DB;
 
-interface ImageAnalyserPlan{
-	List<ImageAnalyserInterface> getImageAnalyserInterface();
+
+interface MessageParserPlan{
+	List<MessageParserInterface> getMessageParserInterface();
 	List<DeploymentComponent> getDeploymentComponent();
 	Unit deploy();
 	Unit undeploy();
 }
 
-class ImageAnalyserPlan(CloudProvider cloudProvider, ImageAnalyser_LoadBalancerInterface imageAnalyser_LoadBalancerObj, NSFWDetector_LoadBalancerInterface nsfwDetector_LoadBalancerObj, MessageAnalyser_LoadBalancerInterface messageAnalyser_LoadBalancerObj, ImageRecognizer_LoadBalancerInterface imageRecognizer_LoadBalancerObj) implements ImageAnalyserPlan{
+class MessageParserPlan(CloudProvider cloudProvider, MessageParser_LoadBalancerInterface messageParser_LoadBalancerObj, HeaderAnalyser_LoadBalancerInterface headerAnalyser_LoadBalancerObj, LinkAnalyser_LoadBalancerInterface linkAnalyser_LoadBalancerObj, TextAnalyser_LoadBalancerInterface textAnalyser_LoadBalancerObj, VirusScanner_LoadBalancerInterface virusScanner_LoadBalancerObj, DBInterface dbObj, MessageAnalyser_LoadBalancerInterface messageAnalyser_LoadBalancerObj) implements MessageParserPlan{
 
-	List<List<ImageAnalyserInterface>> ls_ls_ImageAnalyserInterface = Nil;
-	List<ImageAnalyserInterface> ls_ImageAnalyserInterface = Nil;
+	List<List<MessageParserInterface>> ls_ls_MessageParserInterface = Nil;
+	List<MessageParserInterface> ls_MessageParserInterface = Nil;
 	List<List<DeploymentComponent>> ls_ls_DeploymentComponent = Nil;
 	List<DeploymentComponent> ls_DeploymentComponent = Nil;
 	Rat waiting_time = 100;
 	{
+		cloudProvider.addInstanceDescription(Pair("c4_4xlarge",
+			map[Pair(CostPerInterval,950)
+			,Pair(PaymentInterval,1)
+			,Pair(Bandwidth,2000)
+			,Pair(Memory,3000)
+			,Pair(Cores,16)
+			,Pair(Speed,80)
+			]));
 		cloudProvider.addInstanceDescription(Pair("c4_xlarge",
 			map[Pair(CostPerInterval,237)
 			,Pair(PaymentInterval,1)
@@ -44,12 +54,12 @@ class ImageAnalyserPlan(CloudProvider cloudProvider, ImageAnalyser_LoadBalancerI
 			]));
 	}
 
-	List<ImageAnalyserInterface> getImageAnalyserInterface() { return ls_ImageAnalyserInterface; }
+	List<MessageParserInterface> getMessageParserInterface() { return ls_MessageParserInterface; }
 	List<DeploymentComponent> getDeploymentComponent() { return ls_DeploymentComponent; }
 
 	Unit deploy() {
-		ls_ls_ImageAnalyserInterface = Cons(ls_ImageAnalyserInterface,ls_ls_ImageAnalyserInterface);
-		ls_ImageAnalyserInterface = Nil;
+		ls_ls_MessageParserInterface = Cons(ls_MessageParserInterface,ls_ls_MessageParserInterface);
+		ls_MessageParserInterface = Nil;
 		ls_ls_DeploymentComponent = Cons(ls_DeploymentComponent,ls_ls_DeploymentComponent);
 		ls_DeploymentComponent = Nil;
 		this.deploy_aux();
@@ -60,8 +70,8 @@ class ImageAnalyserPlan(CloudProvider cloudProvider, ImageAnalyser_LoadBalancerI
 			this.undeploy_aux();
 			ls_DeploymentComponent = head(ls_ls_DeploymentComponent);
 			ls_ls_DeploymentComponent = tail(ls_ls_DeploymentComponent);
-				ls_ImageAnalyserInterface = head(ls_ls_ImageAnalyserInterface);
-			ls_ls_ImageAnalyserInterface = tail(ls_ls_ImageAnalyserInterface);
+				ls_MessageParserInterface = head(ls_ls_MessageParserInterface);
+			ls_ls_MessageParserInterface = tail(ls_ls_MessageParserInterface);
 		}
 	}
 
@@ -71,18 +81,18 @@ class ImageAnalyserPlan(CloudProvider cloudProvider, ImageAnalyser_LoadBalancerI
 		DeploymentComponent c4_large_0 = cloudProvider.launchInstanceNamed("c4_large");
 		ls_DeploymentComponent = Cons(c4_large_0,ls_DeploymentComponent);
 		speedPatchMap = put(speedPatchMap,c4_large_0,0);
-		[DC: c4_large_0] ImageAnalyserInterface odefault___ImageAnalyser_0_c4_large_0 = new ImageAnalyser(nsfwDetector_LoadBalancerObj, imageRecognizer_LoadBalancerObj, messageAnalyser_LoadBalancerObj);
-		Rat coreRequired_odefault___ImageAnalyser_0_c4_large_0 = 1;
-		speedPatchMap = put(speedPatchMap, c4_large_0, fromJust(lookup(speedPatchMap,c4_large_0)) + coreRequired_odefault___ImageAnalyser_0_c4_large_0);
-		ls_ImageAnalyserInterface = Cons(odefault___ImageAnalyser_0_c4_large_0, ls_ImageAnalyserInterface);
+		[DC: c4_large_0] MessageParserInterface odefault___MessageParser_0_c4_large_0 = new MessageParser(headerAnalyser_LoadBalancerObj, linkAnalyser_LoadBalancerObj, textAnalyser_LoadBalancerObj, virusScanner_LoadBalancerObj, messageAnalyser_LoadBalancerObj, dbObj);
+		Rat coreRequired_odefault___MessageParser_0_c4_large_0 = 1;
+		speedPatchMap = put(speedPatchMap, c4_large_0, fromJust(lookup(speedPatchMap,c4_large_0)) + coreRequired_odefault___MessageParser_0_c4_large_0);
+		ls_MessageParserInterface = Cons(odefault___MessageParser_0_c4_large_0, ls_MessageParserInterface);
 		this!patchSpeed(speedPatchMap);
 		await duration(waiting_time,waiting_time);
-		imageAnalyser_LoadBalancerObj.connectInstance(odefault___ImageAnalyser_0_c4_large_0);
+		messageParser_LoadBalancerObj.connectInstance(odefault___MessageParser_0_c4_large_0);
 	}
 
 	Unit undeploy_aux() {
-		ImageAnalyserInterface odefault___ImageAnalyser_0_c4_large_0 = nth(ls_ImageAnalyserInterface,0);
-		imageAnalyser_LoadBalancerObj.disconnectInstance();
+		MessageParserInterface odefault___MessageParser_0_c4_large_0 = nth(ls_MessageParserInterface,0);
+		messageParser_LoadBalancerObj.disconnectInstance();
 		while ( !isEmpty(ls_DeploymentComponent) ) {
 			cloudProvider.shutdownInstance(head(ls_DeploymentComponent));
 			ls_DeploymentComponent = tail(ls_DeploymentComponent);

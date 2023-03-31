@@ -1,7 +1,9 @@
 module MessageAnalyserPlan;
 export *;
 import * from ABS.DC;
-import * from EmailProcessingPipelineArchitecture;
+import * from Architecture;
+import * from DB;
+
 
 interface MessageAnalyserPlan{
 	List<MessageAnalyserInterface> getMessageAnalyserInterface();
