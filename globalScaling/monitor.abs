@@ -121,17 +121,17 @@ class Monitor(ScalerServiceInterface scaler, DBInterface db, List<Int> init_conf
       Pair<Rat,Rat> maxes = this.find_maxes();
       Rat max_pred = fst(maxes);
       Rat max_true = snd(maxes);
-      Rat target = max_true;
-      if(proactiveness()) target = max_pred;
-      if(mixing()) target = this.mix(max_true, max_pred);
+      Rat target_workload = max_true;
+      if(proactiveness()) target_workload = max_pred;
+      if(mixing()) target_workload = this.mix(max_true, max_pred);
       time = time + ratio();
       Rat mcl = scaler.getSystemMCL();
       Int nInst = scaler.computeInstanceNumber();
-      if(target - (mcl - kbig()) > k() || (mcl - kbig()) - target > k()) {
-        List<Int> target_config = scaler.computeConfiguration(target);
+      if(target_workload - (mcl - kbig()) > k() || (mcl - kbig()) - target_workload > k()) {
+        List<Int> target_config = scaler.computeConfiguration(target_workload);
         scaler.scale(target_config);
       }
-      this.log(max_true, max_pred, mcl, target, nInst); //debug purpose
+      this.log(max_true, max_pred, mcl, target_workload, nInst); //debug purpose
       db.resetMetrics();
     }
   }

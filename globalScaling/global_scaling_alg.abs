@@ -87,9 +87,19 @@ class ScalerService(Rat initialCost) implements ScalerServiceInterface {
 
 
   Unit scale(List<Int> configDeltas) {
-    this.reconfigure(deployedDeltas, configDeltas);
-    scalingAct = this.recordAction(scalingTrace, printableconfig);
+    Int i = 0;
+    while(i < numScales) {
+      Int diff = nth(configDeltas,i) - nth(deployedDeltas,i);
+      Rat num = abs(diff);
+      while(num > 0) {
+         if (diff > 0) {nth(orchestrationDeltas,i)!deploy();}
+         else {nth(orchestrationDeltas,i)!undeploy();}
+         num = num - 1;
+      }
+      i = i + 1;
+    }
     deployedDeltas = configDeltas;
+    scalingAct = this.recordAction(scalingTrace, printableconfig);
     scalingTrace = printableconfig;
   }
 
@@ -201,7 +211,7 @@ class ScalerService(Rat initialCost) implements ScalerServiceInterface {
     return toPrint;
   }
 
-  Unit reconfigure(List<Int> deployedDeltas, List<Int> configDeltas) {
+  /*Unit reconfigure(List<Int> deployedDeltas, List<Int> configDeltas) {
     Int i = 0;
     while(i < numScales) {
       Int diff = nth(configDeltas,i) - nth(deployedDeltas,i);
@@ -213,5 +223,5 @@ class ScalerService(Rat initialCost) implements ScalerServiceInterface {
       }
       i = i + 1;
     }
-  }
+  }*/
 }
