@@ -17,6 +17,10 @@ import * from DB;
 [SmartDeployCloudProvider: "{\"c4_large\" : {\"cost\" : 100, \"payment_interval\" : 1, \"resources\" : { \"Cores\" : 2, \"Memory\" : 375, \"Bandwidth\" : 500, \"Speed\" : 10, \"Startupduration\" : 100}} , \"c4_xlarge\" : { \"cost\" : 199, \"payment_interval\" : 1, \"resources\" : { \"Cores\" : 4, \"Memory\" : 750, \"Bandwidth\" : 750, \"Speed\" : 20, \"Startupduration\" : 100}} , \"c4_2xlarge\" : { \"cost\" : 398, \"payment_interval\" : 1, \"resources\" : { \"Cores\" : 8, \"Memory\" : 1500, \"Bandwidth\" : 1000, \"Speed\" : 40, \"Startupduration\" : 100}}, \"c4_4xlarge\" : { \"cost\" : 796, \"payment_interval\" : 1, \"resources\" : { \"Cores\" : 16, \"Memory\" : 3000, \"Bandwidth\" : 2000, \"Speed\" : 80, \"Startupduration\" : 100}}}"]
 ///////////////////////////////////////////////////////////////////////
 
+
+[SmartDeploy : "{ \"id\":\"Setup\", \"specification\":\"MessageReceiver = 1 and MessageParser = 1 and HeaderAnalyser = 1 and LinkAnalyser = 1 and TextAnalyser = 1 and SentimentAnalyser = 2 and VirusScanner = 1 and AttachmentsManager = 1 and ImageAnalyser = 1 and NSFWDetector = 1 and ImageRecognizer = 1 and MessageAnalyser = 1 and forall ?x in DC: ( ?x.MessageReceiver_LoadBalancer + ?x.MessageParser_LoadBalancer + ?x.HeaderAnalyser_LoadBalancer + ?x.LinkAnalyser_LoadBalancer + ?x.TextAnalyser_LoadBalancer + ?x.SentimentAnalyser_LoadBalancer + ?x.VirusScanner_LoadBalancer + ?x.AttachmentsManager_LoadBalancer + ?x.ImageAnalyser_LoadBalancer + ?x.NSFWDetector_LoadBalancer + ?x.ImageRecognizer_LoadBalancer + ?x.MessageAnalyser_LoadBalancer + ?x.HeaderAnalyser + ?x.LinkAnalyser + ?x.TextAnalyser > 0 impl (sum ?y in obj: ?x.?y) = 1)\", \"DC\":[ ], \"obj\":[{\"name\":\"dbObj\",\"interface\":\"DBInterface\",\"provides\":[{\"ports\":[\"DBInterface\"],\"num\":-1}],\"methods\" : []} ], \"cloud_provider_DC_availability\":{ \"c4_large\":40, \"c4_xlarge\":40, \"c4_2xlarge\":40, \"c4_4xlarge\":40 }, \"bind preferences\":[ \"local\",  \"forall ?x of type MessageReceiver in '.*' : forall ?y of type MessageReceiver_LoadBalancer in '.*' : ?x used by ?y\",\"forall ?x of type MessageParser in '.*' : forall ?y of type MessageParser_LoadBalancer in '.*' : ?x used by ?y\", \"forall ?x of type HeaderAnalyser in '.*' : forall ?y of type HeaderAnalyser_LoadBalancer in '.*' : ?x used by ?y\", \"forall ?x of type LinkAnalyser in '.*' : forall ?y of type LinkAnalyser_LoadBalancer in '.*' : ?x used by ?y\", \"forall ?x of type TextAnalyser in '.*' : forall ?y of type TextAnalyser_LoadBalancer in '.*' : ?x used by ?y\", \"forall ?x of type SentimentAnalyser in '.*' : forall ?y of type SentimentAnalyser_LoadBalancer in '.*' : ?x used by ?y\", \"forall ?x of type VirusScanner in '.*' : forall ?y of type VirusScanner_LoadBalancer in '.*' : ?x used by ?y\", \"forall ?x of type AttachmentsManager in '.*' : forall ?y of type AttachmentsManager_LoadBalancer in '.*' : ?x used by ?y\", \"forall ?x of type ImageAnalyser in '.*' :  forall ?y of type ImageAnalyser_LoadBalancer in '.*' : ?x used by ?y\", \"forall ?x of type NSFWDetector in '.*' :  forall ?y of type NSFWDetector_LoadBalancer in '.*' : ?x used by ?y\", \"forall ?x of type ImageRecognizer in '.*' :  forall ?y of type ImageRecognizer_LoadBalancer in '.*' : ?x used by ?y\", \"forall ?x of type MessageAnalyser in '.*' :  forall ?y of type MessageAnalyser_LoadBalancer in '.*' : ?x used by ?y\" ], \"add_method_priorities\":[], \"remove_method_priorities\":[] }" ]
+
+
 /////////////////////INVARIANTS ANNOTATION/////////////////////////////////////
 /*
 [ SmartDeploy : "{ \"id\":\"InvariantsDeployer\", \"specification\":\"MessageReceiver_LoadBalancer = 1 and MessageParser_LoadBalancer = 1 and HeaderAnalyser_LoadBalancer = 1 and LinkAnalyser_LoadBalancer = 1 and TextAnalyser_LoadBalancer = 1 and SentimentAnalyser_LoadBalancer = 1 and VirusScanner_LoadBalancer = 1 and AttachmentsManager_LoadBalancer = 1 and ImageAnalyser_LoadBalancer = 1 and NSFWDetector_LoadBalancer = 1 and ImageRecognizer_LoadBalancer = 1 and MessageAnalyser_LoadBalancer = 1 and forall ?x in DC: ( ?x.MessageAnalyser_LoadBalancer + ?x.MessageParser_LoadBalancer + ?x.HeaderAnalyser_LoadBalancer + ?x.LinkAnalyser_LoadBalancer + ?x.TextAnalyser_LoadBalancer + ?x.SentimentAnalyser_LoadBalancer + ?x.VirusScanner_LoadBalancer + ?x.AttachmentsManager_LoadBalancer + ?x.ImageAnalyser_LoadBalancer + ?x.NSFWDetector_LoadBalancer + ?x.ImageRecognizer_LoadBalancer + ?x.MessageAnalyser_LoadBalancer  > 0 impl (sum ?y in obj: ?x.?y) = 1)\", \"DC\":[ ], \"obj\":[{\"name\":\"dbObj\",\"interface\":\"DBInterface\",\"provides\":[{\"ports\":[\"DBInterface\"],\"num\":-1}],\"methods\" : []} ], \"cloud_provider_DC_availability\":{ \"c4_large\":40, \"c4_xlarge\":40, \"c4_2xlarge\":40 }, \"bind preferences\":[ \"local\"], \"add_method_priorities\":[], \"remove_method_priorities\":[] }" ]
@@ -59,7 +63,7 @@ interface MessageReceiver_LoadBalancerInterface {
     Unit removeMessage();
 }
 
-//[SmartDeployCost : "{\"class\" : \"MessageReceiver_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"MessageReceiverInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"MessageReceiverInterface\"}}]}]}"]
+[SmartDeployCost : "{\"class\" : \"MessageReceiver_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"MessageReceiverInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"MessageReceiverInterface\"}}]}]}"]
 class MessageReceiver_LoadBalancer(DBInterface db) implements MessageReceiver_LoadBalancerInterface {
   List<MessageReceiverInterface> instancesConnected = list[];
   Int nextInstance = -1;
@@ -111,7 +115,7 @@ interface MessageParser_LoadBalancerInterface {
     Unit removeMessage();
 }
 
-//[SmartDeployCost : "{\"class\" : \"MessageParser_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"MessageParserInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"MessageParserInterface\"}}]}]}"]
+[SmartDeployCost : "{\"class\" : \"MessageParser_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"MessageParserInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"MessageParserInterface\"}}]}]}"]
 class MessageParser_LoadBalancer(DBInterface db) implements MessageParser_LoadBalancerInterface {
   List<MessageParserInterface> instancesConnected = list[];
   Int nextInstance = -1;
@@ -194,7 +198,7 @@ interface HeaderAnalyser_LoadBalancerInterface {
     Unit newRequest (String headers, String messageId);
 }
 
-//[SmartDeployCost : "{\"class\" : \"HeaderAnalyser_LoadBalancer\", \"scenarios\" : [{ \"name\" : \"default\", \"provide\" : -1, \"cost\" : { \"Cores\" : 2, \"Memory\" : 200 }, \"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{ \"add\" : { \"name\" : \"connectInstance\", \"param_type\" : \"HeaderAnalyserInterface\" }, \"remove\" : { \"name\" : \"disconnectInstance\", \"return_type\": \"HeaderAnalyserInterface\" }}]}]}"]
+[SmartDeployCost : "{\"class\" : \"HeaderAnalyser_LoadBalancer\", \"scenarios\" : [{ \"name\" : \"default\", \"provide\" : -1, \"cost\" : { \"Cores\" : 2, \"Memory\" : 200 }, \"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{ \"add\" : { \"name\" : \"connectInstance\", \"param_type\" : \"HeaderAnalyserInterface\" }, \"remove\" : { \"name\" : \"disconnectInstance\", \"return_type\": \"HeaderAnalyserInterface\" }}]}]}"]
 class HeaderAnalyser_LoadBalancer(DBInterface db)  implements HeaderAnalyser_LoadBalancerInterface {
   List<HeaderAnalyserInterface> instancesConnected = list[];
   Int nextInstance = -1;
@@ -233,7 +237,7 @@ interface LinkAnalyser_LoadBalancerInterface {
   Unit newRequest (Set<String> links, String messageId);
 }
 
-//[SmartDeployCost : "{\"class\" : \"LinkAnalyser_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"LinkAnalyserInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"LinkAnalyserInterface\"}}]}]}"]
+[SmartDeployCost : "{\"class\" : \"LinkAnalyser_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"LinkAnalyserInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"LinkAnalyserInterface\"}}]}]}"]
 class LinkAnalyser_LoadBalancer(DBInterface db)  implements LinkAnalyser_LoadBalancerInterface {
   List<LinkAnalyserInterface> instancesConnected = list[];
   Int nextInstance = -1;
@@ -271,7 +275,7 @@ interface TextAnalyser_LoadBalancerInterface {
   Unit newRequest (String messageHeader, String messageBody, String messageId);
 }
 
-//[SmartDeployCost : "{\"class\" : \"TextAnalyser_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"TextAnalyserInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"TextAnalyserInterface\"}}]}]}"]
+[SmartDeployCost : "{\"class\" : \"TextAnalyser_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"TextAnalyserInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"TextAnalyserInterface\"}}]}]}"]
 class TextAnalyser_LoadBalancer(DBInterface db)  implements TextAnalyser_LoadBalancerInterface {
   List<TextAnalyserInterface> instancesConnected = list[];
   Int nextInstance = -1;
@@ -336,7 +340,7 @@ interface SentimentAnalyser_LoadBalancerInterface {
   Unit removeMessage();
 }
 
-//[SmartDeployCost : "{\"class\" : \"SentimentAnalyser_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"SentimentAnalyserInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"SentimentAnalyserInterface\"}}]}]}"]
+[SmartDeployCost : "{\"class\" : \"SentimentAnalyser_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"SentimentAnalyserInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"SentimentAnalyserInterface\"}}]}]}"]
 class SentimentAnalyser_LoadBalancer(DBInterface dbObj)  implements SentimentAnalyser_LoadBalancerInterface {
   List<SentimentAnalyserInterface> instancesConnected = list[];
   Int pending = 0;
@@ -390,7 +394,7 @@ interface VirusScanner_LoadBalancerInterface {
   Unit removeMessage();
 }
 
-//[SmartDeployCost : "{\"class\" : \"VirusScanner_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"VirusScannerInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"VirusScannerInterface\"}}]}]}"]
+[SmartDeployCost : "{\"class\" : \"VirusScanner_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"VirusScannerInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"VirusScannerInterface\"}}]}]}"]
 class VirusScanner_LoadBalancer(DBInterface db)  implements VirusScanner_LoadBalancerInterface {
   List<VirusScannerInterface> instancesConnected = list[];
   Int nextInstance = -1;
@@ -444,7 +448,7 @@ interface AttachmentsManager_LoadBalancerInterface {
   Unit removeMessage();
 }
 
-//[SmartDeployCost : "{\"class\" : \"AttachmentsManager_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"AttachmentsManagerInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"AttachmentsManagerInterface\"}}]}]}"]
+[SmartDeployCost : "{\"class\" : \"AttachmentsManager_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"AttachmentsManagerInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"AttachmentsManagerInterface\"}}]}]}"]
 class AttachmentsManager_LoadBalancer(DBInterface db)  implements AttachmentsManager_LoadBalancerInterface {
   List<AttachmentsManagerInterface> instancesConnected = list[];
   Int nextInstance = -1;
@@ -495,7 +499,7 @@ interface ImageAnalyser_LoadBalancerInterface {
   Unit removeMessage();
 }
 
-//[SmartDeployCost : "{\"class\" : \"ImageAnalyser_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"ImageAnalyserInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"ImageAnalyserInterface\"}}]}]}"]
+[SmartDeployCost : "{\"class\" : \"ImageAnalyser_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"ImageAnalyserInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"ImageAnalyserInterface\"}}]}]}"]
 class ImageAnalyser_LoadBalancer(DBInterface db)  implements ImageAnalyser_LoadBalancerInterface {
   List<ImageAnalyserInterface> instancesConnected = list[];
   Int nextInstance = -1;
@@ -558,7 +562,7 @@ interface NSFWDetector_LoadBalancerInterface {
   Unit removeMessage();
 }
 
-//[SmartDeployCost : "{\"class\" : \"NSFWDetector_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"NSFWDetectorInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"NSFWDetectorInterface\"}}]}]}"]
+[SmartDeployCost : "{\"class\" : \"NSFWDetector_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"NSFWDetectorInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"NSFWDetectorInterface\"}}]}]}"]
 class NSFWDetector_LoadBalancer(DBInterface db)  implements NSFWDetector_LoadBalancerInterface {
   List<NSFWDetectorInterface> instancesConnected = list[];
   Int nextInstance = -1;
@@ -612,7 +616,7 @@ interface ImageRecognizer_LoadBalancerInterface {
   Unit removeMessage();
 }
 
-//[SmartDeployCost : "{\"class\" : \"ImageRecognizer_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"ImageRecognizerInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"ImageRecognizerInterface\"}}]}]}"]
+[SmartDeployCost : "{\"class\" : \"ImageRecognizer_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"ImageRecognizerInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"ImageRecognizerInterface\"}}]}]}"]
 class ImageRecognizer_LoadBalancer(DBInterface db)  implements ImageRecognizer_LoadBalancerInterface {
   List<ImageRecognizerInterface> instancesConnected = list[];
   Int nextInstance = -1;
@@ -665,7 +669,7 @@ interface MessageAnalyser_LoadBalancerInterface {
   Unit removeMessage();
 }
 
-//[SmartDeployCost : "{\"class\" : \"MessageAnalyser_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"MessageAnalyserInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"MessageAnalyserInterface\"}}]}]}"]
+[SmartDeployCost : "{\"class\" : \"MessageAnalyser_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"MessageAnalyserInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"MessageAnalyserInterface\"}}]}]}"]
 class MessageAnalyser_LoadBalancer(DBInterface db)  implements MessageAnalyser_LoadBalancerInterface {
   List<MessageAnalyserInterface> instancesConnected = list[];
   Int nextInstance = -1;

@@ -13,7 +13,7 @@ interface ScalerServiceInterface {
   String getScalingActions();
   Int computeInstanceNumber();
   Rat computeTotalCost(Int ratio);
-  List<Int> computeConfiguration(Rat inbound_workload);
+  List<Int> computeConfiguration(Rat target_workload);
   List<Rat> getScores();
 }
 
@@ -63,12 +63,12 @@ class ScalerService(Rat initialCost) implements ScalerServiceInterface {
     return map((Rat x) => x / overall_inc)(scale_scores); 
   }
 
-  List<Int> computeConfiguration(Rat inbound_workload) {
+  List<Int> computeConfiguration(Rat target_workload) {
     List<Int> configDeltas = this.createEmpty(numScales);
     printableconfig = configDeltas;
     List<Int> config = baseConfig;
     mcl = this.mcl(config);
-    Bool configFound = (mcl - kbig()) - inbound_workload  >= 0;
+    Bool configFound = (mcl - kbig()) - target_workload  >= 0;
     while(!configFound) {
       List<Int> candidateConfig = baseConfig;
       Int i = -1;
@@ -76,7 +76,7 @@ class ScalerService(Rat initialCost) implements ScalerServiceInterface {
         i = i + 1;
         candidateConfig = this.vSum(config, nth(scaleComponents,i));
         mcl = this.mcl(candidateConfig);
-        configFound = (mcl - kbig()) - inbound_workload  >= 0;
+        configFound = (mcl - kbig()) - target_workload  >= 0;
       }
       config = candidateConfig;
       printableconfig = this.incrementValue(i,printableconfig);

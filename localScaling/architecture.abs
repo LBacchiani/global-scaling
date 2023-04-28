@@ -110,7 +110,7 @@ interface MessageReceiver_LoadBalancerInterface extends LoadBalancer {
     Unit removeMessage();
 }
 
-//[SmartDeployCost : "{\"class\" : \"MessageReceiver_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"MessageParserInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"MessageParserInterface\"}}]}]}"]
+//[SmartDeployCost : "{\"class\" : \"MessageReceiver_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : m], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"MessageReceiverInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"MessageReceiverInterface\"}}]}]}"]
 class MessageReceiver_LoadBalancer(DBInterface db) implements MessageReceiver_LoadBalancerInterface {
   List<MessageReceiverInterface> instancesConnected = list[];
   Int nextInstance = -1;
