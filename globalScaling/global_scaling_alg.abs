@@ -14,7 +14,6 @@ interface ScalerServiceInterface {
   Int computeInstanceNumber();
   Rat computeTotalCost(Int ratio);
   List<Int> computeConfiguration(Rat target_workload);
-  List<Rat> getScores();
 }
 
 class ScalerService(Rat initialCost) implements ScalerServiceInterface {
@@ -50,17 +49,6 @@ class ScalerService(Rat initialCost) implements ScalerServiceInterface {
     scalingTrace = appendright(scalingTrace, 0);
     scaleNames = appendright(scaleNames, scalingName);
     numScales = numScales + 1;
-  }
-
-  List<Rat> getScores() {
-    List<Rat> scale_scores = list[];
-    Rat overall_inc = 0;
-    foreach(scale in scaleComponents) {
-      Rat single_mcl = this.mcl(scale);
-      scale_scores = appendright(scale_scores, single_mcl);
-      overall_inc = overall_inc + single_mcl;
-    }
-    return map((Rat x) => x / overall_inc)(scale_scores); 
   }
 
   List<Int> computeConfiguration(Rat target_workload) {

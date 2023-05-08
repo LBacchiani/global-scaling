@@ -4,7 +4,7 @@ export *;
 import * from ABS.DC;
 import * from Wrapper;
 import * from InvariantsDeployer;
-import * from BaseScale;
+import * from BaseScale1;
 import * from Scale1;
 import * from Scale2;
 import * from Scale3;

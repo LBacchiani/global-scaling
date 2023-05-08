@@ -10,6 +10,7 @@ import * from DB;
 import * from Scaler;
 import * from Monitor;
 import * from Param;
+import * from Mixer;
 
 
 
@@ -23,6 +24,7 @@ import * from Param;
     ScalerServiceInterface scaler = setupSystem.deployGSAlg(db);
     List<Int> fst_conf = list[];
     if(proactiveness()) fst_conf = setupSystem.proactiveDeployment();
-    MonitorInterface monitor = new Monitor(scaler, db, fst_conf);
+    MixerInterface mixer = new Mixer();
+    MonitorInterface monitor = new Monitor(scaler, mixer, db, fst_conf);
     MailGeneratorInterface testProcess = new MailGenerator(entryPoint);
 }
