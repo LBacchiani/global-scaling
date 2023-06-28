@@ -1,8 +1,6 @@
-gen/erl
+abs-simulations/gen/erl
 abstools/
-localScaling/gen/
-oracleLocalScaling/gen/
-process_checker.sh
-compile_global_scaling.sh
-compile_local_scaling.sh
-predictiveGlobalScaling/workload_predictor/data/emails.csv
+abs-simulations/localScaling/gen/
+abs-simulations/oracleLocalScaling/gen/
+abs-simulations/compile_global_scaling.sh
+abs-simulations/compile_local_scaling.sh
