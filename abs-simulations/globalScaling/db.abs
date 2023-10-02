@@ -46,7 +46,7 @@ class DB() implements DBInterface {
   Int rejectedMessages() {return rejected;}
 
   Unit insertMessageInformation (String messageId, Int attachmentsNumber){
-    MessageResultInterface newResults = new MessageResult(3+attachmentsNumber);
+    MessageResultInterface newResults = new MessageResult(attachmentsNumber);
 		messageInfo = insert(messageInfo,Pair(messageId,Pair(newResults,timeValue(now()))));
   }
 
