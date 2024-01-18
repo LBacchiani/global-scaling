@@ -1,21 +1,22 @@
-module BalancerMonitor;
+module LocalMonitor;
 
 export *;
-import * from EmailProcessingPipelineArchitecture;
+import * from Architecture;
+import * from Param;
 
-interface LoadBalancerMonitorInterface{
+interface LocalMonitorInterface{
   Unit check();
   Unit tick();
   Unit printReqs();
 }
 
-class LoadBalancerMonitor(LoadBalancer balancer, String balancerName, Rat mcl, Int baseInstanceN, Rat mf, List<Int> forecast) implements LoadBalancerMonitorInterface {
+class LocalMonitor(LoadBalancer balancer, String balancerName, Rat mcl, Int baseInstanceN, Rat mf, List<Int> predictions) implements LocalMonitorInterface {
   Int deplInstances = baseInstanceN;
   ScalingWrapper sw;
-  Rat k = 10 * mf;
-  Rat kbig =  20 * mf;
-  List<Int> reqs = forecast;
-  Int i = 5;
+  Rat k = k() * mf;
+  Rat kbig =  kbig() * mf;
+  Int i = 0;
+  List<Int> reqs = list[];
 
   {sw = new ScalingWrapperImpl(balancer);}
 
@@ -23,12 +24,20 @@ class LoadBalancerMonitor(LoadBalancer balancer, String balancerName, Rat mcl, I
 
   Unit printReqs() {println(balancerName + ": " + toString(reqs));}
 
+  Int getTarget() {
+    Int max = 0;
+    if(isEmpty(predictions)) {
+      max = balancer.get_one_sec_workload();
+      reqs = appendright(reqs,max);
+    } else {
+      max = nth(predictions,i);
+      if(i < length(predictions)) i = i + 1;
+    }
+    return max;
+  }
+
   Unit check() {
-    //Rat inbound_workload = balancer.returninbound_workload();
-    //inbound_workload = inbound_workload / 10;
-    Int max = nth(reqs,i);//balancer.get_one_sec_workload();
-    i = i + 1;
-    //reqs = appendright(reqs,max);
+    Int max = this.getTarget();
     if(max - (mcl * deplInstances - kbig)  > k || (mcl * deplInstances - kbig) - max > k) {
       Int configInstances = ceil(float((max + kbig)/ mcl));
       if(configInstances > deplInstances) {sw!deploy(configInstances - deplInstances);}

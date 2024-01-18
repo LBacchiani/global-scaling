@@ -1,6 +1,7 @@
 abs-simulations/gen/erl
-abstools/
 abs-simulations/localScaling/gen/
+abs-simulations/globalScaling/gen/
 abs-simulations/oracleLocalScaling/gen/
 abs-simulations/compile_global_scaling.sh
 abs-simulations/compile_local_scaling.sh
+compile.sh

@@ -6,7 +6,7 @@ import * from Sys_init;
 import * from Param;
 import * from DB;
 import * from Monitor;
-import * from BalancerMonitor;
+import * from LocalMonitor;
 
 
 {
@@ -17,7 +17,8 @@ import * from BalancerMonitor;
 	setupSystem.createLocalMonitors();
 	setupSystem.setupServices(db);
 	MessageReceiver_LoadBalancerInterface entryPoint =  setupSystem.getEntrypoint();
-	List<LoadBalancerMonitorInterface> local_monitors = setupSystem.getLocalMonitors();
+	List<LocalMonitorInterface> local_monitors = setupSystem.getLocalMonitors();
+	if(oracleScaling()) foreach(monitor in local_monitors) {monitor.check();}
 	List<LoadBalancer> balancers = setupSystem.getLB();
 	Rat setup_cost = setupSystem.getSetupCost();
 	MonitorInterface monitor = new Monitor(db, balancers, local_monitors, setup_cost);

@@ -2,14 +2,14 @@ module Monitor;
 
 export *;
 
-import * from BalancerMonitor;
+import * from LocalMonitor;
 import * from Architecture;
 import * from DB;
 import * from Param;
 
 interface MonitorInterface {}
 
-class Monitor(DBInterface db, List<LoadBalancer> balancers, List<LoadBalancerMonitorInterface> monitors, Rat initialCost) implements MonitorInterface {
+class Monitor(DBInterface db, List<LoadBalancer> balancers, List<LocalMonitorInterface> monitors, Rat initialCost) implements MonitorInterface {
   Int time = 0;
 
   String getInstances() {
@@ -36,18 +36,24 @@ class Monitor(DBInterface db, List<LoadBalancer> balancers, List<LoadBalancerMon
     return total;
   }
 
+  Rat find_max() {
+    Rat max_true = -1;
+    Int i = 0;
+    while(i < ratio()) {
+      await duration(monitoringWin()/ratio(), monitoringWin()/ratio());
+      Rat chunk_real = db.get_one_sec_workload();
+      db.one_sec_timeout();
+      if(chunk_real > max_true) max_true = chunk_real;
+      this.tick();
+      i = i + 1;
+    }
+    return max_true;
+  }
+
+
 	Unit run() {
     while(time < 200){
-      Rat max_true = 0;
-      Int i = 0;
-      while(i < ratio()) {
-        await duration(monitoringWin()/ratio(), monitoringWin()/ratio());
-        Rat chunk_real = db.get_one_sec_workload();
-        db.one_sec_timeout();
-        if(chunk_real > max_true) max_true = chunk_real;
-        this.tick();
-        i = i + 1;
-      }
+      Rat max_true = this.find_max();
       Float averageAnalysisTime = db.returnAverageAnalysisTime();
       Rat completed = db.messageCompleted();
       Rat inbound_workload = db.returninbound_workload();
@@ -60,6 +66,6 @@ class Monitor(DBInterface db, List<LoadBalancer> balancers, List<LoadBalancerMon
       db.resetMetrics();
       println(toPrint);
     }
-    this.printReqs();
+    if(!oracleScaling()) this.printReqs();
   }
 }

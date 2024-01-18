@@ -4,7 +4,7 @@ export *;
 import * from ABS.DC;
 import * from ABS.SmartDeploy;
 import * from InvariantsDeployer;
-import * from BaseScale1;
+import * from BaseScale;
 import * from Scale1;
 import * from Scale2;
 import * from Scale3;
@@ -67,7 +67,7 @@ interface MessageReceiver_LoadBalancerInterface {
 class MessageReceiver_LoadBalancer(DBInterface db) implements MessageReceiver_LoadBalancerInterface {
   List<MessageReceiverInterface> instancesConnected = list[];
   Int nextInstance = -1;
-  Rat buffer_size = 5000 * 1;
+  Rat buffer_size = 50 * 1;
   Int pending = 0;
 
   Unit connectInstance(MessageReceiverInterface newInstance){instancesConnected = appendright(instancesConnected, newInstance);}
@@ -119,7 +119,7 @@ interface MessageParser_LoadBalancerInterface {
 class MessageParser_LoadBalancer(DBInterface db) implements MessageParser_LoadBalancerInterface {
   List<MessageParserInterface> instancesConnected = list[];
   Int nextInstance = -1;
-  Rat buffer_size = 5000 * 1;
+  Rat buffer_size = 50 * 1;
   Int pending = 0;
   Int id = 0;
 
@@ -202,7 +202,7 @@ interface HeaderAnalyser_LoadBalancerInterface {
 class HeaderAnalyser_LoadBalancer(DBInterface db)  implements HeaderAnalyser_LoadBalancerInterface {
   List<HeaderAnalyserInterface> instancesConnected = list[];
   Int nextInstance = -1;
-  Rat buffer_size = 5000 * 1;
+  Rat buffer_size = 50 * 1;
 
   Unit connectInstance(HeaderAnalyserInterface newInstance){instancesConnected = appendright(instancesConnected, newInstance);}
 
@@ -241,7 +241,7 @@ interface LinkAnalyser_LoadBalancerInterface {
 class LinkAnalyser_LoadBalancer(DBInterface db)  implements LinkAnalyser_LoadBalancerInterface {
   List<LinkAnalyserInterface> instancesConnected = list[];
   Int nextInstance = -1;
-  Rat buffer_size = 5000 * 1;
+  Rat buffer_size = 50 * 1;
 
   Unit connectInstance(LinkAnalyserInterface newInstance){instancesConnected = appendright(instancesConnected, newInstance);}
 
@@ -279,7 +279,7 @@ interface TextAnalyser_LoadBalancerInterface {
 class TextAnalyser_LoadBalancer(DBInterface db)  implements TextAnalyser_LoadBalancerInterface {
   List<TextAnalyserInterface> instancesConnected = list[];
   Int nextInstance = -1;
-  Rat buffer_size = 5000 * 1;
+  Rat buffer_size = 50 * 1;
 
   Unit connectInstance(TextAnalyserInterface newInstance){instancesConnected = appendright(instancesConnected, newInstance);}
 
@@ -345,7 +345,7 @@ class SentimentAnalyser_LoadBalancer(DBInterface dbObj)  implements SentimentAna
   List<SentimentAnalyserInterface> instancesConnected = list[];
   Int pending = 0;
   Int nextInstance = -1;
-  Rat buffer_size = 5000 * 5/2;
+  Rat buffer_size = 50 * 5/2;
 
   Unit connectInstance(SentimentAnalyserInterface newInstance){instancesConnected = appendright(instancesConnected, newInstance);}
 
@@ -399,7 +399,7 @@ class VirusScanner_LoadBalancer(DBInterface db)  implements VirusScanner_LoadBal
   List<VirusScannerInterface> instancesConnected = list[];
   Int nextInstance = -1;
   Int pending = 0;
-  Rat buffer_size = 5000 * 2;
+  Rat buffer_size = 50 * 2;
 
   Unit connectInstance(VirusScannerInterface newInstance){instancesConnected = appendright(instancesConnected, newInstance);}
 
@@ -453,7 +453,7 @@ class AttachmentsManager_LoadBalancer(DBInterface db)  implements AttachmentsMan
   List<AttachmentsManagerInterface> instancesConnected = list[];
   Int nextInstance = -1;
   Int pending = 0;
-  Rat buffer_size = 5000 * 3/2;
+  Rat buffer_size = 50 * 3/2;
 
   Unit connectInstance(AttachmentsManagerInterface newInstance){instancesConnected = appendright(instancesConnected, newInstance);}
 
@@ -504,7 +504,7 @@ class ImageAnalyser_LoadBalancer(DBInterface db)  implements ImageAnalyser_LoadB
   List<ImageAnalyserInterface> instancesConnected = list[];
   Int nextInstance = -1;
   Int pending = 0;
-  Rat buffer_size = 5000 * 3/2;
+  Rat buffer_size = 50 * 3/2;
   Unit connectInstance(ImageAnalyserInterface newInstance){
     instancesConnected = appendright(instancesConnected, newInstance);
   }
@@ -567,7 +567,7 @@ class NSFWDetector_LoadBalancer(DBInterface db)  implements NSFWDetector_LoadBal
   List<NSFWDetectorInterface> instancesConnected = list[];
   Int nextInstance = -1;
   Int pending = 0;
-  Rat buffer_size = 5000 * 3/2;
+  Rat buffer_size = 50 * 3/2;
 
   Unit connectInstance(NSFWDetectorInterface newInstance){instancesConnected = appendright(instancesConnected, newInstance);}
 
@@ -621,7 +621,7 @@ class ImageRecognizer_LoadBalancer(DBInterface db)  implements ImageRecognizer_L
   List<ImageRecognizerInterface> instancesConnected = list[];
   Int nextInstance = -1;
   Int pending = 0;
-  Rat buffer_size = 5000 * 3/2;
+  Rat buffer_size = 50 * 3/2;
 
   Unit connectInstance(ImageRecognizerInterface newInstance){instancesConnected = appendright(instancesConnected, newInstance);}
 
@@ -673,7 +673,7 @@ interface MessageAnalyser_LoadBalancerInterface {
 class MessageAnalyser_LoadBalancer(DBInterface db)  implements MessageAnalyser_LoadBalancerInterface {
   List<MessageAnalyserInterface> instancesConnected = list[];
   Int nextInstance = -1;
-  Rat buffer_size = 5000 * 5;
+  Rat buffer_size = 50 * 5;
   Int pending = 0;
 
   Unit connectInstance(MessageAnalyserInterface newInstance){instancesConnected = appendright(instancesConnected, newInstance);}
