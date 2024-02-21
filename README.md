@@ -16,8 +16,8 @@ The simulation can be executed via docker. First, you need to start a container 
 docker run --entrypoint="/bin/bash" -i --rm -t lorenzobacchiani/absglobalscaling
 ```
 The container is initialli in abs-simulations/.
-To change the simulation parameters (e.g., inbound workload, predicted workload), you need to go in [param.abs](abs-simulations/globalScaling/param.abs) (for global scaling) and 
-[param.abs](abs-simulations/localScaling/param.abs) (for local scaling) and comment/uncomment the paramenters you want to discard/use, using vim as editor (it is already installed within the container)
+To change the simulation parameters (e.g., inbound workload, predicted workload, enable proactity and/or reactivty), you need to go in [param.abs](abs-simulations/globalScaling/param.abs) (for global scaling) and 
+[param.abs](abs-simulations/localScaling/param.abs) (for local scaling) and comment/uncomment the paramenters you want to discard/use, using vim as editor (it is already installed within the container).
 
 ### Global Scaling
 To compile the ABS code for global scaling (from abs-simulations/):
@@ -35,6 +35,10 @@ To run the ABS code for global scaling:
 gen/erl/run
 ```
 
+If you want to test our mixing technique go to [workload_mixer.abs](abs-simulations/globalScaling/workload_mixer.abs) and [monitor.abs](abs-simulations/globalScaling/monitor.abs) and uncomment everything tagged with '//OUR MIXING TECHNIQUE' and comment everything tagged with '//LITERATURE MIXING TECHNIQUE'.
+
+If you want to use the mixing technique from [1] do viceversa.
+
 ### Local Scaling
 To compile the ABS code for local scaling (from abs-simulations/):
 
@@ -51,5 +55,5 @@ To run the ABS code for local scaling:
 gen/erl/run
 ```
 
-
+[1] [Agile dynamic provisioning of multi-tier internet applications](https://dl.acm.org/doi/10.1145/1342171.1342172)
 
