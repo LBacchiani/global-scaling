@@ -16,7 +16,7 @@ interface MonitorInterface {}
 class Monitor(ScalerServiceInterface scaler, MixerInterface mixer, DBInterface db, List<Int> init_conf) implements MonitorInterface {
   Int time = 0;
   List<Int> last_pred_config = init_conf; //field for proactive-reactive global scaling
-  //Rat last_pred = 32; //uncomment when using literature mixing method
+  //Rat last_pred = fst_pred(); //uncomment when using literature mixing method
 
   Pair<Rat,Rat> find_maxes() {
     Rat max_pred = -1;
@@ -41,26 +41,24 @@ class Monitor(ScalerServiceInterface scaler, MixerInterface mixer, DBInterface d
       Rat max_pred = fst(maxes);
       Rat max_true = snd(maxes);
       Rat target_workload = max_true;
+      time = time + ratio();
+      Rat mcl = scaler.getSystemMCL();
+      Int nInst = scaler.computeInstanceNumber();
       if(proactiveness()) target_workload = max_pred;
       if(mixing()) {
         List<Int> actual_conf = scaler.computeConfiguration(max_true);
         target_workload = mixer.mix(max_true, max_pred, last_pred_config, actual_conf);
         last_pred_config = scaler.computeConfiguration(max_pred);
         ///LITERATURE MIXING METHOD
-        /*
-        target_workload = mixer.mix(max_true, last_pred);
-        last_pred = max_pred;
-         */
+        /*target_workload = mixer.mix(last_pred, max_pred, max_true);
+        last_pred = max_pred;*/
         ///////////
       }
-      time = time + ratio();
-      Rat mcl = scaler.getSystemMCL();
-      Int nInst = scaler.computeInstanceNumber();
+      this.log(max_true, max_pred, mcl, target_workload, nInst); //debug purpose
       if(target_workload - (mcl - kbig()) > k() || (mcl - kbig()) - target_workload > k()) {
         List<Int> target_config = scaler.computeConfiguration(target_workload);
         scaler.scale(target_config);
       }
-      this.log(max_true, max_pred, mcl, target_workload, nInst); //debug purpose
       db.resetMetrics();
     }
   }

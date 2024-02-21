@@ -8,6 +8,7 @@ import * from ABS.DC;
 
 interface MixerInterface {
     Rat mix(Rat max_true, Rat max_pred, List<Int> last_pred_config, List<Int> actual_conf);
+    //Rat mix(Rat max_true, Rat curr_pred, Rat max_pred); //literature mixing technique
 }
 
 class Mixer implements MixerInterface{
@@ -83,10 +84,9 @@ class Mixer implements MixerInterface{
   }
 
 
-  Rat mix(Rat max_true, Rat max_pred) {
+  Rat mix(Rat last_pred, Rat curr_pred, Rat max_true) {
     Rat diff = this.compute_diff(last_pred, max_true);
-    last_pred = max_pred;
-    Rat target_scale = max_pred + diff;
+    Rat target_scale = curr_pred + diff;
     return target_scale;
   }*/
 

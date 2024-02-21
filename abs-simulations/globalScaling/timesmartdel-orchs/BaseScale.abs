@@ -50,7 +50,7 @@ class BaseScale(CloudProvider cloudProvider, MessageReceiver_LoadBalancerInterfa
 	List<SentimentAnalyserInterface> ls_SentimentAnalyserInterface = Nil;
 	List<List<DeploymentComponent>> ls_ls_DeploymentComponent = Nil;
 	List<DeploymentComponent> ls_DeploymentComponent = Nil;
-	Rat waiting_time = 100;
+	Rat waiting_time = 10;
 	{
 		cloudProvider.addInstanceDescription(Pair("c4_4xlarge",
 			map[Pair(CostPerInterval,796)

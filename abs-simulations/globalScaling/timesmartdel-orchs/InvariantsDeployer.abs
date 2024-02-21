@@ -50,7 +50,7 @@ class InvariantsDeployer(CloudProvider cloudProvider, DBInterface dbObj) impleme
 	List<LinkAnalyser_LoadBalancerInterface> ls_LinkAnalyser_LoadBalancerInterface = Nil;
 	List<List<DeploymentComponent>> ls_ls_DeploymentComponent = Nil;
 	List<DeploymentComponent> ls_DeploymentComponent = Nil;
-	Rat waiting_time = 100;
+	Rat waiting_time = 10;
 	{
 		cloudProvider.addInstanceDescription(Pair("c4_4xlarge",
 			map[Pair(CostPerInterval,796)
