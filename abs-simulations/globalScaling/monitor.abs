@@ -15,8 +15,8 @@ interface MonitorInterface {}
 
 class Monitor(ScalerServiceInterface scaler, MixerInterface mixer, DBInterface db, List<Int> init_conf) implements MonitorInterface {
   Int time = 0;
-  List<Int> last_pred_config = init_conf; //field for proactive-reactive global scaling
-  //Rat last_pred = fst_pred(); //uncomment when using literature mixing method
+  List<Int> last_pred_config = init_conf; //OUR MIXING TECHNIQUE
+  //Rat last_pred = fst_pred(); //LITERATURE MIXING TECHNIQUE
 
   Pair<Rat,Rat> find_maxes() {
     Rat max_pred = -1;
@@ -47,8 +47,11 @@ class Monitor(ScalerServiceInterface scaler, MixerInterface mixer, DBInterface d
       if(proactiveness()) target_workload = max_pred;
       if(mixing()) {
         List<Int> actual_conf = scaler.computeConfiguration(max_true);
+        ///OUR MIXING TECHNIQUE////
         target_workload = mixer.mix(max_true, max_pred, last_pred_config, actual_conf);
         last_pred_config = scaler.computeConfiguration(max_pred);
+        //////////////////////
+        
         ///LITERATURE MIXING METHOD
         /*target_workload = mixer.mix(last_pred, max_pred, max_true);
         last_pred = max_pred;*/

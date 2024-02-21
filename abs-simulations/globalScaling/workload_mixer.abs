@@ -7,14 +7,14 @@ import * from ABS.DC;
 
 
 interface MixerInterface {
-    Rat mix(Rat max_true, Rat max_pred, List<Int> last_pred_config, List<Int> actual_conf);
-    //Rat mix(Rat max_true, Rat curr_pred, Rat max_pred); //literature mixing technique
+    Rat mix(Rat max_true, Rat max_pred, List<Int> last_pred_config, List<Int> actual_conf); //OUR MIXING TECHNIQUE
+    //Rat mix(Rat max_true, Rat curr_pred, Rat max_pred); //LITERATURE MIXING TECHNIQUE
 }
 
 class Mixer implements MixerInterface{
    List<Rat> errors = list[]; //field for proactive-reactive global scaling
 
-  //////MIXING TECHNIQUE//////////
+  /////OUR MIXING TECHNIQUE//////////
   List<Int> compute_diff(List<Int> pred_conf, List<Int> actual_conf) {
     List<Int> diff = list[];
     Int i = 0;
@@ -67,7 +67,7 @@ class Mixer implements MixerInterface{
   //////END MIXING TECHNIQUE//////////
 
 
-  ////MIXING TECHNIQUE TAKEN FROM THE LITERATURE////
+  //////LITERATURE MIXING TECHNIQUE////
  /*Rat compute_diff(Rat pred, Rat obs) {
     Rat diff = 0;
     Int j = 0;
