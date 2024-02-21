@@ -13,11 +13,11 @@ The localScaling directory contains the model for the simulation with local-leve
 The simulation can be executed via docker. First, you need to start a container containing the ABS code with:
 
 ```bash
-docker run -it lorenzobacchiani/absglobalscaling
+docker run --entrypoint="/bin/bash" -i --rm -t lorenzobacchiani/absglobalscaling
 ```
 The container is initialli in abs-simulations/.
 To change the simulation parameters (e.g., inbound workload, predicted workload), you need to go in [param.abs](abs-simulations/globalScaling/param.abs) (for global scaling) and 
-[param.abs](abs-simulations/localScaling/param.abs) (for local scaling) and comment/uncomment the paramenters you want to discard/use.
+[param.abs](abs-simulations/localScaling/param.abs) (for local scaling) and comment/uncomment the paramenters you want to discard/use, using vim as editor (it is already installed within the container)
 
 ### Global Scaling
 To compile the ABS code for global scaling (from abs-simulations/):
