@@ -15,9 +15,9 @@ The simulation can be executed via docker. First, you need to start a container 
 ```bash
 docker run --entrypoint="/bin/bash" -i --rm -t lorenzobacchiani/absglobalscaling
 ```
-The container is initialli in abs-simulations/.
-To change the simulation parameters (e.g., inbound workload, predicted workload, enable proactity and/or reactivty), you need to go in [param.abs](abs-simulations/globalScaling/param.abs) (for global scaling) and 
-[param.abs](abs-simulations/localScaling/param.abs) (for local scaling) and comment/uncomment the paramenters you want to discard/use, using vim as editor (it is already installed within the container).
+The container is initially in abs-simulations/.
+To change the simulation parameters (e.g., inbound workload, predicted workload, enable proactivity and/or reactivity), you need to go in [param.abs](abs-simulations/globalScaling/param.abs) (for global scaling) and 
+[param.abs](abs-simulations/localScaling/param.abs) (for local scaling) and comment/uncomment the parameters you want to discard/use, using vim as editor (it is already installed within the container).
 
 ### Global Scaling
 To compile the ABS code for global scaling (from abs-simulations/):
