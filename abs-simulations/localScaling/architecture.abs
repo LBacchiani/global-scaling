@@ -93,12 +93,10 @@ interface LoadBalancer {
   Unit resetMetrics();
   Unit deploy();
   Unit undeploy();
-  Int returninbound_workload();
   String getInstanceNumberDescription();
   Rat getCost();
   Int getInstancesNumber();
-  Unit tick();
-  Int get_one_sec_workload();
+  Int get_workload();
 }
 
 
@@ -120,15 +118,6 @@ class MessageReceiver_LoadBalancer(DBInterface db) implements MessageReceiver_Lo
   MessageReceiverPlan plan;
   Int deplTimes = 0;
   Rat cost = 0;
-  Int max = 0;
-  Int one_sec_reqs = 0;
-
-  Unit tick() {
-    if(max <= one_sec_reqs) max = one_sec_reqs;
-    one_sec_reqs = 0;
-  }
-
-  Int get_one_sec_workload() {return max;}
 
   Unit connectInstance(MessageReceiverInterface newInstance){
     if(plan != null){deplTimes = deplTimes + 1;}
@@ -157,8 +146,6 @@ class MessageReceiver_LoadBalancer(DBInterface db) implements MessageReceiver_Lo
 
   Unit resetMetrics() {
     inbound_workload = 0;
-    one_sec_reqs = 0;
-    max = 0;
   }
 
   String getInstanceNumberDescription() {return "MR" + toString(length(instancesConnected)) + " ";}
@@ -169,11 +156,10 @@ class MessageReceiver_LoadBalancer(DBInterface db) implements MessageReceiver_Lo
 
   Int getInstancesNumber() {return length(instancesConnected);}
 
-  Int returninbound_workload() {return inbound_workload;}
+  Int get_workload() {return inbound_workload;}
 
   Unit newMessage(){
     inbound_workload = inbound_workload + 1;
-    one_sec_reqs = one_sec_reqs + 1;
     db.messageArrived();
     if(pending < buffer_size) {
       pending = pending + 1;
@@ -220,15 +206,6 @@ class MessageParser_LoadBalancer(DBInterface db) implements MessageParser_LoadBa
   Int id = 0;
   MessageParserPlan plan;
   Int deplTimes = 0;
-  Int max = 0;
-  Int one_sec_reqs = 0;
-
-  Unit tick() {
-  if(max <= one_sec_reqs) max = one_sec_reqs;
-  one_sec_reqs = 0;
-}
-
-  Int get_one_sec_workload() {return max;}
 
   Unit connectInstance(MessageParserInterface newInstance){
     if(plan != null) {deplTimes = deplTimes + 1;}
@@ -257,8 +234,6 @@ class MessageParser_LoadBalancer(DBInterface db) implements MessageParser_LoadBa
 
   Unit resetMetrics() {
     inbound_workload = 0;
-    one_sec_reqs = 0;
-    max = 0;
   }
 
   String getInstanceNumberDescription() {return "MP" + toString(length(instancesConnected)) + " ";}
@@ -269,11 +244,10 @@ class MessageParser_LoadBalancer(DBInterface db) implements MessageParser_LoadBa
 
   Int getInstancesNumber() {return length(instancesConnected);}
 
-  Int returninbound_workload() {return inbound_workload;}
+  Int get_workload() {return inbound_workload;}
 
   Unit newRequest (){
     inbound_workload = inbound_workload + 1;
-    one_sec_reqs = one_sec_reqs + 1;
     if(pending < buffer_size) {
       nextInstance = (nextInstance + 1) % length(instancesConnected);
       MessageParserInterface selectedInstance = nth(instancesConnected, nextInstance);
@@ -475,15 +449,6 @@ class SentimentAnalyser_LoadBalancer(DBInterface dbObj)  implements SentimentAna
   Int pending = 0;
   Rat buffer_size = 50 * 5/2;
   Int deplTimes = 0;
-  Int max = 0;
-  Int one_sec_reqs = 0;
-
-  Unit tick() {
-    if(max <= one_sec_reqs) max = one_sec_reqs;
-    one_sec_reqs = 0;
-  }
-
-  Int get_one_sec_workload() {return max;}
 
   Unit connectInstance(SentimentAnalyserInterface newInstance){
     if(plan != null) {deplTimes = deplTimes + 1;}
@@ -512,8 +477,6 @@ class SentimentAnalyser_LoadBalancer(DBInterface dbObj)  implements SentimentAna
 
   Unit resetMetrics() {
     inbound_workload = 0;
-    one_sec_reqs = 0;
-    max = 0;
   }
 
   String getInstanceNumberDescription() {return "SA" + toString(length(instancesConnected)) + " ";}
@@ -524,12 +487,11 @@ class SentimentAnalyser_LoadBalancer(DBInterface dbObj)  implements SentimentAna
 
   Int getInstancesNumber() {return length(instancesConnected);}
 
-  Int returninbound_workload() {return inbound_workload;}
+  Int get_workload() {return inbound_workload;}
 
   Maybe<Fut<String>> newRequest (String messageId){
       Maybe<Fut<String>> res = Nothing;
       inbound_workload = inbound_workload + 1;
-      one_sec_reqs = one_sec_reqs + 1;
       if(pending < buffer_size) {
         pending = pending + 1;
         nextInstance = (nextInstance + 1) % length(instancesConnected);
@@ -578,15 +540,6 @@ class VirusScanner_LoadBalancer(DBInterface db)  implements VirusScanner_LoadBal
   Map<Int,Rat> messagesTime = map[];
   VirusScannerPlan plan;
   Int deplTimes = 0;
-  Int max = 0;
-  Int one_sec_reqs = 0;
-
-  Unit tick() {
-    if(max <= one_sec_reqs) max = one_sec_reqs;
-    one_sec_reqs = 0;
-  }
-
-  Int get_one_sec_workload() {return max;}
 
   Unit connectInstance(VirusScannerInterface newInstance){
     if(plan != null) {deplTimes = deplTimes + 1;}
@@ -615,8 +568,6 @@ class VirusScanner_LoadBalancer(DBInterface db)  implements VirusScanner_LoadBal
 
   Unit resetMetrics() {
     inbound_workload = 0;
-    one_sec_reqs = 0;
-    max = 0;
   }
 
   String getInstanceNumberDescription() {return "VS" + toString(length(instancesConnected)) + " ";}
@@ -627,11 +578,10 @@ class VirusScanner_LoadBalancer(DBInterface db)  implements VirusScanner_LoadBal
 
   Int getInstancesNumber() {return length(instancesConnected);}
 
-  Int returninbound_workload() {return inbound_workload;}
+  Int get_workload() {return inbound_workload;}
 
   Unit newRequest (String messageId){
     inbound_workload = inbound_workload + 1;
-    one_sec_reqs = one_sec_reqs + 1;
     if(pending < buffer_size) {
       nextInstance = (nextInstance + 1) % length(instancesConnected);
       VirusScannerInterface selectedInstance = nth(instancesConnected, nextInstance);
@@ -680,15 +630,6 @@ class AttachmentsManager_LoadBalancer(DBInterface db)  implements AttachmentsMan
   Map<Int,Rat> messagesTime = map[];
   AttachmentsManagerPlan plan;
   Int deplTimes = 0;
-  Int max = 0;
-  Int one_sec_reqs = 0;
-
-  Unit tick() {
-    if(max <= one_sec_reqs) max = one_sec_reqs;
-    one_sec_reqs = 0;
-  }
-
-  Int get_one_sec_workload() {return max;}
 
   Unit connectInstance(AttachmentsManagerInterface newInstance){
     if(plan != null) {deplTimes = deplTimes + 1;}
@@ -717,8 +658,6 @@ class AttachmentsManager_LoadBalancer(DBInterface db)  implements AttachmentsMan
 
   Unit resetMetrics() {
     inbound_workload = 0;
-    one_sec_reqs = 0;
-    max = 0;
   }
 
   String getInstanceNumberDescription() {return "AM" + toString(length(instancesConnected)) + " ";}
@@ -729,11 +668,10 @@ class AttachmentsManager_LoadBalancer(DBInterface db)  implements AttachmentsMan
 
   Int getInstancesNumber() {return length(instancesConnected);}
 
-  Int returninbound_workload() {return inbound_workload;}
+  Int get_workload() {return inbound_workload;}
 
   Unit newRequest (String messageId){
     inbound_workload = inbound_workload + 1;
-    one_sec_reqs = one_sec_reqs + 1;
     if(pending < buffer_size) {
       nextInstance = (nextInstance + 1) % length(instancesConnected);
       AttachmentsManagerInterface selectedInstance = nth(instancesConnected, nextInstance);
@@ -778,15 +716,6 @@ class ImageAnalyser_LoadBalancer(DBInterface db)  implements ImageAnalyser_LoadB
   ImageAnalyserPlan plan;
   Int inbound_workload = 0;
   Int deplTimes = 0;
-  Int max = 0;
-  Int one_sec_reqs = 0;
-
-  Unit tick() {
-    if(max <= one_sec_reqs) max = one_sec_reqs;
-    one_sec_reqs = 0;
-  }
-
-  Int get_one_sec_workload() {return max;}
 
   Unit connectInstance(ImageAnalyserInterface newInstance){
     if(plan != null) {deplTimes = deplTimes + 1;}
@@ -815,7 +744,6 @@ class ImageAnalyser_LoadBalancer(DBInterface db)  implements ImageAnalyser_LoadB
 
   Unit newRequest(String messageId){
     inbound_workload = inbound_workload + 1;
-    one_sec_reqs = one_sec_reqs + 1;
     if(pending < buffer_size) {
       nextInstance = (nextInstance + 1) % length(instancesConnected);
       ImageAnalyserInterface selectedInstance = nth(instancesConnected, nextInstance);
@@ -826,8 +754,6 @@ class ImageAnalyser_LoadBalancer(DBInterface db)  implements ImageAnalyser_LoadB
 
   Unit resetMetrics() {
     inbound_workload = 0;
-    one_sec_reqs = 0;
-    max = 0;
   }
 
   String getInstanceNumberDescription() {return "IA" + toString(length(instancesConnected)) + " ";}
@@ -838,7 +764,7 @@ class ImageAnalyser_LoadBalancer(DBInterface db)  implements ImageAnalyser_LoadB
 
   Int getInstancesNumber() {return length(instancesConnected);}
 
-  Int returninbound_workload() {return inbound_workload;}
+  Int get_workload() {return inbound_workload;}
 
   Unit removeMessage() {pending = pending - 1;}
 }
@@ -884,16 +810,6 @@ class NSFWDetector_LoadBalancer(DBInterface db)  implements NSFWDetector_LoadBal
   Int pending = 0;
   Rat buffer_size = 50 * 3/2;
   Int deplTimes = 0;
-  Int max = 0;
-  Int one_sec_reqs = 0;
-
-  Unit tick() {
-    if(max <= one_sec_reqs) max = one_sec_reqs;
-    one_sec_reqs = 0;
-  }
-
-  Int get_one_sec_workload() {return max;}
-
 
   Unit connectInstance(NSFWDetectorInterface newInstance){
     if(plan != null) {deplTimes = deplTimes + 1;}
@@ -922,8 +838,6 @@ class NSFWDetector_LoadBalancer(DBInterface db)  implements NSFWDetector_LoadBal
 
   Unit resetMetrics() {
     inbound_workload = 0;
-    one_sec_reqs = 0;
-    max = 0;
   }
 
   String getInstanceNumberDescription() {return "NSFW" + toString(length(instancesConnected)) + " ";}
@@ -934,12 +848,11 @@ class NSFWDetector_LoadBalancer(DBInterface db)  implements NSFWDetector_LoadBal
 
   Int getInstancesNumber() {return length(instancesConnected);}
 
-  Int returninbound_workload() {return inbound_workload;}
+  Int get_workload() {return inbound_workload;}
 
   Maybe<Fut<Bool>> newRequest (String messageId){
     Maybe<Fut<Bool>> res = Nothing;
     inbound_workload = inbound_workload + 1;
-    one_sec_reqs = one_sec_reqs + 1;
     if(pending < buffer_size) {
       pending = pending + 1;
       nextInstance = (nextInstance + 1) % length(instancesConnected);
@@ -989,15 +902,6 @@ class ImageRecognizer_LoadBalancer(DBInterface db)  implements ImageRecognizer_L
   Int pending = 0;
   Rat buffer_size = 50 * 3/2;
   Int deplTimes = 0;
-  Int max = 0;
-  Int one_sec_reqs = 0;
-
-  Unit tick() {
-    if(max <= one_sec_reqs) max = one_sec_reqs;
-    one_sec_reqs = 0;
-  }
-
-  Int get_one_sec_workload() {return max;}
 
   Unit connectInstance(ImageRecognizerInterface newInstance){
     if(plan != null) {deplTimes = deplTimes + 1;}
@@ -1026,8 +930,6 @@ class ImageRecognizer_LoadBalancer(DBInterface db)  implements ImageRecognizer_L
 
   Unit resetMetrics() {
     inbound_workload = 0;
-    one_sec_reqs = 0;
-    max = 0;
   }
 
   String getInstanceNumberDescription() {return "IR" + toString(length(instancesConnected)) + " ";}
@@ -1038,12 +940,11 @@ class ImageRecognizer_LoadBalancer(DBInterface db)  implements ImageRecognizer_L
 
   Int getInstancesNumber() {return length(instancesConnected);}
 
-  Int returninbound_workload() {return inbound_workload;}
+  Int get_workload() {return inbound_workload;}
 
   Maybe<Fut<String>> newRequest(String messageId){
     Maybe<Fut<String>> res = Nothing;
     inbound_workload = inbound_workload + 1;
-    one_sec_reqs = one_sec_reqs + 1;
     if(pending < buffer_size) {
       pending = pending + 1;
       nextInstance = (nextInstance + 1) % length(instancesConnected);
@@ -1090,15 +991,6 @@ class MessageAnalyser_LoadBalancer(DBInterface db)  implements MessageAnalyser_L
   Int inbound_workload = 0;
   MessageAnalyserPlan plan;
   Int deplTimes = 0;
-  Int max = 0;
-  Int one_sec_reqs = 0;
-
-  Unit tick() {
-    if(max <= one_sec_reqs) max = one_sec_reqs;
-    one_sec_reqs = 0;
-  }
-
-  Int get_one_sec_workload() {return max;}
 
   Unit connectInstance(MessageAnalyserInterface newInstance){
     if(plan != null) {deplTimes = deplTimes + 1;}
@@ -1127,8 +1019,6 @@ class MessageAnalyser_LoadBalancer(DBInterface db)  implements MessageAnalyser_L
 
   Unit resetMetrics() {
     inbound_workload = 0;
-    one_sec_reqs = 0;
-    max = 0;
   }
 
   String getInstanceNumberDescription() {return "MA" + toString(length(instancesConnected)) + " ";}
@@ -1139,11 +1029,10 @@ class MessageAnalyser_LoadBalancer(DBInterface db)  implements MessageAnalyser_L
 
   Int getInstancesNumber() {return length(instancesConnected);}
 
-  Int returninbound_workload() {return inbound_workload;}
+  Int get_workload() {return inbound_workload;}
 
   Unit insertResult(String id){
     inbound_workload = inbound_workload + 1;
-    one_sec_reqs = one_sec_reqs + 1;
     if(pending < buffer_size) {
       nextInstance = (nextInstance + 1) % length(instancesConnected);
       MessageAnalyserInterface selectedInstance = nth(instancesConnected, nextInstance);

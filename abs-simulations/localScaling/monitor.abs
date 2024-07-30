@@ -23,8 +23,6 @@ class Monitor(DBInterface db, List<LoadBalancer> balancers, List<LocalMonitorInt
 
   Unit checkBalancers() {foreach(monitor in monitors) {monitor.check();}}
 
-  Unit tick() {foreach(monitor in monitors) {monitor.tick();}}
-
   Unit printReqs() {foreach(monitor in monitors) {monitor.printReqs();}}
 
   Int getTotalInstances() {
@@ -36,32 +34,18 @@ class Monitor(DBInterface db, List<LoadBalancer> balancers, List<LocalMonitorInt
     return total;
   }
 
-  Rat find_max() {
-    Rat max_true = -1;
-    Int i = 0;
-    while(i < ratio()) {
-      await duration(monitoringWin()/ratio(), monitoringWin()/ratio());
-      Rat chunk_real = db.get_one_sec_workload();
-      db.one_sec_timeout();
-      if(chunk_real > max_true) max_true = chunk_real;
-      this.tick();
-      i = i + 1;
-    }
-    return max_true;
-  }
-
-
 	Unit run() {
     while(time < 200){
-      Rat max_true = this.find_max();
+      await duration(monitoringWin());
+      Rat inbound_workload = db.returninbound_workload();
+      Rat measured_avg = inbound_workload / 20;
       Float averageAnalysisTime = db.returnAverageAnalysisTime();
       Rat completed = db.messageCompleted();
-      Rat inbound_workload = db.returninbound_workload();
       Rat rejected = db.rejectedMessages();
       Int totalInstances = this.getTotalInstances();
       String instances = this.getInstances();
-      time = time + ratio();
-      String toPrint = toString(time) + "  " + toString(float(100/3) * averageAnalysisTime) + " #curr_max: " + toString(max_true) + " TOT: " + toString(inbound_workload) + " COMP: " + toString(completed) + " REJ: " + toString(rejected) + " INST: " + toString(totalInstances + 3) +" " + instances;
+      time = time + 20;
+      String toPrint = toString(time) + "  " + toString(float(100/3) * averageAnalysisTime) + " #curr_avg: " + toString(float(measured_avg)) + " TOT: " + toString(inbound_workload) + " COMP: " + toString(completed) + " REJ: " + toString(rejected) + " INST: " + toString(totalInstances + 3) +" " + instances;
       this.checkBalancers();
       db.resetMetrics();
       println(toPrint);

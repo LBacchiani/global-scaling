@@ -6,7 +6,6 @@ import * from Param;
 
 interface LocalMonitorInterface{
   Unit check();
-  Unit tick();
   Unit printReqs();
 }
 
@@ -20,24 +19,23 @@ class LocalMonitor(LoadBalancer balancer, String balancerName, Rat mcl, Int base
 
   {sw = new ScalingWrapperImpl(balancer);}
 
-  Unit tick() {balancer.tick();}
 
   Unit printReqs() {println(balancerName + ": " + toString(reqs));}
 
-  Int getTarget() {
+  Rat getTarget() {
     Int max = 0;
     if(isEmpty(predictions)) {
-      max = balancer.get_one_sec_workload();
+      max = balancer.get_workload();
       reqs = appendright(reqs,max);
     } else {
       max = nth(predictions,i);
       if(i < length(predictions)) i = i + 1;
     }
-    return max;
+    return max/20; //x is the window duration in sec
   }
 
   Unit check() {
-    Int max = this.getTarget();
+    Rat max = this.getTarget();
     if(max - (mcl * deplInstances - kbig)  > k || (mcl * deplInstances - kbig) - max > k) {
       Int configInstances = ceil(float((max + kbig)/ mcl));
       if(configInstances > deplInstances) {sw!deploy(configInstances - deplInstances);}

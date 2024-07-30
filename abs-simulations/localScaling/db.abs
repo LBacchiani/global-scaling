@@ -13,8 +13,6 @@ interface DBInterface {
   Unit resetMetrics();
   Int rejectedMessages();
   Unit messageLoss(String messageId);
-  Int get_one_sec_workload();
-  Unit one_sec_timeout();
   Unit analysisTimeTick(String messageId);
 }
 
@@ -24,7 +22,6 @@ class DB() implements DBInterface {
 	Rat totalTime = 0;
   Int totalMessages = 0;
   Int rejected = 0;
-  Int one_sec_workload = 0;
 
   Unit messageLoss(String messageId) {
     if(messageId == "") {rejected = rejected + 1;}
@@ -33,10 +30,7 @@ class DB() implements DBInterface {
 
   Unit messageArrived() {
     inbound_workload = inbound_workload + 1;
-    one_sec_workload = one_sec_workload + 1;
   }
-
-  Int get_one_sec_workload() {return one_sec_workload;}
 
   Int returninbound_workload(){return inbound_workload;}
 
@@ -74,8 +68,6 @@ class DB() implements DBInterface {
     if(totalMessages != 0){averageTime = totalTime/totalMessages;}
     return float(averageTime);
   }
-
-  Unit one_sec_timeout() {one_sec_workload = 0;}
 
   Unit resetMetrics(){
     totalMessages = 0;

@@ -18,38 +18,49 @@ class Monitor(ScalerServiceInterface scaler, MixerInterface mixer, DBInterface d
   List<Int> last_pred_config = init_conf; //OUR MIXING TECHNIQUE
   //Rat last_pred = fst_pred(); //LITERATURE MIXING TECHNIQUE
 
-  Pair<Rat,Rat> find_maxes() {
-    Rat max_pred = -1;
-    Rat max_true = -1;
-    Int i = 0;
-    while(i < ratio()) {
-      await duration(monitoringWin()/ratio(), monitoringWin()/ratio());
-      Rat chunk_pred = -1;
-      if(proactiveness()) chunk_pred = nth(predicted_workload(), (i + time) % length(predicted_workload()));
-      Rat chunk_real = db.get_one_sec_workload();
-      db.one_sec_timeout();
-      max_pred = max(chunk_pred,max_pred);
-      max_true = max(chunk_real,max_true);
+  // Pair<Rat,Rat> find_maxes() {
+  //   Rat max_pred = -1;
+  //   Rat max_true = -1;
+  //   Int i = 0;
+  //   while(i < ratio()) {
+  //     await duration(monitoringWin()/ratio(), monitoringWin()/ratio());
+  //     Rat chunk_pred = -1;
+  //     if(proactiveness()) chunk_pred = nth(predicted_workload(), (i + time) % length(predicted_workload()));
+  //     Rat chunk_real = db.get_one_sec_workload();
+  //     db.one_sec_timeout();
+  //     max_pred = max(chunk_pred,max_pred);
+  //     max_true = max(chunk_real,max_true);
+  //     i = i + 1;
+  //   }
+  //   return Pair(max_pred, max_true);
+  // }
+
+  Rat compute_predicted_avg(Int start, Int stop) {
+    Int i = start;
+    Rat avg = 0;
+    while(i < stop) {
+      avg = avg + nth(predicted_workload(), i);
       i = i + 1;
     }
-    return Pair(max_pred, max_true);
+    return avg/10;
   }
 
 	Unit run() {
     while(time < 200){
-      Pair<Rat,Rat> maxes = this.find_maxes();
-      Rat max_pred = fst(maxes);
-      Rat max_true = snd(maxes);
-      Rat target_workload = max_true;
-      time = time + ratio();
+      await duration(monitoringWin());
+      time = time + 10;
+      Rat measured_avg = db.get_inbound_workload();
+      measured_avg = measured_avg/10;
+      Rat predicted_avg = this.compute_predicted_avg(time - 10, time);
+      Rat target_workload = measured_avg;
       Rat mcl = scaler.getSystemMCL();
       Int nInst = scaler.computeInstanceNumber();
-      if(proactiveness()) target_workload = max_pred;
+      if(proactiveness()) target_workload = predicted_avg;
       if(mixing()) {
-        List<Int> actual_conf = scaler.computeConfiguration(max_true);
+        List<Int> actual_conf = scaler.computeConfiguration(measured_avg);
         ///OUR MIXING TECHNIQUE////
-        target_workload = mixer.mix(max_true, max_pred, last_pred_config, actual_conf);
-        last_pred_config = scaler.computeConfiguration(max_pred);
+        target_workload = mixer.mix(measured_avg, predicted_avg, last_pred_config, actual_conf);
+        last_pred_config = scaler.computeConfiguration(predicted_avg);
         //////////////////////
         
         ///LITERATURE MIXING METHOD
@@ -57,7 +68,7 @@ class Monitor(ScalerServiceInterface scaler, MixerInterface mixer, DBInterface d
         last_pred = max_pred;*/
         ///////////
       }
-      this.log(max_true, max_pred, mcl, target_workload, nInst); //debug purpose
+      this.log(measured_avg, predicted_avg, mcl, target_workload, nInst); //debug purpose
       if(target_workload - (mcl - kbig()) > k() || (mcl - kbig()) - target_workload > k()) {
         List<Int> target_config = scaler.computeConfiguration(target_workload);
         scaler.scale(target_config);
@@ -71,10 +82,10 @@ class Monitor(ScalerServiceInterface scaler, MixerInterface mixer, DBInterface d
       Rat completed = db.messageCompleted();
       Rat rejected = db.rejectedMessages();
       Rat totalMsg = db.get_inbound_workload();
-      Rat totalCost = scaler.computeTotalCost(ratio());
+      Rat totalCost = scaler.computeTotalCost(10); //10 is the duration of the monitoring window in sec
       String toPrint = toString(time) + "  " + toString(float(100/3) * averageAnalysisTime);
-      if(proactiveness()) toPrint = toPrint + " #next_max: " + toString(max_pred);
-      toPrint = toPrint + " curr_max: " + toString(max_true); 
+      if(proactiveness()) toPrint = toPrint + " #next_max: " + toString(float(max_pred));
+      toPrint = toPrint + " curr_max: " + toString(float(max_true)); 
       if(mixing()) toPrint = toPrint + " target_scale: " + toString(float(target));
       toPrint = toPrint + " TOT: " + toString(totalMsg) + " COMP: " + toString(completed) + " REJ: " + toString(rejected) + " SUPP: " + toString(mcl) + " COST: " + toString(float(totalCost)) + " INST: " + toString(nInst);
       String scalingAct = scaler.getScalingActions();
