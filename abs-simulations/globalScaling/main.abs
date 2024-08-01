@@ -20,7 +20,7 @@ import * from Mixer;
     SetUpSystemInterface setupSystem = new SetUpSystem();
     setupSystem.setupLoadBalancers(db);
     setupSystem.setupServices(db);
-    MessageReceiver_LoadBalancerInterface entryPoint =  setupSystem.getEntrypoint();
+    MessageParser_LoadBalancerInterface entryPoint =  setupSystem.getEntrypoint();
     ScalerServiceInterface scaler = setupSystem.deployGSAlg(db);
     List<Int> fst_conf = list[];
     if(proactiveness()) fst_conf = setupSystem.proactiveDeployment();

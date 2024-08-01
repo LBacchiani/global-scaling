@@ -31,7 +31,7 @@ class LocalMonitor(LoadBalancer balancer, String balancerName, Rat mcl, Int base
       max = nth(predictions,i);
       if(i < length(predictions)) i = i + 1;
     }
-    return max/20; //x is the window duration in sec
+    return max/10; //x is the window duration in sec
   }
 
   Unit check() {

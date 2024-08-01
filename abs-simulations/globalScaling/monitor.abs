@@ -46,6 +46,7 @@ class Monitor(ScalerServiceInterface scaler, MixerInterface mixer, DBInterface d
   }
 
 	Unit run() {
+    println("0  0.0 measured: 0.0 TOT: 0 comp: 0 rej: 0 supp: 60 INST: 8");
     while(time < 200){
       await duration(monitoringWin());
       time = time + 10;
@@ -82,12 +83,12 @@ class Monitor(ScalerServiceInterface scaler, MixerInterface mixer, DBInterface d
       Rat completed = db.messageCompleted();
       Rat rejected = db.rejectedMessages();
       Rat totalMsg = db.get_inbound_workload();
-      Rat totalCost = scaler.computeTotalCost(10); //10 is the duration of the monitoring window in sec
+      Rat totalCost = scaler.computeTotalCost(10);
       String toPrint = toString(time) + "  " + toString(float(100/3) * averageAnalysisTime);
-      if(proactiveness()) toPrint = toPrint + " #next_max: " + toString(float(max_pred));
-      toPrint = toPrint + " curr_max: " + toString(float(max_true)); 
-      if(mixing()) toPrint = toPrint + " target_scale: " + toString(float(target));
-      toPrint = toPrint + " TOT: " + toString(totalMsg) + " COMP: " + toString(completed) + " REJ: " + toString(rejected) + " SUPP: " + toString(mcl) + " COST: " + toString(float(totalCost)) + " INST: " + toString(nInst);
+      if(proactiveness()) toPrint = toPrint + " next: " + toString(float(max_pred));
+      toPrint = toPrint + " measured: " + toString(float(max_true)); 
+      if(mixing()) toPrint = toPrint + " target: " + toString(float(target));
+      toPrint = toPrint + " TOT: " + toString(totalMsg) + " comp: " + toString(completed) + " rej: " + toString(rejected) + " supp: " + toString(mcl) + " INST: " + toString(nInst);
       String scalingAct = scaler.getScalingActions();
       toPrint = toPrint + scalingAct;
       println(toPrint);

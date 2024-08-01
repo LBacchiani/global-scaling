@@ -16,7 +16,7 @@ import * from LocalMonitor;
 	setupSystem.connectPlan(db);
 	setupSystem.createLocalMonitors();
 	setupSystem.setupServices(db);
-	MessageReceiver_LoadBalancerInterface entryPoint =  setupSystem.getEntrypoint();
+	MessageParser_LoadBalancerInterface entryPoint =  setupSystem.getEntrypoint();
 	List<LocalMonitorInterface> local_monitors = setupSystem.getLocalMonitors();
 	if(oracleScaling()) foreach(monitor in local_monitors) {monitor.check();}
 	List<LoadBalancer> balancers = setupSystem.getLB();

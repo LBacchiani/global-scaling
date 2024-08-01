@@ -6,26 +6,16 @@ import * from ABS.SmartDeploy;
 
 def Int kbig() = 20;
 def Int k() = 10;
-def Int monitoringWin() = 600;
+def Int monitoringWin() = 300;
 def Int sendingWin() = 30;
 def Bool oracleScaling() = False;
 
 /*
 //request prediction for oracle scaling ENRON
 
-//message receiver
-def List<Int> mr_prediction() = case oracleScaling() {
-    True => list[27, 120, 535, 675, 635, 710, 760, 745, 690, 552, 505, 405, 320, 312, 322, 260, 232, 150, 400, 475, 535, 675, 635]
-    _ => list[]
-};
 //message parser
 def List<Int> mp_prediction() = case oracleScaling() {
     True => list[27, 119, 276, 586, 605, 701, 761, 745, 690, 552, 505, 405, 320, 312, 322, 260, 232, 150, 270, 466, 535, 597, 622]
-    _ => list[]
-};
-//sentiment analyser
-def List<Int> sa_prediction() = case oracleScaling() {
-    True => list[57, 279, 550, 862, 1534, 1637, 1950, 1879, 1759, 1349, 1274, 1060, 787, 810, 831, 670, 595, 350, 543, 851, 1337, 1433, 1640]
     _ => list[]
 };
 //virus scanner
@@ -43,17 +33,6 @@ def List<Int> ia_prediction() = case oracleScaling() {
     True => list[53, 96, 285, 373, 489, 945, 1127, 1090, 1031, 831, 797, 603, 494, 490, 506, 418, 345, 245, 327, 469, 646, 702, 901]
     _ => list[]
 };
-//nsfw
-def List<Int> nsfw_prediction() = case oracleScaling() {
-    True => list[53, 96, 272, 418, 467, 708, 1137, 1093, 1031, 831, 797, 603, 494, 490, 506, 418, 345, 245, 327, 464, 646, 702, 913]
-    _ => list[]
-};
-//image recognizer
-def List<Int> ir_prediction() = case oracleScaling() {
-    True => list[53, 96, 272, 418, 467, 708, 1137, 1094, 1031, 831, 797, 603, 494, 490, 506, 418, 345, 245, 327, 464, 646, 702, 912]
-    _ => list[]
-};
-
 //message analyser
 def List<Int> ma_prediction() = case oracleScaling() {
     True => list[146, 401, 868, 1389, 2285, 2862, 3350, 3657, 3446, 2728, 2563, 2025, 1600, 1573, 1623, 1334, 1149, 775, 1066, 1411, 2179, 2685, 2824]
@@ -61,55 +40,6 @@ def List<Int> ma_prediction() = case oracleScaling() {
 };
 */
 
-
-//request prediction for oracle scaling IMAPS (COORD)
-
-//message receiver
-def List<Int> mr_prediction() = case oracleScaling() {
-    True => list[114, 151, 154, 155, 156, 210, 295, 279, 200, 224, 204, 182, 275, 374, 515, 470, 337, 235, 134, 113]
-    _ => list[]
-};
-//message parser
-def List<Int> mp_prediction() = case oracleScaling() {
-    True => list[114, 151, 154, 155, 156, 210, 247, 267, 200, 224, 204, 182, 249, 353, 477, 463, 337, 235, 134, 113]
-    _ => list[]
-};
-//sentiment analyser
-def List<Int> sa_prediction() = case oracleScaling() {
-    True => list[279, 405, 403, 406, 418, 535, 575, 733, 518, 573, 502, 454, 577, 855, 1123, 1180, 855, 567, 335, 289]
-    _ => list[]
-};
-//virus scanner
-def List<Int> vs_prediction() = case oracleScaling() {
-    True => list[246, 346, 313, 340, 339, 436, 471, 595, 415, 459, 409, 381, 480, 706, 926, 908, 660, 467, 263, 261]
-    _ => list[]
-};
-//attachment manager
-def List<Int> am_prediction() = case oracleScaling() {
-    True => list[92, 266, 244, 256, 240, 266, 364, 441, 313, 358, 297, 284, 362, 471, 638, 721, 496, 348, 199, 197]
-    _ => list[]
-};
-//image analyser
-def List<Int> ia_prediction() = case oracleScaling() {
-    True => list[92, 266, 244, 256, 240, 266, 364, 442, 313, 358, 297, 284, 362, 463, 638, 685, 496, 348, 199, 197]
-    _ => list[]
-};
-//nsfw
-def List<Int> nsfw_prediction() = case oracleScaling() {
-    True => list[92, 263, 244, 256, 240, 266, 364, 443, 313, 358, 297, 284, 362, 462, 638, 674, 496, 348, 199, 197]
-    _ => list[]
-};
-//image recognizer
-def List<Int> ir_prediction() = case oracleScaling() {
-    True => list[92, 263, 244, 256, 240, 266, 364, 443, 313, 358, 297, 284, 362, 462, 637, 674, 496, 348, 199, 197]
-    _ => list[]
-};
-
-//message analyser
-def List<Int> ma_prediction() = case oracleScaling() {
-    True => list[429, 727, 849, 799, 804, 966, 1139, 1431, 1011, 1123, 1019, 907, 1134, 1567, 2046, 2328, 1668, 1169, 662, 603]
-    _ => list[]
-};
 
 
     //COORD diurnal load pattern

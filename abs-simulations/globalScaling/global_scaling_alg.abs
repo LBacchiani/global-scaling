@@ -18,19 +18,15 @@ interface ScalerServiceInterface {
 
 class ScalerService(Rat initialCost) implements ScalerServiceInterface {
 
-  List<Int> mcls = list[116, 110, 100, 120, 231, 231, 90, 90, 300];
-  List<Rat> mfs = list[1, 1, 5/2, 2, 3/2, 3/2, 3/2, 3/2, 5];
-  List<Int> baseConfig = list[1, //MR
-                              1, //MP
+  List<Int> mcls = list[110, 120, 231, 231, 300];
+  List<Rat> mfs = list[1, 2, 3/2, 3/2, 5];
+  List<Int> baseConfig = list[1, //MP
                               //0, //HA
                               //0, //LA
                               //0, //TA
-                              2, //SA
                               1,  //VS
                               1, //AM
                               1, //IA
-                              1,  //NSFW
-                              1,  //IR
                               1]; //MA
   List<List<Int>> scaleComponents = list[];
   List<Int> deployedDeltas = list[];

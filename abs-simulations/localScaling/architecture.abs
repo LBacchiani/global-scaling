@@ -4,14 +4,10 @@ export *;
 import * from ABS.DC;
 import * from ABS.SmartDeploy;
 import * from DB;
-import * from MessageReceiverPlan;
 import * from MessageParserPlan;
-import * from SentimentAnalyserPlan;
 import * from VirusScannerPlan;
 import * from AttachmentsManagerPlan;
 import * from ImageAnalyserPlan;
-import * from NSFWDetectorPlan;
-import * from ImageRecognizerPlan;
 import * from MessageAnalyserPlan;
 
 
@@ -99,95 +95,6 @@ interface LoadBalancer {
   Int get_workload();
 }
 
-
-interface MessageReceiver_LoadBalancerInterface extends LoadBalancer {
-    Unit connectInstance(MessageReceiverInterface newInstance);
-    MessageReceiverInterface disconnectInstance();
-    Unit newMessage();
-    Unit connectPlan(MessageReceiverPlan p);
-    Unit removeMessage();
-}
-
-//[SmartDeployCost : "{\"class\" : \"MessageReceiver_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : m], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"MessageReceiverInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"MessageReceiverInterface\"}}]}]}"]
-class MessageReceiver_LoadBalancer(DBInterface db) implements MessageReceiver_LoadBalancerInterface {
-  List<MessageReceiverInterface> instancesConnected = list[];
-  Int nextInstance = -1;
-  Rat buffer_size = 50 * 1;
-  Int inbound_workload = 0;
-  Int pending = 0;
-  MessageReceiverPlan plan;
-  Int deplTimes = 0;
-  Rat cost = 0;
-
-  Unit connectInstance(MessageReceiverInterface newInstance){
-    if(plan != null){deplTimes = deplTimes + 1;}
-    instancesConnected = appendright(instancesConnected, newInstance);
-  }
-
-  MessageReceiverInterface disconnectInstance(){
-    deplTimes = deplTimes - 1;
-    MessageReceiverInterface removedInstance = nth(instancesConnected, length(instancesConnected)-1);
-    instancesConnected = without(instancesConnected, removedInstance);
-    return removedInstance;
-  }
-
-  Rat getCost() {
-    Rat totalCost = 0;
-    List<DeploymentComponent> dcs = plan.getDeploymentComponent();
-    if(length(dcs) > 0) {
-      DeploymentComponent dc = nth(dcs,0);
-      Rat cost = dc.getCostPerInterval();
-      totalCost = deplTimes * cost;
-    }
-    return totalCost;
-  }
-
-  Unit connectPlan(MessageReceiverPlan p) {plan = p;}
-
-  Unit resetMetrics() {
-    inbound_workload = 0;
-  }
-
-  String getInstanceNumberDescription() {return "MR" + toString(length(instancesConnected)) + " ";}
-
-  Unit deploy() {plan!deploy();}
-
-  Unit undeploy() {plan!undeploy();}
-
-  Int getInstancesNumber() {return length(instancesConnected);}
-
-  Int get_workload() {return inbound_workload;}
-
-  Unit newMessage(){
-    inbound_workload = inbound_workload + 1;
-    db.messageArrived();
-    if(pending < buffer_size) {
-      pending = pending + 1;
-      nextInstance = (nextInstance + 1) % length(instancesConnected);
-      MessageReceiverInterface selectedInstance = nth(instancesConnected, nextInstance);
-      selectedInstance!newMessage(this);
-    } else {db.messageLoss("");}
-  }
-
-  Unit removeMessage() {pending = pending - 1;}
-
-}
-
-interface MessageReceiverInterface {
-    Unit newMessage(MessageReceiver_LoadBalancerInterface balancer);
-}
-
-////[SmartDeployCost : "{\"class\" : \"MessageReceiver\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 1,\"Memory\" : 100},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"MessageParser_LoadBalancerInterface\"}],\"methods\" : []}]}"]
-class MessageReceiver(MessageParser_LoadBalancerInterface parserLoadBalancer) implements MessageReceiverInterface {
-  Int speed_res = 5;
-  Int mcl = 116;
-  Unit newMessage (MessageReceiver_LoadBalancerInterface balancer) {
-    [Cost: speed_res * 30 / mcl] skip;
-    balancer.removeMessage();
-    parserLoadBalancer.newRequest();
-  }
-}
-
 interface MessageParser_LoadBalancerInterface extends LoadBalancer {
     Unit connectInstance(MessageParserInterface newInstance);
     MessageParserInterface disconnectInstance();
@@ -247,6 +154,7 @@ class MessageParser_LoadBalancer(DBInterface db) implements MessageParser_LoadBa
   Int get_workload() {return inbound_workload;}
 
   Unit newRequest (){
+    db.messageArrived();
     inbound_workload = inbound_workload + 1;
     if(pending < buffer_size) {
       nextInstance = (nextInstance + 1) % length(instancesConnected);
@@ -405,122 +313,13 @@ interface TextAnalyserInterface {
 }
 
 ////[SmartDeployCost : "{\"class\" : \"TextAnalyser\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{ \"kind\" : \"require\",\"type\" : \"SentimentAnalyser_LoadBalancerInterface\" },{\"kind\" : \"require\",\"type\" : \"MessageAnalyser_LoadBalancerInterface\"}],\"methods\" : []}]}"]
-class TextAnalyser(SentimentAnalyser_LoadBalancerInterface sentimentAnalayserLoadBalancer, MessageAnalyser_LoadBalancerInterface messageAnalyserLoadBalancer) implements TextAnalyserInterface {
+class TextAnalyser(MessageAnalyser_LoadBalancerInterface messageAnalyserLoadBalancer) implements TextAnalyserInterface {
 
   Unit analyzeText(String messageId) {
-    Int n_text_blocks = random(4) + 1;
-    Bool refused = False;
-    List<Maybe<Fut<String>>> futList = list[];
-    while (length(futList) < n_text_blocks) {
-      Maybe<Fut<String>> currentFuture = sentimentAnalayserLoadBalancer.newRequest(messageId);
-      futList = appendright(futList, currentFuture);
-    }
-    while (futList != Nil) {
-      Maybe<Fut<String>> maybe = head(futList);
-      futList = tail(futList);
-      if(!isJust(maybe)) {
-        futList = Nil;
-        refused = True;
-      }
-      else {
-        Fut<String> currentFuture = fromJust(maybe);
-        await currentFuture?;
-      }
-		}
-    if(!refused){messageAnalyserLoadBalancer.insertResult(messageId);}
+    messageAnalyserLoadBalancer.insertResult(messageId);
   }
 }
 
-
-interface SentimentAnalyser_LoadBalancerInterface extends LoadBalancer {
-  Unit connectInstance(SentimentAnalyserInterface newInstance);
-  SentimentAnalyserInterface disconnectInstance();
-  Maybe<Fut<String>> newRequest (String messageId);
-  Unit connectPlan(SentimentAnalyserPlan p);
-  Unit removeMessage();
-}
-
-//[SmartDeployCost : "{\"class\" : \"SentimentAnalyser_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"SentimentAnalyserInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"SentimentAnalyserInterface\"}}]}]}"]
-class SentimentAnalyser_LoadBalancer(DBInterface dbObj)  implements SentimentAnalyser_LoadBalancerInterface {
-  List<SentimentAnalyserInterface> instancesConnected = list[];
-  Int nextInstance = -1;
-  SentimentAnalyserPlan plan;
-  Int inbound_workload = 0;
-  Int pending = 0;
-  Rat buffer_size = 50 * 5/2;
-  Int deplTimes = 0;
-
-  Unit connectInstance(SentimentAnalyserInterface newInstance){
-    if(plan != null) {deplTimes = deplTimes + 1;}
-    instancesConnected = appendright(instancesConnected, newInstance);
-  }
-
-  SentimentAnalyserInterface disconnectInstance(){
-    deplTimes = deplTimes - 1;
-    SentimentAnalyserInterface removedInstance = nth(instancesConnected, length(instancesConnected)-1);
-    instancesConnected = without(instancesConnected, removedInstance);
-    return removedInstance;
-  }
-
-  Rat getCost() {
-    Rat totalCost = 0;
-    List<DeploymentComponent> dcs = plan.getDeploymentComponent();
-    if(length(dcs) > 0) {
-      DeploymentComponent dc = nth(dcs,0);
-      Rat cost = dc.getCostPerInterval();
-      totalCost = deplTimes * cost;
-    }
-    return totalCost;
-  }
-
-  Unit connectPlan(SentimentAnalyserPlan p) {plan = p;}
-
-  Unit resetMetrics() {
-    inbound_workload = 0;
-  }
-
-  String getInstanceNumberDescription() {return "SA" + toString(length(instancesConnected)) + " ";}
-
-  Unit deploy() {plan!deploy();}
-
-  Unit undeploy() {plan!undeploy();}
-
-  Int getInstancesNumber() {return length(instancesConnected);}
-
-  Int get_workload() {return inbound_workload;}
-
-  Maybe<Fut<String>> newRequest (String messageId){
-      Maybe<Fut<String>> res = Nothing;
-      inbound_workload = inbound_workload + 1;
-      if(pending < buffer_size) {
-        pending = pending + 1;
-        nextInstance = (nextInstance + 1) % length(instancesConnected);
-        SentimentAnalyserInterface selectedInstance = nth(instancesConnected, nextInstance);
-        Fut<String> fut = selectedInstance!analyzeSentiments(this);
-        res = Just(fut);
-      } else {dbObj.messageLoss(messageId);}
-      return res;
-  }
-
-  Unit removeMessage() {pending = pending - 1;}
-
-}
-
-interface SentimentAnalyserInterface   {
-  String analyzeSentiments(SentimentAnalyser_LoadBalancerInterface balancer);
-}
-
-////[SmartDeployCost : "{\"class\" : \"SentimentAnalyser\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 4,\"Memory\" : 250},\"sig\" : [],\"methods\" : []}]}"]
-class SentimentAnalyser() implements SentimentAnalyserInterface {
-  Int speed_res = 20;
-  Int mcl = 100;
-
-  String analyzeSentiments (SentimentAnalyser_LoadBalancerInterface balancer){
-    [Cost: speed_res * 30 / mcl] skip;
-    balancer.removeMessage();
-    return "res";
-  }
-}
 
 interface VirusScanner_LoadBalancerInterface extends LoadBalancer {
   Unit connectInstance(VirusScannerInterface newInstance);
@@ -535,7 +334,7 @@ class VirusScanner_LoadBalancer(DBInterface db)  implements VirusScanner_LoadBal
   List<VirusScannerInterface> instancesConnected = list[];
   Int nextInstance = -1;
   Int pending = 0;
-  Rat buffer_size = 50 *  2;
+  Rat buffer_size = 50 * 1;
   Int inbound_workload = 0;
   Map<Int,Rat> messagesTime = map[];
   VirusScannerPlan plan;
@@ -774,203 +573,14 @@ interface ImageAnalyserInterface {
 }
 
 ////[SmartDeployCost : "{\"class\" : \"ImageAnalyser\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 1,\"Memory\" : 200},\"sig\" : [{ \"kind\" : \"require\",\"type\" : \"NSFWDetector_LoadBalancerInterface\" }, { \"kind\" : \"require\",\"type\" : \"ImageRecognizer_LoadBalancerInterface\" }, { \"kind\" : \"require\",\"type\" : \"MessageAnalyser_LoadBalancerInterface\" }],\"methods\" : []}]}"]
-class ImageAnalyser(NSFWDetector_LoadBalancerInterface nsfwDetectorLoadBalancer, ImageRecognizer_LoadBalancerInterface imageRecognizerLoadBalancer, MessageAnalyser_LoadBalancerInterface messageAnalyserLoadBalancer) implements ImageAnalyserInterface {
+class ImageAnalyser(MessageAnalyser_LoadBalancerInterface messageAnalyserLoadBalancer) implements ImageAnalyserInterface {
   Int speed_res = 5;
   Int mcl = 231;
 
   Unit analyzeImage (String messageId, ImageAnalyser_LoadBalancerInterface balancer, DBInterface db){
     [Cost: speed_res * 30 / mcl] skip;
     balancer.removeMessage();
-    Maybe<Fut<Bool>> maybeNSFW = nsfwDetectorLoadBalancer.newRequest(messageId);
-    Maybe<Fut<String>> maybeImageCategory = imageRecognizerLoadBalancer.newRequest(messageId);
-    if(isJust(maybeNSFW) && isJust(maybeImageCategory)) {
-      Fut<Bool> futNSFW = fromJust(maybeNSFW);
-      await futNSFW?;
-      Fut<String> futImageCategory = fromJust(maybeImageCategory);
-      await futImageCategory?;
-      messageAnalyserLoadBalancer.insertResult(messageId);
-    }
-  }
-}
-
-interface NSFWDetector_LoadBalancerInterface extends LoadBalancer {
-  Unit connectInstance(NSFWDetectorInterface newInstance);
-  NSFWDetectorInterface disconnectInstance();
-  Maybe<Fut<Bool>> newRequest(String messageId);
-  Unit connectPlan(NSFWDetectorPlan p);
-  Unit removeMessage();
-}
-
-//[SmartDeployCost : "{\"class\" : \"NSFWDetector_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"NSFWDetectorInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"NSFWDetectorInterface\"}}]}]}"]
-class NSFWDetector_LoadBalancer(DBInterface db)  implements NSFWDetector_LoadBalancerInterface {
-  List<NSFWDetectorInterface> instancesConnected = list[];
-  Int nextInstance = -1;
-  NSFWDetectorPlan plan;
-  Int inbound_workload = 0;
-  Int pending = 0;
-  Rat buffer_size = 50 * 3/2;
-  Int deplTimes = 0;
-
-  Unit connectInstance(NSFWDetectorInterface newInstance){
-    if(plan != null) {deplTimes = deplTimes + 1;}
-    instancesConnected = appendright(instancesConnected, newInstance);
-  }
-
-  NSFWDetectorInterface disconnectInstance(){
-    deplTimes = deplTimes - 1;
-    NSFWDetectorInterface removedInstance = nth(instancesConnected, length(instancesConnected)-1);
-    instancesConnected = without(instancesConnected, removedInstance);
-    return removedInstance;
-  }
-
-  Rat getCost() {
-    Rat totalCost = 0;
-    List<DeploymentComponent> dcs = plan.getDeploymentComponent();
-    if(length(dcs) > 0) {
-      DeploymentComponent dc = nth(dcs,0);
-      Rat cost = dc.getCostPerInterval();
-      totalCost = deplTimes * cost;
-    }
-    return totalCost;
-  }
-
-  Unit connectPlan(NSFWDetectorPlan p) {plan = p;}
-
-  Unit resetMetrics() {
-    inbound_workload = 0;
-  }
-
-  String getInstanceNumberDescription() {return "NSFW" + toString(length(instancesConnected)) + " ";}
-
-  Unit deploy() {plan!deploy();}
-
-  Unit undeploy() {plan!undeploy();}
-
-  Int getInstancesNumber() {return length(instancesConnected);}
-
-  Int get_workload() {return inbound_workload;}
-
-  Maybe<Fut<Bool>> newRequest (String messageId){
-    Maybe<Fut<Bool>> res = Nothing;
-    inbound_workload = inbound_workload + 1;
-    if(pending < buffer_size) {
-      pending = pending + 1;
-      nextInstance = (nextInstance + 1) % length(instancesConnected);
-      NSFWDetectorInterface selectedInstance = nth(instancesConnected, nextInstance);
-      Fut<Bool> fut = selectedInstance!nsfwDetection(this);
-      res = Just(fut);
-    } else {db.messageLoss(messageId);}
-    return res;
-  }
-
-  Unit removeMessage() {pending = pending - 1;}
-}
-
-interface NSFWDetectorInterface   {
-  Bool nsfwDetection(NSFWDetector_LoadBalancerInterface balancer);
-}
-
-////[SmartDeployCost : "{\"class\" : \"NSFWDetector\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 6,\"Memory\" : 800},\"sig\" : [],\"methods\" : []}]}"]
-class NSFWDetector() implements NSFWDetectorInterface {
-  Int yesOrNot = -1;
-  Int speed_res = 30;
-  Int mcl = 90;
-
-  Bool nsfwDetection(NSFWDetector_LoadBalancerInterface balancer){
-		[Cost: speed_res * 30 / mcl] skip;
-    balancer!removeMessage();
-    yesOrNot = yesOrNot + 1;
-    return yesOrNot%3 == 0;
-  }
-}
-
-interface ImageRecognizer_LoadBalancerInterface extends LoadBalancer {
-  Unit connectInstance(ImageRecognizerInterface newInstance);
-  ImageRecognizerInterface disconnectInstance();
-  Maybe<Fut<String>> newRequest (String messageId);
-  Unit connectPlan(ImageRecognizerPlan p);
-  Unit removeMessage();
-
-}
-
-//[SmartDeployCost : "{\"class\" : \"ImageRecognizer_LoadBalancer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 2,\"Memory\" : 200},\"sig\" : [{\"kind\" : \"require\",\"type\" : \"DBInterface\"}], \"methods\" : [{\"add\" : {\"name\" : \"connectInstance\",\"param_type\" : \"ImageRecognizerInterface\"},\"remove\" : {\"name\" : \"disconnectInstance\", \"return_type\": \"ImageRecognizerInterface\"}}]}]}"]
-class ImageRecognizer_LoadBalancer(DBInterface db)  implements ImageRecognizer_LoadBalancerInterface {
-  List<ImageRecognizerInterface> instancesConnected = list[];
-  Int nextInstance = -1;
-  ImageRecognizerPlan plan;
-  Int inbound_workload = 0;
-  Int pending = 0;
-  Rat buffer_size = 50 * 3/2;
-  Int deplTimes = 0;
-
-  Unit connectInstance(ImageRecognizerInterface newInstance){
-    if(plan != null) {deplTimes = deplTimes + 1;}
-    instancesConnected = appendright(instancesConnected, newInstance);
-  }
-
-  ImageRecognizerInterface disconnectInstance(){
-    deplTimes = deplTimes - 1;
-    ImageRecognizerInterface removedInstance = nth(instancesConnected, length(instancesConnected)-1);
-    instancesConnected = without(instancesConnected, removedInstance);
-    return removedInstance;
-  }
-
-  Rat getCost() {
-    Rat totalCost = 0;
-    List<DeploymentComponent> dcs = plan.getDeploymentComponent();
-    if(length(dcs) > 0) {
-      DeploymentComponent dc = nth(dcs,0);
-      Rat cost = dc.getCostPerInterval();
-      totalCost = deplTimes * cost;
-    }
-    return totalCost;
-  }
-
-  Unit connectPlan(ImageRecognizerPlan p) {plan = p;}
-
-  Unit resetMetrics() {
-    inbound_workload = 0;
-  }
-
-  String getInstanceNumberDescription() {return "IR" + toString(length(instancesConnected)) + " ";}
-
-  Unit deploy() {plan!deploy();}
-
-  Unit undeploy() {plan!undeploy();}
-
-  Int getInstancesNumber() {return length(instancesConnected);}
-
-  Int get_workload() {return inbound_workload;}
-
-  Maybe<Fut<String>> newRequest(String messageId){
-    Maybe<Fut<String>> res = Nothing;
-    inbound_workload = inbound_workload + 1;
-    if(pending < buffer_size) {
-      pending = pending + 1;
-      nextInstance = (nextInstance + 1) % length(instancesConnected);
-      ImageRecognizerInterface selectedInstance = nth(instancesConnected, nextInstance);
-      Fut<String> fut = selectedInstance!recognizeImage(this);
-      res = Just(fut);
-    } else {db.messageLoss(messageId);}
-    return res;
-  }
-
-  Unit removeMessage() {pending = pending - 1;}
-}
-
-interface ImageRecognizerInterface {
-  String recognizeImage(ImageRecognizer_LoadBalancerInterface balancer);
-}
-
-////[SmartDeployCost : "{\"class\" : \"ImageRecognizer\",\"scenarios\" : [{\"name\" : \"default\",\"provide\" : -1,\"cost\" : {\"Cores\" : 6,\"Memory\" : 800},\"sig\" : [],\"methods\" : []}]}"]
-class ImageRecognizer() implements ImageRecognizerInterface {
-  Int speed_res = 30;
-  Int mcl = 90;
-
-  String recognizeImage(ImageRecognizer_LoadBalancerInterface balancer){
-		[Cost: speed_res * 30 / mcl] skip;
-    balancer.removeMessage();
-    return "res";
+    messageAnalyserLoadBalancer.insertResult(messageId);
   }
 }
 

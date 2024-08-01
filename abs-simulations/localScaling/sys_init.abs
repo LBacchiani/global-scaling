@@ -7,14 +7,10 @@ import * from LocalMonitor;
 import * from ABS.DC;
 import * from BaseScale;
 import * from InvariantsDeployer;
-import * from MessageReceiverPlan;
 import * from MessageParserPlan;
-import * from SentimentAnalyserPlan;
 import * from VirusScannerPlan;
 import * from AttachmentsManagerPlan;
 import * from ImageAnalyserPlan;
-import * from NSFWDetectorPlan;
-import * from ImageRecognizerPlan;
 import * from MessageAnalyserPlan;
 import * from DB;
 import * from Param;
@@ -25,7 +21,7 @@ interface SetUpSystemInterface {
   Unit connectPlan(DBInterface db);
   Unit createLocalMonitors();
   Unit setupServices(DBInterface db);
-  MessageReceiver_LoadBalancerInterface getEntrypoint();
+  MessageParser_LoadBalancerInterface getEntrypoint();
   List<LocalMonitorInterface> getLocalMonitors();
   List<LoadBalancer> getLB();
   Rat getSetupCost();
@@ -36,18 +32,14 @@ class SetUpSystem implements SetUpSystemInterface {
   Rat windowDim = 300;
   Rat setup_cost = 0;
   CloudProvider cp;
-  MessageReceiver_LoadBalancerInterface entryPoint;
-  List<MessageReceiver_LoadBalancerInterface> messageReceiver_LoadBalancerList = list[];
+  MessageParser_LoadBalancerInterface entryPoint;
 	List<MessageParser_LoadBalancerInterface> messageParser_LoadBalancerList = list[];
 	List<HeaderAnalyser_LoadBalancerInterface> headerAnalyser_LoadBalancerList = list[];
 	List<LinkAnalyser_LoadBalancerInterface> linkAnalyser_LoadBalancerList = list[];
 	List<TextAnalyser_LoadBalancerInterface> textAnalyser_LoadBalancerList = list[];
-	List<SentimentAnalyser_LoadBalancerInterface> sentimentAnalyser_LoadBalancerList = list[];
 	List<VirusScanner_LoadBalancerInterface> virusScanner_LoadBalancerList = list[];
 	List<AttachmentsManager_LoadBalancerInterface> attachmentsManager_LoadBalancerList = list[];
 	List<ImageAnalyser_LoadBalancerInterface> imageAnalyser_LoadBalancerList = list[];
-	List<NSFWDetector_LoadBalancerInterface> nsfwDetector_LoadBalancerList = list[];
-	List<ImageRecognizer_LoadBalancerInterface> imageRecognizer_LoadBalancerList = list[];
 	List<MessageAnalyser_LoadBalancerInterface> messageAnalyser_LoadBalancerList = list[];
   List<LoadBalancer> balancers = list[];
   List<LocalMonitorInterface> local_monitors = list[];
@@ -68,72 +60,52 @@ class SetUpSystem implements SetUpSystemInterface {
     c1.deploy();
     List<DeploymentComponent> dcs = c1.getDeploymentComponent();
     this.computeInitialCost(dcs);
-    messageReceiver_LoadBalancerList = c1.getMessageReceiver_LoadBalancerInterface();
 		messageParser_LoadBalancerList = c1.getMessageParser_LoadBalancerInterface();
 		headerAnalyser_LoadBalancerList = c1.getHeaderAnalyser_LoadBalancerInterface();
 		linkAnalyser_LoadBalancerList = c1.getLinkAnalyser_LoadBalancerInterface();
 		textAnalyser_LoadBalancerList = c1.getTextAnalyser_LoadBalancerInterface();
-		sentimentAnalyser_LoadBalancerList = c1.getSentimentAnalyser_LoadBalancerInterface();
 		virusScanner_LoadBalancerList = c1.getVirusScanner_LoadBalancerInterface();
 		attachmentsManager_LoadBalancerList = c1.getAttachmentsManager_LoadBalancerInterface();
 		imageAnalyser_LoadBalancerList = c1.getImageAnalyser_LoadBalancerInterface();
-		nsfwDetector_LoadBalancerList = c1.getNSFWDetector_LoadBalancerInterface();
-		imageRecognizer_LoadBalancerList = c1.getImageRecognizer_LoadBalancerInterface();
 		messageAnalyser_LoadBalancerList = c1.getMessageAnalyser_LoadBalancerInterface();
     balancers = c1.getLoadBalancer();
-    entryPoint = head(messageReceiver_LoadBalancerList);
+    entryPoint = head(messageParser_LoadBalancerList);
   }
 
   Unit connectPlan(DBInterface db) {
-    MessageReceiverPlan receiverPlan = new MessageReceiverPlan(cp, head(messageReceiver_LoadBalancerList), head(messageParser_LoadBalancerList));
     MessageParserPlan parserPlan = new MessageParserPlan(cp, head(messageParser_LoadBalancerList), head(headerAnalyser_LoadBalancerList), head(linkAnalyser_LoadBalancerList), head(textAnalyser_LoadBalancerList), head(virusScanner_LoadBalancerList), db, head(messageAnalyser_LoadBalancerList));
-    SentimentAnalyserPlan sentimentPlan = new SentimentAnalyserPlan(cp, head(sentimentAnalyser_LoadBalancerList));
     VirusScannerPlan virusPlan = new VirusScannerPlan(cp, head(virusScanner_LoadBalancerList), head(messageAnalyser_LoadBalancerList), head(attachmentsManager_LoadBalancerList));
     AttachmentsManagerPlan attachmentsManagerPlan = new AttachmentsManagerPlan(cp, head(attachmentsManager_LoadBalancerList), head(imageAnalyser_LoadBalancerList));
-    ImageAnalyserPlan imageAnalyserPlan = new ImageAnalyserPlan(cp, head(imageAnalyser_LoadBalancerList), head(nsfwDetector_LoadBalancerList), head(messageAnalyser_LoadBalancerList), head(imageRecognizer_LoadBalancerList));
-    NSFWDetectorPlan nsfwDetectorPlan = new NSFWDetectorPlan(cp, head(nsfwDetector_LoadBalancerList));
-    ImageRecognizerPlan imageRecognizerPlan = new ImageRecognizerPlan(cp, head(imageRecognizer_LoadBalancerList));
+    ImageAnalyserPlan imageAnalyserPlan = new ImageAnalyserPlan(cp, head(imageAnalyser_LoadBalancerList), head(messageAnalyser_LoadBalancerList));
     MessageAnalyserPlan messageAnalyserPlan = new MessageAnalyserPlan(cp, head(messageAnalyser_LoadBalancerList), db);
-    head(messageReceiver_LoadBalancerList).connectPlan(receiverPlan);
     head(messageParser_LoadBalancerList).connectPlan(parserPlan);
-    head(sentimentAnalyser_LoadBalancerList).connectPlan(sentimentPlan);
     head(virusScanner_LoadBalancerList).connectPlan(virusPlan);
     head(attachmentsManager_LoadBalancerList).connectPlan(attachmentsManagerPlan);
     head(imageAnalyser_LoadBalancerList).connectPlan(imageAnalyserPlan);
-    head(nsfwDetector_LoadBalancerList).connectPlan(nsfwDetectorPlan);
-    head(imageRecognizer_LoadBalancerList).connectPlan(imageRecognizerPlan);
     head(messageAnalyser_LoadBalancerList).connectPlan(messageAnalyserPlan);
   }
 
   Unit createLocalMonitors() {
-    LocalMonitorInterface receiverMonitor = new LocalMonitor(head(messageReceiver_LoadBalancerList), "MR", 116, 1, 1, mr_prediction());
-    local_monitors = appendright(local_monitors,receiverMonitor);
     LocalMonitorInterface parserMonitor = new LocalMonitor(head(messageParser_LoadBalancerList), "MP", 110, 1, 1, mp_prediction());
     local_monitors = appendright(local_monitors,parserMonitor);
-    LocalMonitorInterface sentimentMonitor = new LocalMonitor(head(sentimentAnalyser_LoadBalancerList), "SA", 100, 2, 5/2, sa_prediction());
-    local_monitors = appendright(local_monitors,sentimentMonitor);
     LocalMonitorInterface virusMonitor = new LocalMonitor(head(virusScanner_LoadBalancerList), "VS", 120, 1, 2, vs_prediction());
     local_monitors = appendright(local_monitors,virusMonitor);
     LocalMonitorInterface attachMonitor = new LocalMonitor(head(attachmentsManager_LoadBalancerList), "AM", 231, 1, 3/2, am_prediction());
     local_monitors = appendright(local_monitors,attachMonitor);
     LocalMonitorInterface imageAnalyserMonitor = new LocalMonitor(head(imageAnalyser_LoadBalancerList), "IA", 231, 1, 3/2, ia_prediction());
     local_monitors = appendright(local_monitors,imageAnalyserMonitor);
-    LocalMonitorInterface nsfwMonitor = new LocalMonitor(head(nsfwDetector_LoadBalancerList), "NSFW", 90, 1, 3/2, nsfw_prediction());
-    local_monitors = appendright(local_monitors,nsfwMonitor);
-    LocalMonitorInterface imageRecMonitor = new LocalMonitor(head(imageRecognizer_LoadBalancerList), "IR", 90, 1, 3/2, ir_prediction());
-    local_monitors = appendright(local_monitors,imageRecMonitor);
     LocalMonitorInterface messageAnalyserMonitor = new LocalMonitor(head(messageAnalyser_LoadBalancerList), "MA", 300, 1, 5, ma_prediction());
     local_monitors = appendright(local_monitors,messageAnalyserMonitor);
   }
 
   Unit setupServices(DBInterface db){
-    BaseScale c2 = new BaseScale(cp, head(messageReceiver_LoadBalancerList), head(messageParser_LoadBalancerList), head(headerAnalyser_LoadBalancerList), head(linkAnalyser_LoadBalancerList), head(textAnalyser_LoadBalancerList), head(sentimentAnalyser_LoadBalancerList), head(virusScanner_LoadBalancerList), head(attachmentsManager_LoadBalancerList), head(imageAnalyser_LoadBalancerList), head(nsfwDetector_LoadBalancerList), head(imageRecognizer_LoadBalancerList), head(messageAnalyser_LoadBalancerList), db);
+    BaseScale c2 = new BaseScale(cp, head(messageParser_LoadBalancerList), head(headerAnalyser_LoadBalancerList), head(linkAnalyser_LoadBalancerList), head(textAnalyser_LoadBalancerList), head(virusScanner_LoadBalancerList), head(attachmentsManager_LoadBalancerList), head(imageAnalyser_LoadBalancerList), head(messageAnalyser_LoadBalancerList), db);
     c2.deploy();
     List<DeploymentComponent> dcs = c2.getDeploymentComponent();
     this.computeInitialCost(dcs);
 	}
 
-  MessageReceiver_LoadBalancerInterface getEntrypoint() {return entryPoint;}
+  MessageParser_LoadBalancerInterface getEntrypoint() {return entryPoint;}
 
   List<LocalMonitorInterface> getLocalMonitors() {return local_monitors;}
 

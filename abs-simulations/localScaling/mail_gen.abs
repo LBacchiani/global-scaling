@@ -7,7 +7,7 @@ import * from Param;
 
 interface MailGeneratorInterface{}
 
-class MailGenerator(MessageReceiver_LoadBalancerInterface entryPoint) implements MailGeneratorInterface {
+class MailGenerator(MessageParser_LoadBalancerInterface entryPoint) implements MailGeneratorInterface {
 	Unit run() {
 		Int i = 0;
     Int round = 0;
@@ -17,8 +17,8 @@ class MailGenerator(MessageReceiver_LoadBalancerInterface entryPoint) implements
       round = round + 1;
       Int j = 0;
       while(j < currentMessageNumber) {
-        entryPoint!newMessage();
-        await duration(sendingWin() / currentMessageNumber, sendingWin() / currentMessageNumber);
+        entryPoint!newRequest();
+        await duration(sendingWin() / currentMessageNumber);
         j = j + 1;
       }
     }
