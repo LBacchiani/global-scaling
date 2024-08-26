@@ -46,7 +46,7 @@ class Monitor(DBInterface db, List<LoadBalancer> balancers, List<LocalMonitorInt
       Int totalInstances = this.getTotalInstances();
       String instances = this.getInstances();
       time = time + 10;
-      String toPrint = toString(time) + "  " + toString(float(100/3) * averageAnalysisTime) + " #curr_avg: " + toString(float(measured_avg)) + " TOT: " + toString(inbound_workload) + " COMP: " + toString(completed) + " REJ: " + toString(rejected) + " INST: " + toString(totalInstances + 3) +" " + instances;
+      String toPrint = toString(time) + " " + toString(float(100/3) * averageAnalysisTime) + " #curr_avg: " + toString(float(measured_avg)) + " TOT: " + toString(inbound_workload) + " COMP: " + toString(completed) + " REJ: " + toString(rejected) + " INST: " + toString(totalInstances + 3) +" " + instances;
       this.checkBalancers();
       db.resetMetrics();
       println(toPrint);

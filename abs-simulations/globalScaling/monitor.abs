@@ -18,23 +18,6 @@ class Monitor(ScalerServiceInterface scaler, MixerInterface mixer, DBInterface d
   List<Int> last_pred_config = init_conf; //OUR MIXING TECHNIQUE
   //Rat last_pred = fst_pred(); //LITERATURE MIXING TECHNIQUE
 
-  // Pair<Rat,Rat> find_maxes() {
-  //   Rat max_pred = -1;
-  //   Rat max_true = -1;
-  //   Int i = 0;
-  //   while(i < ratio()) {
-  //     await duration(monitoringWin()/ratio(), monitoringWin()/ratio());
-  //     Rat chunk_pred = -1;
-  //     if(proactiveness()) chunk_pred = nth(predicted_workload(), (i + time) % length(predicted_workload()));
-  //     Rat chunk_real = db.get_one_sec_workload();
-  //     db.one_sec_timeout();
-  //     max_pred = max(chunk_pred,max_pred);
-  //     max_true = max(chunk_real,max_true);
-  //     i = i + 1;
-  //   }
-  //   return Pair(max_pred, max_true);
-  // }
-
   Rat compute_predicted_avg(Int start, Int stop) {
     Int i = start;
     Rat avg = 0;
@@ -46,7 +29,7 @@ class Monitor(ScalerServiceInterface scaler, MixerInterface mixer, DBInterface d
   }
 
 	Unit run() {
-    println("0  0.0 measured: 0.0 TOT: 0 comp: 0 rej: 0 supp: 60 INST: 8");
+    println("0 0.0 next: 12.8 measured: 0.0 target: 12.8 TOT: 0 comp: 0 rej: 0 supp: 60 INST: 8");
     while(time < 200){
       await duration(monitoringWin());
       time = time + 10;
@@ -84,7 +67,7 @@ class Monitor(ScalerServiceInterface scaler, MixerInterface mixer, DBInterface d
       Rat rejected = db.rejectedMessages();
       Rat totalMsg = db.get_inbound_workload();
       Rat totalCost = scaler.computeTotalCost(10);
-      String toPrint = toString(time) + "  " + toString(float(100/3) * averageAnalysisTime);
+      String toPrint = toString(time) + " " + toString(float(100/3) * averageAnalysisTime);
       if(proactiveness()) toPrint = toPrint + " next: " + toString(float(max_pred));
       toPrint = toPrint + " measured: " + toString(float(max_true)); 
       if(mixing()) toPrint = toPrint + " target: " + toString(float(target));
