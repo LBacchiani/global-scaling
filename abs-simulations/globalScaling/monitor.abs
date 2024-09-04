@@ -29,7 +29,9 @@ class Monitor(ScalerServiceInterface scaler, MixerInterface mixer, DBInterface d
   }
 
 	Unit run() {
-    println("0 0.0 next: 12.8 measured: 0.0 target: 12.8 TOT: 0 comp: 0 rej: 0 supp: 60 INST: 8");
+    Rat mcl = scaler.getSystemMCL();
+    Int nInst = scaler.computeInstanceNumber();
+    this.log(0, fst_pred(), mcl, 0, nInst); //debug purpose
     while(time < 200){
       await duration(monitoringWin());
       time = time + 10;
@@ -37,8 +39,8 @@ class Monitor(ScalerServiceInterface scaler, MixerInterface mixer, DBInterface d
       measured_avg = measured_avg/10;
       Rat predicted_avg = this.compute_predicted_avg(time - 10, time);
       Rat target_workload = measured_avg;
-      Rat mcl = scaler.getSystemMCL();
-      Int nInst = scaler.computeInstanceNumber();
+      mcl = scaler.getSystemMCL();
+      nInst = scaler.computeInstanceNumber();
       if(proactiveness()) target_workload = predicted_avg;
       if(mixing()) {
         List<Int> actual_conf = scaler.computeConfiguration(measured_avg);
@@ -67,7 +69,7 @@ class Monitor(ScalerServiceInterface scaler, MixerInterface mixer, DBInterface d
       Rat rejected = db.rejectedMessages();
       Rat totalMsg = db.get_inbound_workload();
       Rat totalCost = scaler.computeTotalCost(10);
-      String toPrint = toString(time) + " " + toString(float(100/3) * averageAnalysisTime);
+      String toPrint = toString(time) + " " + toString(when(completed > 0) then float(100/3) * averageAnalysisTime else 0.0);
       if(proactiveness()) toPrint = toPrint + " next: " + toString(float(max_pred));
       toPrint = toPrint + " measured: " + toString(float(max_true)); 
       if(mixing()) toPrint = toPrint + " target: " + toString(float(target));
