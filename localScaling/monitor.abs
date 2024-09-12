@@ -1,0 +1,56 @@
+module Monitor;
+
+export *;
+
+import * from LocalMonitor;
+import * from Architecture;
+import * from DB;
+import * from Param;
+
+interface MonitorInterface {}
+
+class Monitor(DBInterface db, List<LoadBalancer> balancers, List<LocalMonitorInterface> monitors, Rat initialCost) implements MonitorInterface {
+  Int time = 0;
+
+  String getInstances() {
+    String res = "";
+    foreach(b in balancers) {
+      String toAdd = b.getInstanceNumberDescription();
+      res = res + toAdd;
+    }
+    return res;
+  }
+
+  Unit checkBalancers() {foreach(monitor in monitors) {monitor.check();}}
+
+  Unit printReqs() {foreach(monitor in monitors) {monitor.printReqs();}}
+
+  Int getTotalInstances() {
+    Int total = 0;
+    foreach(b in balancers) {
+      Int n = b.getInstancesNumber();
+      total = total + n;
+    }
+    return total;
+  }
+
+	Unit run() {
+    println("0 0.0 #curr_avg: 0.0 TOT: 0 COMP: 0 REJ: 0 INST: 8 VS1 MP1 AM1 MA1 IA1");
+    while(time < 200){
+      await duration(monitoringWin());
+      Rat inbound_workload = db.returninbound_workload();
+      Rat measured_avg = inbound_workload / 10;
+      Float averageAnalysisTime = db.returnAverageAnalysisTime();
+      Rat completed = db.messageCompleted();
+      Rat rejected = db.rejectedMessages();
+      Int totalInstances = this.getTotalInstances();
+      String instances = this.getInstances();
+      time = time + 10;
+      String toPrint = toString(time) + " " + toString(float(100/3) * averageAnalysisTime) + " #curr_avg: " + toString(float(measured_avg)) + " TOT: " + toString(inbound_workload) + " COMP: " + toString(completed) + " REJ: " + toString(rejected) + " INST: " + toString(totalInstances + 3) +" " + instances;
+      this.checkBalancers();
+      db.resetMetrics();
+      println(toPrint);
+    }
+    if(!oracleScaling()) this.printReqs();
+  }
+}

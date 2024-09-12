@@ -1,0 +1,25 @@
+module MailGen;
+
+export *;
+import * from Architecture;
+import * from Param;
+
+interface MailGeneratorInterface{}
+
+class MailGenerator(MessageParser_LoadBalancerInterface entryPoint) implements MailGeneratorInterface {
+	Unit run() {
+		Int i = 0;
+    Int round = 0;
+    while(round < 200) {
+      Rat currentMessageNumber = nth(actual_workload(), i);
+      i = (i + 1) % length(actual_workload());
+      round = round + 1;
+      Int j = 0;
+      while(j < currentMessageNumber) {
+        entryPoint!newRequest("Message");
+        await duration(sendingWin() / currentMessageNumber);
+        j = j + 1;
+      }
+    }
+	}
+}

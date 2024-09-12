@@ -1,0 +1,30 @@
+module Launcher;
+
+export *;
+import * from ABS.DC;
+import * from MailGen;
+import * from Architecture;
+import * from Sys_init;
+import * from Wrapper;
+import * from DB;
+import * from Scaler;
+import * from Monitor;
+import * from Param;
+import * from Mixer;
+
+
+
+{
+
+    DBInterface db = new DB();
+    SetUpSystemInterface setupSystem = new SetUpSystem();
+    setupSystem.setupLoadBalancers(db);
+    setupSystem.setupServices(db);
+    MessageParser_LoadBalancerInterface entryPoint =  setupSystem.getEntrypoint();
+    ScalerServiceInterface scaler = setupSystem.deployGSAlg(db);
+    List<Int> fst_conf = list[];
+    if(proactiveness()) fst_conf = setupSystem.proactiveDeployment();
+    MixerInterface mixer = new Mixer();
+    MonitorInterface monitor = new Monitor(scaler, mixer, db, fst_conf);
+    MailGeneratorInterface testProcess = new MailGenerator(entryPoint);
+}

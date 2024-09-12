@@ -1,0 +1,82 @@
+module Monitor;
+
+export *;
+import * from ABS.DC;
+import * from MailGen;
+import * from Architecture;
+import * from Sys_init;
+import * from Wrapper;
+import * from DB;
+import * from Scaler;
+import * from Param;
+import * from Mixer;
+
+interface MonitorInterface {}
+
+class Monitor(ScalerServiceInterface scaler, MixerInterface mixer, DBInterface db, List<Int> init_conf) implements MonitorInterface {
+  Int time = 0;
+  List<Int> last_pred_config = init_conf; //OUR MIXING TECHNIQUE
+  //Rat last_pred = fst_pred(); //LITERATURE MIXING TECHNIQUE
+
+  Rat compute_predicted_avg(Int start, Int stop) {
+    Int i = start;
+    Rat avg = 0;
+    while(i < stop) {
+      avg = avg + nth(predicted_workload(), i);
+      i = i + 1;
+    }
+    return avg/10;
+  }
+
+	Unit run() {
+    Rat mcl = scaler.getSystemMCL();
+    Int nInst = scaler.computeInstanceNumber();
+    this.log(0, fst_pred(), mcl, 0, nInst); //debug purpose
+    while(time < 200){
+      await duration(monitoringWin());
+      time = time + 10;
+      Rat measured_avg = db.get_inbound_workload();
+      measured_avg = measured_avg/10;
+      Rat predicted_avg = this.compute_predicted_avg(time - 10, time);
+      Rat target_workload = measured_avg;
+      mcl = scaler.getSystemMCL();
+      nInst = scaler.computeInstanceNumber();
+      if(proactiveness()) target_workload = predicted_avg;
+      if(mixing()) {
+        List<Int> actual_conf = scaler.computeConfiguration(measured_avg);
+        ///OUR MIXING TECHNIQUE////
+        target_workload = mixer.mix(measured_avg, predicted_avg, last_pred_config, actual_conf);
+        last_pred_config = scaler.computeConfiguration(predicted_avg);
+        //////////////////////
+        
+        ///LITERATURE MIXING METHOD
+        /*target_workload = mixer.mix(last_pred, max_pred, max_true);
+        last_pred = max_pred;*/
+        ///////////
+      }
+      this.log(measured_avg, predicted_avg, mcl, target_workload, nInst); //debug purpose
+      if(target_workload - (mcl - kbig()) > k() || (mcl - kbig()) - target_workload > k()) {
+        List<Int> target_config = scaler.computeConfiguration(target_workload);
+        scaler.scale(target_config);
+      }
+      db.resetMetrics();
+    }
+  }
+
+  Unit log(Rat max_true, Rat max_pred, Rat mcl, Rat target, Int nInst) {
+      Float averageAnalysisTime = db.returnAverageAnalysisTime();
+      Rat completed = db.messageCompleted();
+      Rat rejected = db.rejectedMessages();
+      Rat totalMsg = db.get_inbound_workload();
+      Rat totalCost = scaler.computeTotalCost(10);
+      String toPrint = toString(time) + " " + toString(when(completed > 0) then float(100/3) * averageAnalysisTime else 0.0);
+      if(proactiveness()) toPrint = toPrint + " next: " + toString(float(max_pred));
+      toPrint = toPrint + " measured: " + toString(float(max_true)); 
+      if(mixing()) toPrint = toPrint + " target: " + toString(float(target));
+      toPrint = toPrint + " TOT: " + toString(totalMsg) + " comp: " + toString(completed) + " rej: " + toString(rejected) + " supp: " + toString(mcl) + " INST: " + toString(nInst);
+      String scalingAct = scaler.getScalingActions();
+      toPrint = toPrint + scalingAct;
+      println(toPrint);
+  }
+}
+

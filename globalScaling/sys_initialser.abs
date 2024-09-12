@@ -1,0 +1,150 @@
+module Sys_init;
+
+export *;
+import * from ABS.DC;
+import * from Wrapper;
+import * from InvariantsDeployer;
+import * from BaseScale;
+import * from Scale1;
+import * from Scale2;
+import * from Scale3;
+import * from Scale4;
+import * from Architecture;
+import * from DB;
+import * from Scaler;
+import * from Monitor;
+import * from Param;
+
+
+
+interface SetUpSystemInterface {
+	Unit setupServices(DBInterface db);
+  Unit setupLoadBalancers(DBInterface db);
+  ScalerServiceInterface deployGSAlg(DBInterface db);
+  MessageParser_LoadBalancerInterface getEntrypoint();
+  List<Int> proactiveDeployment();
+}
+
+class SetUpSystem implements SetUpSystemInterface {
+
+  MessageParser_LoadBalancerInterface entryPoint;
+  CloudProvider cp;
+  Rat setup_cost = 0;
+  ScalerServiceInterface scaler;  
+	List<MessageParser_LoadBalancerInterface> messageParser_LoadBalancerList = list[];
+	List<HeaderAnalyser_LoadBalancerInterface> headerAnalyser_LoadBalancerList = list[];
+	List<LinkAnalyser_LoadBalancerInterface> linkAnalyser_LoadBalancerList = list[];
+	List<TextAnalyser_LoadBalancerInterface> textAnalyser_LoadBalancerList = list[];
+	List<VirusScanner_LoadBalancerInterface> virusScanner_LoadBalancerList = list[];
+	List<AttachmentsManager_LoadBalancerInterface> attachmentsManager_LoadBalancerList = list[];
+	List<ImageAnalyser_LoadBalancerInterface> imageAnalyser_LoadBalancerList = list[];
+	List<MessageAnalyser_LoadBalancerInterface> messageAnalyser_LoadBalancerList = list[];
+
+ {
+    cp = new CloudProvider("CloudProvider");
+ } 
+    
+  Unit computeInitialCost(List<DeploymentComponent> dcs) {
+    foreach(dc in dcs) {
+      Rat singleCost = dc.getCostPerInterval();
+      setup_cost = setup_cost + singleCost;
+    }
+  }
+
+  MessageParser_LoadBalancerInterface getEntrypoint() {return entryPoint;}
+
+  Unit setupLoadBalancers(DBInterface db) {
+    InvariantsDeployer c1 = new InvariantsDeployer(cp,db);
+    c1.deploy();
+    List<DeploymentComponent> dcs = c1.getDeploymentComponent();
+    this.computeInitialCost(dcs);
+		messageParser_LoadBalancerList = c1.getMessageParser_LoadBalancerInterface();
+		headerAnalyser_LoadBalancerList = c1.getHeaderAnalyser_LoadBalancerInterface();
+		linkAnalyser_LoadBalancerList = c1.getLinkAnalyser_LoadBalancerInterface();
+		textAnalyser_LoadBalancerList = c1.getTextAnalyser_LoadBalancerInterface();
+		virusScanner_LoadBalancerList = c1.getVirusScanner_LoadBalancerInterface();
+		attachmentsManager_LoadBalancerList = c1.getAttachmentsManager_LoadBalancerInterface();
+		imageAnalyser_LoadBalancerList = c1.getImageAnalyser_LoadBalancerInterface();
+		messageAnalyser_LoadBalancerList = c1.getMessageAnalyser_LoadBalancerInterface();
+    entryPoint = head(messageParser_LoadBalancerList);
+  }
+
+	Unit setupServices(DBInterface db){
+    BaseScale c2 = new BaseScale(cp, head(messageParser_LoadBalancerList), head(headerAnalyser_LoadBalancerList), head(linkAnalyser_LoadBalancerList), head(textAnalyser_LoadBalancerList),  head(virusScanner_LoadBalancerList), head(attachmentsManager_LoadBalancerList), head(imageAnalyser_LoadBalancerList),  head(messageAnalyser_LoadBalancerList), db);
+    c2.deploy();
+    List<DeploymentComponent> dcs = c2.getDeploymentComponent();
+    this.computeInitialCost(dcs);
+  }
+
+  ScalerServiceInterface deployGSAlg(DBInterface db) {
+
+    ///////SCALING ORCHESTRATION CREATION///////////
+
+    List<Int> s1config = list[1, //MP
+                             //0, //HA
+                             //0, //LA
+                             //0, //TA
+                               1, //VS
+                               0, //AM
+                               0, //IA
+                               1];//MA
+
+    //create the scaling policy and insert them in the monitor
+    Scale1 s1 = new Scale1(cp, head(messageParser_LoadBalancerList), head(headerAnalyser_LoadBalancerList), head(linkAnalyser_LoadBalancerList), head(textAnalyser_LoadBalancerList),  head(virusScanner_LoadBalancerList), head(attachmentsManager_LoadBalancerList), head(imageAnalyser_LoadBalancerList), head(messageAnalyser_LoadBalancerList),
+      db);
+    WrapperScaleInterface wrapperS1 = new WrapperScale(s1, null, null, null, 3);
+
+    List<Int> s2config = list[1, //MP
+                               //0, //HA
+                               //0, //LA
+                               //0, //TA
+                               3, //VS
+                               1, //AM
+                               1, //IA
+                               3];//MA
+		Scale2 s2 = new Scale2(cp, head(messageParser_LoadBalancerList), head(headerAnalyser_LoadBalancerList), head(linkAnalyser_LoadBalancerList), head(textAnalyser_LoadBalancerList),  head(virusScanner_LoadBalancerList), head(attachmentsManager_LoadBalancerList), head(imageAnalyser_LoadBalancerList),  head(messageAnalyser_LoadBalancerList), db);
+    WrapperScaleInterface wrapperS2 = new WrapperScale(null, s2, null, null, 6);
+    List<Int> s3config = list[ 2, //MP
+                               //0, //HA
+                               //0, //LA
+                               //0, //TA
+                               4, //VS
+                               1, //AM
+                               1, //IA
+                               4];//MA
+
+    Scale3 s3 = new Scale3(cp, head(messageParser_LoadBalancerList), head(headerAnalyser_LoadBalancerList), head(linkAnalyser_LoadBalancerList), head(textAnalyser_LoadBalancerList),  head(virusScanner_LoadBalancerList), head(attachmentsManager_LoadBalancerList), head(imageAnalyser_LoadBalancerList),  head(messageAnalyser_LoadBalancerList), db);
+    WrapperScaleInterface wrapperS3 = new WrapperScale(null, null, s3, null, 3);
+
+    List<Int> s4config = list[3, //MP
+                               //0, //HA
+                               //0, //LA
+                               //0, //TA
+                               6, //VS
+                               2, //AM
+                               2, //IA
+                               6];//MA
+    Scale4 s4 = new Scale4(cp, head(messageParser_LoadBalancerList), head(headerAnalyser_LoadBalancerList), head(linkAnalyser_LoadBalancerList), head(textAnalyser_LoadBalancerList), head(virusScanner_LoadBalancerList), head(attachmentsManager_LoadBalancerList), head(imageAnalyser_LoadBalancerList), head(messageAnalyser_LoadBalancerList), db);
+    WrapperScaleInterface wrapperS4 = new WrapperScale(null, null, null, s4, 7);
+
+    //////END SCALING ORCHESTRATION CREATION///////
+
+
+    scaler = new ScalerService(setup_cost);
+    scaler.insertScalingElements(s1config, wrapperS1, "Scale1");
+    scaler.insertScalingElements(s2config, wrapperS2, "Scale2");
+    scaler.insertScalingElements(s3config, wrapperS3, "Scale3");
+    scaler.insertScalingElements(s4config, wrapperS4, "Scale4");
+    return scaler;
+
+  }
+
+   List<Int> proactiveDeployment() {
+     List<Int> config = scaler.computeConfiguration(fst_pred());
+     scaler.scale(config);
+     String scalingAct = scaler.getScalingActions();
+     println("Initial Configuration: Basex1 " + scalingAct);
+     await duration(200,200);
+     return config;
+	}
+}

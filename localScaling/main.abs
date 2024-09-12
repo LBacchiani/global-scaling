@@ -1,0 +1,26 @@
+module Main;
+
+import * from Gen;
+import * from Architecture;
+import * from Sys_init;
+import * from Param;
+import * from DB;
+import * from Monitor;
+import * from LocalMonitor;
+
+
+{
+	DBInterface db = new DB();
+	SetUpSystemInterface setupSystem = new SetUpSystem();
+	setupSystem.setupLoadBalancers(db);
+	setupSystem.connectPlan(db);
+	setupSystem.createLocalMonitors();
+	setupSystem.setupServices(db);
+	MessageParser_LoadBalancerInterface entryPoint =  setupSystem.getEntrypoint();
+	List<LocalMonitorInterface> local_monitors = setupSystem.getLocalMonitors();
+	if(oracleScaling()) foreach(monitor in local_monitors) {monitor.check();}
+	List<LoadBalancer> balancers = setupSystem.getLB();
+	Rat setup_cost = setupSystem.getSetupCost();
+	MonitorInterface monitor = new Monitor(db, balancers, local_monitors, setup_cost);
+	MailGeneratorInterface testProcess = new MailGenerator(entryPoint);
+}
