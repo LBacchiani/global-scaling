@@ -1,0 +1,21 @@
+0 0.0 next: 12.8 measured: 0.0 TOT: 1 comp: 0 rej: 0 supp: 60 INST: 8
+10 0.0 next: 41.7 measured: 15.2 TOT: 163 comp: 152 rej: 0 supp: 60 INST: 8
+20 77.51483134679444 next: 198.6 measured: 41.6 TOT: 407 comp: 324 rej: 36 supp: 60 INST: 8
+30 265.20277401174405 next: 591.3 measured: 198.5 TOT: 2086 comp: 1004 rej: 817 supp: 220 INST: 17 Scale2-upx1
+40 135.07903472282294 next: 590.8 measured: 591.2 TOT: 5755 comp: 5661 rej: 303 supp: 616 INST: 39 Scale2-downx1 Scale3-upx1 Scale4-upx1
+50 48.134160063924135 next: 593.0 measured: 590.7 TOT: 6440 comp: 6069 rej: 0 supp: 616 INST: 39
+60 18.801612273161602 next: 741.6 measured: 592.9 TOT: 5990 comp: 5550 rej: 211 supp: 616 INST: 39
+70 63.08386769844595 next: 729.3 measured: 741.5 TOT: 6837 comp: 7413 rej: 162 supp: 770 INST: 46 Scale3-downx1 Scale4-upx1
+80 0.830293052450112 next: 597.9 measured: 729.2 TOT: 7206 comp: 7292 rej: 0 supp: 770 INST: 46
+90 0.08463774822112 next: 517.8 measured: 597.8 TOT: 5732 comp: 5979 rej: 0 supp: 770 INST: 46
+100 0.172717825698695 next: 439.6 measured: 517.7 TOT: 4681 comp: 5178 rej: 0 supp: 550 INST: 36 Scale2-upx1 Scale4-downx1
+110 105.06271312236387 next: 354.9 measured: 439.5 TOT: 4598 comp: 4128 rej: 268 supp: 462 INST: 30 Scale1-upx1 Scale2-downx1
+120 0.59303034239031 next: 301.1 measured: 354.8 TOT: 3412 comp: 3549 rej: 0 supp: 420 INST: 27 Scale1-downx1
+130 0.004966085343297 next: 300.7 measured: 301.0 TOT: 3131 comp: 3011 rej: 0 supp: 420 INST: 27
+140 0.012151300116209 next: 302.7 measured: 300.6 TOT: 2771 comp: 3007 rej: 0 supp: 420 INST: 27
+150 0.003200739598758 next: 243.6 measured: 302.6 TOT: 3215 comp: 3027 rej: 0 supp: 420 INST: 27
+160 0.142177813536595 next: 195.4 measured: 243.5 TOT: 2221 comp: 2436 rej: 0 supp: 300 INST: 20 Scale3-upx1 Scale4-downx1
+170 3.553969470476203 next: 79.8 measured: 195.4 TOT: 1759 comp: 1954 rej: 0 supp: 220 INST: 17 Scale2-upx1 Scale3-downx1
+180 190.70837419464144 next: 150.3 measured: 79.8 TOT: 876 comp: 775 rej: 23 supp: 120 INST: 11 Scale1-upx1 Scale2-downx1
+190 15.273989463047876 next: 445.6 measured: 150.3 TOT: 1391 comp: 1285 rej: 103 supp: 220 INST: 17 Scale1-downx1 Scale2-upx1
+200 26.168314406128815 next: 15.2 measured: 445.5 TOT: 4085 comp: 4510 rej: 57 supp: 550 INST: 36 Scale4-upx1

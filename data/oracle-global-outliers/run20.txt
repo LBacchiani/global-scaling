@@ -1,4 +1,4 @@
- 0.0 next: 710.0 measured: 0.0 TOT: 0 comp: 0 rej: 0 supp: 770 INST: 46
+0 0.0 next: 710.0 measured: 0.0 TOT: 0 comp: 0 rej: 0 supp: 770 INST: 46
 10 0.05493950107701438 next: 741.6 measured: 593.0 TOT: 5931 comp: 5925 rej: 0 supp: 770 INST: 46
 20 3.8042523248239704 next: 729.3 measured: 741.5 TOT: 7416 comp: 7415 rej: 0 supp: 770 INST: 46
 30 0.8931927800324954 next: 597.9 measured: 729.2 TOT: 7292 comp: 7289 rej: 0 supp: 770 INST: 46

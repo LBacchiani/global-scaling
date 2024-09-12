@@ -1,4 +1,4 @@
-0 0.0 next: 12.8 measured: 0.0 target: 12.8 TOT: 0 comp: 0 rej: 0 supp: 60 INST: 8
+0 0.0 next: 12.8 measured: 0.0 TOT: 0 comp: 0 rej: 0 supp: 60 INST: 8
 10 713.5983130420944 next: 45.5 measured: 593.0 TOT: 5931 comp: 710 rej: 5119 supp: 60 INST: 8
 20 754.5782589084348 next: 206.2 measured: 741.5 TOT: 7416 comp: 739 rej: 6669 supp: 60 INST: 8
 30 668.3357269983945 next: 569.6 measured: 729.2 TOT: 7293 comp: 1462 rej: 5779 supp: 300 INST: 20 Scale3-upx1
