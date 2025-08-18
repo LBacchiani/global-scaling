@@ -24,7 +24,7 @@
     3.
 
 'f_proactiveness'(Cog=#cog{ref=CogRef},Stack)->
-    true.
+    false.
 
 'f_mixing'(Cog=#cog{ref=CogRef},Stack)->
     (m_Param_funs:f_proactiveness(Cog,Stack)) and (false).

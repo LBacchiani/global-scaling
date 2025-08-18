@@ -2,4 +2,4 @@
 -undef(ABSMAINMODULE).
 -define(ABSMAINMODULE,m_Launcher).
 -undef(ABSCOMPILERVERSION).
--define(ABSCOMPILERVERSION,"v1.9.3-256-gaa1aeaf18").
+-define(ABSCOMPILERVERSION,"v1.10.1-0-g256866db0").

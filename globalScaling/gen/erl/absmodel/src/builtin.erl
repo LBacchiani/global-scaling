@@ -6,6 +6,7 @@
 -export([currentms/1,ms_since_model_start/1,getProductLine/1,lowlevelDeadline/1,print/2,println/2,strlen/2,substr/4,thisDC/1,toString/2]).
 -export([random/2,truncate/2,numerator/2, denominator/2]).
 -export([float/2, rat/2, floor/2, ceil/2, sqrt/2, log/2, exp/2]).
+-export([min/3, max/3, abs/2]).
 
 -export([method/2, destinyOf/2, arrival/2, proc_deadline/2]).
 
@@ -68,29 +69,30 @@ abslistish_to_iolist(Cog, Cons, _Emp, {Cons, H, T}) ->
     [toString(Cog, H), ", ", toString(Cog, T)].
 
 
-toString(_Cog, true) -> <<"True"/utf8>>;
-toString(_Cog, false) -> <<"False"/utf8>>;
-toString(_Cog,I) when is_float(I) ->
+toString(_Cog, true) -> <<"True"/utf8>>;        % Bool True
+toString(_Cog, false) -> <<"False"/utf8>>;      % Bool False
+toString(_Cog,I) when is_float(I) ->            % Float
     list_to_binary(mochinum:digits(I));
-toString(_Cog,I) when is_integer(I) ->
+toString(_Cog,I) when is_integer(I) ->          % Integer
     integer_to_binary(I);
-toString(_Cog,{N,D}) when is_integer(N),is_integer(D)->
+toString(_Cog,{N,D}) when is_integer(N),is_integer(D)-> % Rat
     {N1, D1} = rationals:proper({N, D}),
     case D1 of
         1 -> integer_to_binary(N1);
         _ -> iolist_to_binary([integer_to_binary(N1), <<"/"/utf8>>, integer_to_binary(D1)])
     end;
-toString(_Cog,S) when is_binary(S) -> S;
-toString(_Cog, null) -> <<"null"/utf8>>;
-toString(_Cog,A) when is_atom(A) -> constructorname_to_string(A);
-toString(Cog,P) when is_pid(P) ->
+toString(_Cog,S) when is_binary(S) -> S;        % String
+toString(_Cog, null) -> <<"null"/utf8>>;        % null
+toString(_Cog,A) when is_atom(A) ->             % datatype w/o arguments
+    constructorname_to_string(A);
+toString(Cog,P) when is_pid(P) ->               % Fut
     Status=future:has_value(P),
     case Status of
         true -> Value=future:get_after_await(P, Cog),
                 iolist_to_binary([pid_to_list(P), ":", toString(Cog, Value)]);
         false -> iolist_to_binary([pid_to_list(P), ":empty"])
     end;
-toString(_Cog,O=#object{cog=Cog,oid=Oid}) ->
+toString(_Cog,O=#object{cog=Cog,oid=Oid}) ->    % Object
     C=object:get_class_from_ref(O),
     ClassName=case C of
                   none -> <<"<no class - main module>">>;
@@ -98,20 +100,28 @@ toString(_Cog,O=#object{cog=Cog,oid=Oid}) ->
               end,
     iolist_to_binary([ClassName,
                       ":", pid_to_list(Cog#cog.ref), "-", integer_to_binary(Oid)]);
-toString(_Cog, L) when is_list(L) ->
+toString(_Cog, L) when is_list(L) ->            % List<A>
     iolist_to_binary(["list[",
                       lists:join(", ", lists:map(fun(I) -> toString(_Cog, I) end, L)),
                       "]"]);
 toString(_Cog, T) when is_tuple(T) ->
     [C|A] = tuple_to_list(T),
     case C of
-        dataInsert ->
+        dataInsert ->                           % Set<A>
             iolist_to_binary(["set[", abslistish_to_iolist(_Cog, dataInsert, dataEmptySet, T), "]"]);
-        dataInsertAssoc ->
+        dataInsertAssoc ->                      % Map<A>
             iolist_to_binary(["map[", abslistish_to_iolist(_Cog, dataInsertAssoc, dataEmptyMap, T), "]"]);
-        _ -> iolist_to_binary([constructorname_to_string(C),
-                               "(", lists:join(",", [toString(_Cog,X) || X <- A]),
-                               ")"])
+        _ -> iolist_to_binary(
+               [constructorname_to_string(C),   % datatype with arguments
+                "(",
+                lists:join(",",
+                           lists:map(fun(X) -> case is_binary(X) of
+                                                   true -> ["\"", X, "\""];
+                                                   false -> toString(_Cog,X)
+                                               end
+                                     end,
+                                     A)),
+                ")"])
     end.
 
 
@@ -145,6 +155,29 @@ rat(_Cog, F) ->
             Length = length(Rest) - 1,
             Factor = mochinum:int_pow(10, Length),
             rationals:new(trunc(F * Factor), Factor)
+    end.
+
+min(_Cog, N1, N2) ->
+    case cmp:lt(N1, N2) of
+        true -> N1;
+        false -> N2
+    end.
+
+max(_Cog, N1, N2) ->
+    case cmp:lt(N1, N2) of
+        true -> N2;
+        false -> N1
+    end.
+
+abs(_Cog, R={N, D}) when is_integer(N),is_integer(D) ->
+    case rationals:is_negative(R) of
+        true -> rationals:neg(R);
+        false -> R
+    end;
+abs(_Cog, N) ->
+    case N < 0 of
+        true -> - N;
+        false -> N
     end.
 
 floor(_Cog, F) ->

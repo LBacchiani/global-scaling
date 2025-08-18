@@ -10,7 +10,7 @@ def Int monitoringWin() = 300;
 def Int sendingWin() = 30;
 def Int initInstancesNumber() = 8;
 def Int memory() = 3; 
-def Bool proactiveness() = True;
+def Bool proactiveness() = False;
 def Bool mixing() = proactiveness() && False;
 def List<Rat> scores() = list[60/330, 90/330, 90/330, 90/330];
 

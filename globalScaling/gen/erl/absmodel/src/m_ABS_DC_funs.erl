@@ -12,7 +12,7 @@
     (fun (V_mins_0)->case cmp:eq(V_mins_0,0) of
         true -> 0;
         false ->  rationals:rdiv(m_ABS_DC_funs:f_sumDivsN(Cog,V_consumeds_0,V_totals_0,V_mins_0,Stack),V_mins_0) 
-    end end(m_ABS_StdLib_funs:f_min(Cog,V_length_0,m_ABS_StdLib_funs:f_min(Cog,m_ABS_StdLib_funs:f_length(Cog,V_consumeds_0,Stack),m_ABS_StdLib_funs:f_length(Cog,V_totals_0,Stack),Stack),Stack))).
+    end end(builtin:min(Cog,V_length_0,builtin:min(Cog,m_ABS_StdLib_funs:f_length(Cog,V_consumeds_0,Stack),m_ABS_StdLib_funs:f_length(Cog,V_totals_0,Stack))))).
 
 'f_thisDC'(Cog=#cog{ref=CogRef},Stack)->
     builtin.
@@ -22,7 +22,7 @@
         case V_data_0 of
             
             {dataFin,V_res_0}->V_res_0;
-            _ -> io:format("No match for data at abs/lang/abslang.abs:801~n"), 
+            _ -> io:format("No match for data at abs/lang/abslang.abs:804~n"), 
             exit(dataPatternMatchFailException)
         end
     end.

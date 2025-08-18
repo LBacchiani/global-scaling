@@ -9,22 +9,13 @@
     not (V_a_0).
 
 'f_max'(Cog=#cog{ref=CogRef},V_a_0,V_b_0,Stack)->
-    case cmp:gt(V_a_0,V_b_0) of
-        true -> V_a_0;
-        false -> V_b_0
-    end.
+    builtin.
 
 'f_min'(Cog=#cog{ref=CogRef},V_a_0,V_b_0,Stack)->
-    case cmp:lt(V_a_0,V_b_0) of
-        true -> V_a_0;
-        false -> V_b_0
-    end.
+    builtin.
 
 'f_abs'(Cog=#cog{ref=CogRef},V_x_0,Stack)->
-    case cmp:gt(V_x_0,0) of
-        true -> V_x_0;
-        false -> rationals:neg( V_x_0)
-    end.
+    builtin.
 
 'f_pow'(Cog=#cog{ref=CogRef},V_b_0,V_n_0,Stack)->
     case cmp:lt(V_n_0,0) of
@@ -39,7 +30,7 @@
     end.
 
 'f_sqrt_newton'(Cog=#cog{ref=CogRef},V_x_0,V_estimate_0,V_epsilon_0,Stack)->
-    (fun (V_next_0)->case cmp:lt(m_ABS_StdLib_funs:f_abs(Cog,( rationals:sub(V_estimate_0,V_next_0)) ,Stack),V_epsilon_0) of
+    (fun (V_next_0)->case cmp:lt(builtin:abs(Cog,( rationals:sub(V_estimate_0,V_next_0)) ),V_epsilon_0) of
         true -> V_estimate_0;
         false -> m_ABS_StdLib_funs:f_sqrt_newton(Cog,V_x_0,V_next_0,V_epsilon_0,Stack)
     end end( rationals:rdiv(( rationals:add(V_estimate_0, rationals:rdiv(V_x_0,V_estimate_0) )) ,2) )).
@@ -54,7 +45,7 @@
     builtin.
 
 'f_exp_newton_helper'(Cog=#cog{ref=CogRef},V_acc_0,V_x_0,V_next_round_0,V_numerator_0,V_denominator_0,V_epsilon_0,Stack)->
-    (fun (V_next_0)->case cmp:lt(m_ABS_StdLib_funs:f_abs(Cog,V_next_0,Stack),V_epsilon_0) of
+    (fun (V_next_0)->case cmp:lt(builtin:abs(Cog,V_next_0),V_epsilon_0) of
         true -> ( rationals:add(V_acc_0,V_next_0)) ;
         false -> m_ABS_StdLib_funs:f_exp_newton_helper(Cog,( rationals:add(V_acc_0,V_next_0)) ,V_x_0,(V_next_round_0 + 1) ,( rationals:mul(V_numerator_0,V_x_0)) ,(V_denominator_0 * V_next_round_0) ,V_epsilon_0,Stack)
     end end( rationals:rdiv(( rationals:mul(V_numerator_0,V_x_0)) ,(V_denominator_0 * V_next_round_0) ) )).
@@ -95,7 +86,7 @@
             
             {dataJust,V_j_0}->true;
             dataNothing->false;
-            _ -> io:format("No match for a at abs/lang/abslang.abs:174~n"), 
+            _ -> io:format("No match for a at abs/lang/abslang.abs:177~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -106,7 +97,7 @@
             
             {dataJust,V_j_0}->V_j_0;
             dataNothing->V_default_0;
-            _ -> io:format("No match for m at abs/lang/abslang.abs:177~n"), 
+            _ -> io:format("No match for m at abs/lang/abslang.abs:180~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -128,7 +119,7 @@
         case V_t_0 of
             
             {dataTriple,_,_,V_val_0}->V_val_0;
-            _ -> io:format("No match for t at abs/lang/abslang.abs:192~n"), 
+            _ -> io:format("No match for t at abs/lang/abslang.abs:195~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -139,7 +130,7 @@
             
             []->dataEmptySet;
             [V_x_0 | V_xs_0]->m_ABS_StdLib_funs:f_insertElement(Cog,m_ABS_StdLib_funs:f_set(Cog,V_xs_0,Stack),V_x_0,Stack);
-            _ -> io:format("No match for l at abs/lang/abslang.abs:205~n"), 
+            _ -> io:format("No match for l at abs/lang/abslang.abs:208~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -154,7 +145,7 @@
                 true -> false;
                 false -> m_ABS_StdLib_funs:f_contains(Cog,V_xs_0,V_e_0,Stack)
             end;
-            _ -> io:format("No match for ss at abs/lang/abslang.abs:214~n"), 
+            _ -> io:format("No match for ss at abs/lang/abslang.abs:217~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -168,7 +159,7 @@
             
             dataEmptySet->0;
             {dataInsert,V_s_0,V_ss_0}->(1 + m_ABS_StdLib_funs:f_size(Cog,V_ss_0,Stack)) ;
-            _ -> io:format("No match for xs at abs/lang/abslang.abs:229~n"), 
+            _ -> io:format("No match for xs at abs/lang/abslang.abs:232~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -179,7 +170,7 @@
             
             dataEmptySet->[];
             {dataInsert,V_s_0,V_ss_0}->[V_s_0 | m_ABS_StdLib_funs:f_elements(Cog,V_ss_0,Stack)];
-            _ -> io:format("No match for xs at abs/lang/abslang.abs:238~n"), 
+            _ -> io:format("No match for xs at abs/lang/abslang.abs:241~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -198,11 +189,11 @@
                         true -> { dataInsert,V_e1_0,m_ABS_StdLib_funs:f_union(Cog,V_ss1_0,V_set2_0,Stack)};
                         false -> { dataInsert,V_e2_0,m_ABS_StdLib_funs:f_union(Cog,V_set1_0,V_ss2_1,Stack)}
                     end;
-                    _ -> io:format("No match for set2 at abs/lang/abslang.abs:249~n"), 
+                    _ -> io:format("No match for set2 at abs/lang/abslang.abs:252~n"), 
                     exit(dataPatternMatchFailException)
                 end
             end;
-            _ -> io:format("No match for set1 at abs/lang/abslang.abs:247~n"), 
+            _ -> io:format("No match for set1 at abs/lang/abslang.abs:250~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -221,11 +212,11 @@
                         true -> m_ABS_StdLib_funs:f_intersection(Cog,V_ss1_0,V_set2_0,Stack);
                         false -> m_ABS_StdLib_funs:f_intersection(Cog,V_set1_0,V_ss2_1,Stack)
                     end;
-                    _ -> io:format("No match for set2 at abs/lang/abslang.abs:265~n"), 
+                    _ -> io:format("No match for set2 at abs/lang/abslang.abs:268~n"), 
                     exit(dataPatternMatchFailException)
                 end
             end;
-            _ -> io:format("No match for set1 at abs/lang/abslang.abs:263~n"), 
+            _ -> io:format("No match for set1 at abs/lang/abslang.abs:266~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -244,11 +235,11 @@
                         true -> { dataInsert,V_e1_0,m_ABS_StdLib_funs:f_difference(Cog,V_ss1_0,V_set2_0,Stack)};
                         false -> m_ABS_StdLib_funs:f_difference(Cog,V_set1_0,V_ss2_1,Stack)
                     end;
-                    _ -> io:format("No match for set2 at abs/lang/abslang.abs:282~n"), 
+                    _ -> io:format("No match for set2 at abs/lang/abslang.abs:285~n"), 
                     exit(dataPatternMatchFailException)
                 end
             end;
-            _ -> io:format("No match for set1 at abs/lang/abslang.abs:280~n"), 
+            _ -> io:format("No match for set1 at abs/lang/abslang.abs:283~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -259,7 +250,7 @@
             
             dataEmptySet->true;
             {dataInsert,V_elem_0,V_rest_0}->(m_ABS_StdLib_funs:f_contains(Cog,V_set_0,V_elem_0,Stack)) and (m_ABS_StdLib_funs:f_isSubset(Cog,V_rest_0,V_set_0,Stack));
-            _ -> io:format("No match for maybe_subset at abs/lang/abslang.abs:297~n"), 
+            _ -> io:format("No match for maybe_subset at abs/lang/abslang.abs:300~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -274,7 +265,7 @@
                 true -> { dataInsert,V_e_0,V_xs_0};
                 false -> { dataInsert,V_x_0,m_ABS_StdLib_funs:f_insertElement(Cog,V_ss_0,V_e_0,Stack)}
             end;
-            _ -> io:format("No match for xs at abs/lang/abslang.abs:308~n"), 
+            _ -> io:format("No match for xs at abs/lang/abslang.abs:311~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -289,7 +280,7 @@
                 true -> V_xs_0;
                 false -> { dataInsert,V_x_0,m_ABS_StdLib_funs:f_remove(Cog,V_ss_1,V_e_0,Stack)}
             end;
-            _ -> io:format("No match for xs at abs/lang/abslang.abs:318~n"), 
+            _ -> io:format("No match for xs at abs/lang/abslang.abs:321~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -299,7 +290,7 @@
         case V_ss_0 of
             
             {dataInsert,V_e_0,_}->V_e_0;
-            _ -> io:format("No match for ss at abs/lang/abslang.abs:330~n"), 
+            _ -> io:format("No match for ss at abs/lang/abslang.abs:333~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -310,7 +301,7 @@
             
             dataEmptySet->dataNothing;
             {dataInsert,V_e_0,_}->{ dataJust,V_e_0};
-            _ -> io:format("No match for ss at abs/lang/abslang.abs:338~n"), 
+            _ -> io:format("No match for ss at abs/lang/abslang.abs:341~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -323,7 +314,7 @@
         case V_s_0 of
             
             {dataInsert,V_e_0,V_set2_0}->{ dataPair,V_set2_0,V_e_0};
-            _ -> io:format("No match for s at abs/lang/abslang.abs:350~n"), 
+            _ -> io:format("No match for s at abs/lang/abslang.abs:353~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -356,7 +347,7 @@ end.
             
             []->dataEmptyMap;
             [V_hd_0 | V_tl_0]->{ dataInsertAssoc,V_hd_0,m_ABS_StdLib_funs:f_map(Cog,V_tl_0,Stack)};
-            _ -> io:format("No match for l at abs/lang/abslang.abs:430~n"), 
+            _ -> io:format("No match for l at abs/lang/abslang.abs:433~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -371,7 +362,7 @@ end.
             dataEmptyMap->V_map_0;
             {dataInsertAssoc,{dataPair,V_key_0,_},V_m_0}->V_m_0;
             {dataInsertAssoc,V_pair_0,V_tail_0}->{ dataInsertAssoc,V_pair_0,m_ABS_StdLib_funs:f_removeKey(Cog,V_tail_0,V_key_0,Stack)};
-            _ -> io:format("No match for map at abs/lang/abslang.abs:441~n"), 
+            _ -> io:format("No match for map at abs/lang/abslang.abs:444~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -382,7 +373,7 @@ end.
             
             dataEmptyMap->[];
             {dataInsertAssoc,{dataPair,_,V_elem_0},V_tail_0}->[V_elem_0 | m_ABS_StdLib_funs:f_values(Cog,V_tail_0,Stack)];
-            _ -> io:format("No match for map at abs/lang/abslang.abs:449~n"), 
+            _ -> io:format("No match for map at abs/lang/abslang.abs:452~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -393,7 +384,7 @@ end.
             
             dataEmptyMap->dataEmptySet;
             {dataInsertAssoc,{dataPair,V_a_0,_},V_tail_0}->m_ABS_StdLib_funs:f_insertElement(Cog,m_ABS_StdLib_funs:f_keys(Cog,V_tail_0,Stack),V_a_0,Stack);
-            _ -> io:format("No match for map at abs/lang/abslang.abs:458~n"), 
+            _ -> io:format("No match for map at abs/lang/abslang.abs:461~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -404,7 +395,7 @@ end.
             
             dataEmptyMap->[];
             {dataInsertAssoc,V_e_0,V_tail_0}->[V_e_0 | m_ABS_StdLib_funs:f_entries(Cog,V_tail_0,Stack)];
-            _ -> io:format("No match for map at abs/lang/abslang.abs:467~n"), 
+            _ -> io:format("No match for map at abs/lang/abslang.abs:470~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -416,7 +407,7 @@ end.
             {dataInsertAssoc,{dataPair,V_k_0,V_y_0},_}->{ dataJust,V_y_0};
             {dataInsertAssoc,_,V_tm_0}->m_ABS_StdLib_funs:f_lookup(Cog,V_tm_0,V_k_0,Stack);
             dataEmptyMap->dataNothing;
-            _ -> io:format("No match for ms at abs/lang/abslang.abs:476~n"), 
+            _ -> io:format("No match for ms at abs/lang/abslang.abs:479~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -434,7 +425,7 @@ end.
             {dataInsertAssoc,{dataPair,V_k_0,V_y_0},_}->V_y_0;
             {dataInsertAssoc,_,V_tm_0}->m_ABS_StdLib_funs:f_lookupDefault(Cog,V_tm_0,V_k_0,V_d_0,Stack);
             dataEmptyMap->V_d_0;
-            _ -> io:format("No match for ms at abs/lang/abslang.abs:499~n"), 
+            _ -> io:format("No match for ms at abs/lang/abslang.abs:502~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -446,7 +437,7 @@ end.
             {dataInsertAssoc,{dataPair,V_key_0,V_value_0},_}->{ dataJust,V_key_0};
             {dataInsertAssoc,_,V_tm_0}->m_ABS_StdLib_funs:f_lookupReverse(Cog,V_tm_0,V_value_0,Stack);
             dataEmptyMap->dataNothing;
-            _ -> io:format("No match for ms at abs/lang/abslang.abs:509~n"), 
+            _ -> io:format("No match for ms at abs/lang/abslang.abs:512~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -458,7 +449,7 @@ end.
             {dataInsertAssoc,{dataPair,V_key_0,V_value_0},_}->V_key_0;
             {dataInsertAssoc,_,V_tm_0}->m_ABS_StdLib_funs:f_lookupReverseDefault(Cog,V_tm_0,V_value_0,V_default_0,Stack);
             dataEmptyMap->V_default_0;
-            _ -> io:format("No match for ms at abs/lang/abslang.abs:520~n"), 
+            _ -> io:format("No match for ms at abs/lang/abslang.abs:523~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -473,7 +464,7 @@ end.
             dataEmptyMap->{ dataInsertAssoc,{ dataPair,V_k_0,V_v_0},dataEmptyMap};
             {dataInsertAssoc,{dataPair,V_k_0,_},V_ts_0}->{ dataInsertAssoc,{ dataPair,V_k_0,V_v_0},V_ts_0};
             {dataInsertAssoc,V_p_0,V_ts_1}->{ dataInsertAssoc,V_p_0,m_ABS_StdLib_funs:f_put(Cog,V_ts_1,V_k_0,V_v_0,Stack)};
-            _ -> io:format("No match for ms at abs/lang/abslang.abs:538~n"), 
+            _ -> io:format("No match for ms at abs/lang/abslang.abs:541~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -500,7 +491,7 @@ end.
     builtin.
 
 'f_timeDifference'(Cog=#cog{ref=CogRef},V_t1_0,V_t2_0,Stack)->
-    m_ABS_StdLib_funs:f_abs(Cog,( rationals:sub(m_ABS_StdLib_funs:f_timeValue(Cog,V_t2_0,Stack),m_ABS_StdLib_funs:f_timeValue(Cog,V_t1_0,Stack))) ,Stack).
+    builtin:abs(Cog,( rationals:sub(m_ABS_StdLib_funs:f_timeValue(Cog,V_t2_0,Stack),m_ABS_StdLib_funs:f_timeValue(Cog,V_t1_0,Stack))) ).
 
 'f_timeLessThan'(Cog=#cog{ref=CogRef},V_t1_0,V_t2_0,Stack)->
     cmp:lt(m_ABS_StdLib_funs:f_timeValue(Cog,V_t1_0,Stack),m_ABS_StdLib_funs:f_timeValue(Cog,V_t2_0,Stack)).
@@ -511,7 +502,7 @@ end.
             
             {dataDuration,_}->false;
             dataInfDuration->true;
-            _ -> io:format("No match for d at abs/lang/abslang.abs:597~n"), 
+            _ -> io:format("No match for d at abs/lang/abslang.abs:600~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -531,12 +522,12 @@ end.
                     
                     {dataDuration,V_v2_0}->cmp:lt(V_v1_0,V_v2_0);
                     dataInfDuration->true;
-                    _ -> io:format("No match for d2 at abs/lang/abslang.abs:607~n"), 
+                    _ -> io:format("No match for d2 at abs/lang/abslang.abs:610~n"), 
                     exit(dataPatternMatchFailException)
                 end
             end;
             dataInfDuration->false;
-            _ -> io:format("No match for d1 at abs/lang/abslang.abs:606~n"), 
+            _ -> io:format("No match for d1 at abs/lang/abslang.abs:609~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -556,7 +547,7 @@ end.
             
             dataInfDuration->dataInfDuration;
             {dataDuration,V_x_0}->{ dataDuration,( rationals:sub(V_x_0,V_v_0)) };
-            _ -> io:format("No match for d at abs/lang/abslang.abs:621~n"), 
+            _ -> io:format("No match for d at abs/lang/abslang.abs:624~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -581,7 +572,7 @@ end.
         case V_data_0 of
             
             {dataJust,V_res_0}->V_res_0;
-            _ -> io:format("No match for data at abs/lang/abslang.abs:171~n"), 
+            _ -> io:format("No match for data at abs/lang/abslang.abs:174~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -591,7 +582,7 @@ end.
         case V_data_0 of
             
             {dataLeft,V_res_0}->V_res_0;
-            _ -> io:format("No match for data at abs/lang/abslang.abs:179~n"), 
+            _ -> io:format("No match for data at abs/lang/abslang.abs:182~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -601,7 +592,7 @@ end.
         case V_data_0 of
             
             {dataRight,V_res_0}->V_res_0;
-            _ -> io:format("No match for data at abs/lang/abslang.abs:179~n"), 
+            _ -> io:format("No match for data at abs/lang/abslang.abs:182~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -611,7 +602,7 @@ end.
         case V_data_0 of
             
             {dataPair,V_res_0,_}->V_res_0;
-            _ -> io:format("No match for data at abs/lang/abslang.abs:187~n"), 
+            _ -> io:format("No match for data at abs/lang/abslang.abs:190~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -621,7 +612,7 @@ end.
         case V_data_0 of
             
             {dataPair,_,V_res_0}->V_res_0;
-            _ -> io:format("No match for data at abs/lang/abslang.abs:187~n"), 
+            _ -> io:format("No match for data at abs/lang/abslang.abs:190~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -631,7 +622,7 @@ end.
         case V_data_0 of
             
             {dataTriple,_,_,V_res_0}->V_res_0;
-            _ -> io:format("No match for data at abs/lang/abslang.abs:189~n"), 
+            _ -> io:format("No match for data at abs/lang/abslang.abs:192~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -641,7 +632,7 @@ end.
         case V_data_0 of
             
             {dataTriple,V_res_0,_,_}->V_res_0;
-            _ -> io:format("No match for data at abs/lang/abslang.abs:189~n"), 
+            _ -> io:format("No match for data at abs/lang/abslang.abs:192~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -651,7 +642,7 @@ end.
         case V_data_0 of
             
             {dataTriple,_,V_res_0,_}->V_res_0;
-            _ -> io:format("No match for data at abs/lang/abslang.abs:189~n"), 
+            _ -> io:format("No match for data at abs/lang/abslang.abs:192~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -661,7 +652,7 @@ end.
         case V_data_0 of
             
             [V_res_0 | _]->V_res_0;
-            _ -> io:format("No match for data at abs/lang/abslang.abs:355~n"), 
+            _ -> io:format("No match for data at abs/lang/abslang.abs:358~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -671,7 +662,7 @@ end.
         case V_data_0 of
             
             [_ | V_res_0]->V_res_0;
-            _ -> io:format("No match for data at abs/lang/abslang.abs:355~n"), 
+            _ -> io:format("No match for data at abs/lang/abslang.abs:358~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -681,7 +672,7 @@ end.
         case V_data_0 of
             
             {dataTime,V_res_0}->V_res_0;
-            _ -> io:format("No match for data at abs/lang/abslang.abs:580~n"), 
+            _ -> io:format("No match for data at abs/lang/abslang.abs:583~n"), 
             exit(dataPatternMatchFailException)
         end
     end.
@@ -691,7 +682,7 @@ end.
         case V_data_0 of
             
             {dataDuration,V_res_0}->V_res_0;
-            _ -> io:format("No match for data at abs/lang/abslang.abs:595~n"), 
+            _ -> io:format("No match for data at abs/lang/abslang.abs:598~n"), 
             exit(dataPatternMatchFailException)
         end
     end.

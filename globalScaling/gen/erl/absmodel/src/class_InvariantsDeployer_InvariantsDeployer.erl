@@ -4,7 +4,7 @@
 -export([get_val_internal/2,set_val_internal/3,init_internal/0,get_state_for_modelapi/1,implemented_interfaces/0,exported/0]).
 -compile(export_all).
 
-implemented_interfaces() -> [ <<"Object">>, <<"InvariantsDeployer">> ].
+implemented_interfaces() -> [ <<"InvariantsDeployer">>, <<"Object">> ].
 
 exported() -> #{  }.
 
@@ -1456,10 +1456,10 @@ exported() -> #{  }.
  'dcs' => V_dcs_0 }),
     try
          %% timesmartdel-orchs/invariants.abs:276--289
-        put(vars, (get(vars))#{'tmp1761307678' => m_ABS_StdLib_funs:f_entries(Cog,maps:get('dcs', get(vars)),[O,DC| Stack])}),
+        put(vars, (get(vars))#{'tmp1210070267' => m_ABS_StdLib_funs:f_entries(Cog,maps:get('dcs', get(vars)),[O,DC| Stack])}),
          %% timesmartdel-orchs/invariants.abs:276--289
         []=(fun Loop ([])->
-            case not (m_ABS_StdLib_funs:f_isEmpty(Cog,maps:get('tmp1761307678', get(vars)),[O,DC| Stack])) of
+            case not (m_ABS_StdLib_funs:f_isEmpty(Cog,maps:get('tmp1210070267', get(vars)),[O,DC| Stack])) of
             false -> [];
             true -> receive
                     {stop_world, CogRef} ->
@@ -1469,20 +1469,20 @@ exported() -> #{  }.
                     after 0 -> ok
                 end,
                  %% timesmartdel-orchs/invariants.abs:276--289
-                put(vars, (get(vars))#{'entry' => m_ABS_StdLib_funs:f_head(Cog,maps:get('tmp1761307678', get(vars)),[O,DC| Stack])}),
+                put(vars, (get(vars))#{'entry' => m_ABS_StdLib_funs:f_head(Cog,maps:get('tmp1210070267', get(vars)),[O,DC| Stack])}),
                  %% timesmartdel-orchs/invariants.abs:276--289
-                put(vars, (get(vars))#{'tmp1761307678' := m_ABS_StdLib_funs:f_tail(Cog,maps:get('tmp1761307678', get(vars)),[O,DC| Stack])}),
+                put(vars, (get(vars))#{'tmp1210070267' := m_ABS_StdLib_funs:f_tail(Cog,maps:get('tmp1210070267', get(vars)),[O,DC| Stack])}),
                  %% timesmartdel-orchs/invariants.abs:277--277
                 put(vars, (get(vars))#{'dc' => m_ABS_StdLib_funs:f_fst(Cog,maps:get('entry', get(vars)),[O,DC| Stack])}),
                  %% timesmartdel-orchs/invariants.abs:278--278
                 put(vars, (get(vars))#{'coreUsed' => m_ABS_StdLib_funs:f_snd(Cog,maps:get('entry', get(vars)),[O,DC| Stack])}),
                  %% timesmartdel-orchs/invariants.abs:279--279
-                put(vars, (get(vars))#{'tmp1021710315' => cog:create_task(maps:get('dc', get(vars)),'m_total',[dataSpeed,[]],#task_info{method= <<"total"/utf8>>, creation={dataTime,builtin:currentms(Cog)}, proc_deadline=dataInfDuration},Cog)}),
+                put(vars, (get(vars))#{'tmp1586437554' => cog:create_task(maps:get('dc', get(vars)),'m_total',[dataSpeed,[]],#task_info{method= <<"total"/utf8>>, creation={dataTime,builtin:currentms(Cog)}, proc_deadline=dataInfDuration},Cog)}),
                  %% timesmartdel-orchs/invariants.abs:279--279
-                future:await(maps:get('tmp1021710315', get(vars)), Cog, [O,DC| Stack]),
+                future:await(maps:get('tmp1586437554', get(vars)), Cog, [O,DC| Stack]),
                 ok,
                  %% timesmartdel-orchs/invariants.abs:279--279
-                put(vars, (get(vars))#{'speed_aux' => future:get_blocking(maps:get('tmp1021710315', get(vars)), Cog, [O,DC| Stack])}),
+                put(vars, (get(vars))#{'speed_aux' => future:get_blocking(maps:get('tmp1586437554', get(vars)), Cog, [O,DC| Stack])}),
                  %% timesmartdel-orchs/invariants.abs:280--283
                 put(vars, (get(vars))#{'total_speed' => begin
                     case maps:get('speed_aux', get(vars)) of
@@ -1494,12 +1494,12 @@ exported() -> #{  }.
                  %% timesmartdel-orchs/invariants.abs:284--284
                 case (not cmp:eq(maps:get('total_speed', get(vars)),-1)) of
                     true ->  %% timesmartdel-orchs/invariants.abs:285--285
-                    put(vars, (get(vars))#{'tmp1643298618' => cog:create_task(maps:get('dc', get(vars)),'m_getNumberOfCores',[[]],#task_info{method= <<"getNumberOfCores"/utf8>>, creation={dataTime,builtin:currentms(Cog)}, proc_deadline=dataInfDuration},Cog)}),
+                    put(vars, (get(vars))#{'tmp1690004391' => cog:create_task(maps:get('dc', get(vars)),'m_getNumberOfCores',[[]],#task_info{method= <<"getNumberOfCores"/utf8>>, creation={dataTime,builtin:currentms(Cog)}, proc_deadline=dataInfDuration},Cog)}),
                      %% timesmartdel-orchs/invariants.abs:285--285
-                    future:await(maps:get('tmp1643298618', get(vars)), Cog, [O,DC| Stack]),
+                    future:await(maps:get('tmp1690004391', get(vars)), Cog, [O,DC| Stack]),
                     ok,
                      %% timesmartdel-orchs/invariants.abs:285--285
-                    put(vars, (get(vars))#{'totalCore' => future:get_blocking(maps:get('tmp1643298618', get(vars)), Cog, [O,DC| Stack])}),
+                    put(vars, (get(vars))#{'totalCore' => future:get_blocking(maps:get('tmp1690004391', get(vars)), Cog, [O,DC| Stack])}),
                      %% timesmartdel-orchs/invariants.abs:286--286
                     put(vars, (get(vars))#{'speedPerCore' =>  rationals:rdiv(maps:get('total_speed', get(vars)),maps:get('totalCore', get(vars))) }),
                      %% timesmartdel-orchs/invariants.abs:287--287

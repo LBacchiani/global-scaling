@@ -4,7 +4,7 @@
 -export([get_val_internal/2,set_val_internal/3,init_internal/0,get_state_for_modelapi/1,implemented_interfaces/0,exported/0]).
 -compile(export_all).
 
-implemented_interfaces() -> [ <<"Object">>, <<"MailGeneratorInterface">> ].
+implemented_interfaces() -> [ <<"MailGeneratorInterface">>, <<"Object">> ].
 
 exported() -> #{  }.
 

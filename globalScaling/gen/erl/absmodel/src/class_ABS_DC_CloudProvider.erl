@@ -4,7 +4,7 @@
 -export([get_val_internal/2,set_val_internal/3,init_internal/0,get_state_for_modelapi/1,implemented_interfaces/0,exported/0]).
 -compile(export_all).
 
-implemented_interfaces() -> [ <<"Object">>, <<"CloudProviderForDeploymentComponent">>, <<"CloudProvider">> ].
+implemented_interfaces() -> [ <<"CloudProvider">>, <<"CloudProviderForDeploymentComponent">>, <<"Object">> ].
 
 exported() -> #{  }.
 
@@ -14,31 +14,31 @@ exported() -> #{  }.
 'init_internal'()->
     #state{}.
 
- %% abs/lang/abslang.abs:888
+ %% abs/lang/abslang.abs:891
 'get_val_internal'(#state{'name'=G},'name')->
     object:register_read('name'),
     G;
- %% abs/lang/abslang.abs:892
+ %% abs/lang/abslang.abs:895
 'get_val_internal'(#state{'instanceDescriptions'=G},'instanceDescriptions')->
     object:register_read('instanceDescriptions'),
     G;
- %% abs/lang/abslang.abs:895
+ %% abs/lang/abslang.abs:898
 'get_val_internal'(#state{'launchedInstances'=G},'launchedInstances')->
     object:register_read('launchedInstances'),
     G;
- %% abs/lang/abslang.abs:897
+ %% abs/lang/abslang.abs:900
 'get_val_internal'(#state{'acquiredInstances'=G},'acquiredInstances')->
     object:register_read('acquiredInstances'),
     G;
- %% abs/lang/abslang.abs:898
+ %% abs/lang/abslang.abs:901
 'get_val_internal'(#state{'killedInstances'=G},'killedInstances')->
     object:register_read('killedInstances'),
     G;
- %% abs/lang/abslang.abs:899
+ %% abs/lang/abslang.abs:902
 'get_val_internal'(#state{'nextInstanceId'=G},'nextInstanceId')->
     object:register_read('nextInstanceId'),
     G;
- %% abs/lang/abslang.abs:900
+ %% abs/lang/abslang.abs:903
 'get_val_internal'(#state{'accumulatedCostOfKilledDCs'=G},'accumulatedCostOfKilledDCs')->
     object:register_read('accumulatedCostOfKilledDCs'),
     G;
@@ -47,31 +47,31 @@ exported() -> #{  }.
     %% Will never occur in generated code.
     none.
 
- %% abs/lang/abslang.abs:888
+ %% abs/lang/abslang.abs:891
 'set_val_internal'(S,'name',V)->
     object:register_write('name'),
     S#state{'name'=V};
- %% abs/lang/abslang.abs:892
+ %% abs/lang/abslang.abs:895
 'set_val_internal'(S,'instanceDescriptions',V)->
     object:register_write('instanceDescriptions'),
     S#state{'instanceDescriptions'=V};
- %% abs/lang/abslang.abs:895
+ %% abs/lang/abslang.abs:898
 'set_val_internal'(S,'launchedInstances',V)->
     object:register_write('launchedInstances'),
     S#state{'launchedInstances'=V};
- %% abs/lang/abslang.abs:897
+ %% abs/lang/abslang.abs:900
 'set_val_internal'(S,'acquiredInstances',V)->
     object:register_write('acquiredInstances'),
     S#state{'acquiredInstances'=V};
- %% abs/lang/abslang.abs:898
+ %% abs/lang/abslang.abs:901
 'set_val_internal'(S,'killedInstances',V)->
     object:register_write('killedInstances'),
     S#state{'killedInstances'=V};
- %% abs/lang/abslang.abs:899
+ %% abs/lang/abslang.abs:902
 'set_val_internal'(S,'nextInstanceId',V)->
     object:register_write('nextInstanceId'),
     S#state{'nextInstanceId'=V};
- %% abs/lang/abslang.abs:900
+ %% abs/lang/abslang.abs:903
 'set_val_internal'(S,'accumulatedCostOfKilledDCs',V)->
     object:register_write('accumulatedCostOfKilledDCs'),
     S#state{'accumulatedCostOfKilledDCs'=V}.
@@ -92,17 +92,17 @@ exported() -> #{  }.
     C=(get(this))#state.class,
     put(vars, #{}),
     put(this, C:set_val_internal(get(this),'name',P_name)),
-     %% abs/lang/abslang.abs:892--892
-    put(this, C:set_val_internal(get(this),'instanceDescriptions',m_ABS_StdLib_funs:f_map(Cog,[],[O,DC| Stack]))),
      %% abs/lang/abslang.abs:895--895
-    put(this, C:set_val_internal(get(this),'launchedInstances',m_ABS_StdLib_funs:f_set(Cog,[],[O,DC| Stack]))),
-     %% abs/lang/abslang.abs:897--897
-    put(this, C:set_val_internal(get(this),'acquiredInstances',m_ABS_StdLib_funs:f_set(Cog,[],[O,DC| Stack]))),
+    put(this, C:set_val_internal(get(this),'instanceDescriptions',m_ABS_StdLib_funs:f_map(Cog,[],[O,DC| Stack]))),
      %% abs/lang/abslang.abs:898--898
-    put(this, C:set_val_internal(get(this),'killedInstances',m_ABS_StdLib_funs:f_set(Cog,[],[O,DC| Stack]))),
-     %% abs/lang/abslang.abs:899--899
-    put(this, C:set_val_internal(get(this),'nextInstanceId',0)),
+    put(this, C:set_val_internal(get(this),'launchedInstances',m_ABS_StdLib_funs:f_set(Cog,[],[O,DC| Stack]))),
      %% abs/lang/abslang.abs:900--900
+    put(this, C:set_val_internal(get(this),'acquiredInstances',m_ABS_StdLib_funs:f_set(Cog,[],[O,DC| Stack]))),
+     %% abs/lang/abslang.abs:901--901
+    put(this, C:set_val_internal(get(this),'killedInstances',m_ABS_StdLib_funs:f_set(Cog,[],[O,DC| Stack]))),
+     %% abs/lang/abslang.abs:902--902
+    put(this, C:set_val_internal(get(this),'nextInstanceId',0)),
+     %% abs/lang/abslang.abs:903--903
     put(this, C:set_val_internal(get(this),'accumulatedCostOfKilledDCs',0)),
     gc:register_object(O),
     O.
@@ -110,13 +110,13 @@ exported() -> #{  }.
 
 %% --- Methods
 
- %% abs/lang/abslang.abs:902
- %% abs/lang/abslang.abs:902
+ %% abs/lang/abslang.abs:905
+ %% abs/lang/abslang.abs:905
 'm_shutdown'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O }),
     try
-         %% abs/lang/abslang.abs:904--904
+         %% abs/lang/abslang.abs:907--907
         skip,
         dataUnit
         
@@ -126,28 +126,28 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [Stacktrace]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs/lang/abslang.abs:907
- %% abs/lang/abslang.abs:907
+ %% abs/lang/abslang.abs:910
+ %% abs/lang/abslang.abs:910
 'm_createInstance'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},V_instancename_0,V_d_0,Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O,
  'instancename' => V_instancename_0,
  'd' => V_d_0 }),
     try
-         %% abs/lang/abslang.abs:908--908
-        put(vars, (get(vars))#{'mightNeedToStartAccounting' => m_ABS_StdLib_funs:f_emptySet(Cog,C:get_val_internal(get(this), 'launchedInstances'),[O,DC| Stack])}),
-         %% abs/lang/abslang.abs:909--910
-        put(vars, (get(vars))#{'result' => object:new(cog:start(Cog,DC),class_ABS_DC_DeploymentComponent,[iolist_to_binary([iolist_to_binary([maps:get('instancename', get(vars)), <<"-"/utf8>>]), builtin:toString(Cog,C:get_val_internal(get(this), 'nextInstanceId'))]),maps:get('d', get(vars)),[]],Cog,[O,DC| Stack])}),
          %% abs/lang/abslang.abs:911--911
+        put(vars, (get(vars))#{'mightNeedToStartAccounting' => m_ABS_StdLib_funs:f_emptySet(Cog,C:get_val_internal(get(this), 'launchedInstances'),[O,DC| Stack])}),
+         %% abs/lang/abslang.abs:912--913
+        put(vars, (get(vars))#{'result' => object:new(cog:start(Cog,DC),class_ABS_DC_DeploymentComponent,[iolist_to_binary([iolist_to_binary([maps:get('instancename', get(vars)), <<"-"/utf8>>]), builtin:toString(Cog,C:get_val_internal(get(this), 'nextInstanceId'))]),maps:get('d', get(vars)),[]],Cog,[O,DC| Stack])}),
+         %% abs/lang/abslang.abs:914--914
         T_1 = cog:create_task(maps:get('result', get(vars)),'m_setProvider',[O,[]],#task_info{method= <<"setProvider"/utf8>>, creation={dataTime,builtin:currentms(Cog)}, proc_deadline=dataInfDuration},Cog),
         T_1,
-         %% abs/lang/abslang.abs:912--912
-        put(this, C:set_val_internal(get(this), 'nextInstanceId',(C:get_val_internal(get(this), 'nextInstanceId') + 1) )),
          %% abs/lang/abslang.abs:915--915
+        put(this, C:set_val_internal(get(this), 'nextInstanceId',(C:get_val_internal(get(this), 'nextInstanceId') + 1) )),
+         %% abs/lang/abslang.abs:918--918
         put(vars, (get(vars))#{'nullWorkAround' => maps:get('result', get(vars))}),
-         %% abs/lang/abslang.abs:916--916
+         %% abs/lang/abslang.abs:919--919
         put(this, C:set_val_internal(get(this), 'launchedInstances',m_ABS_StdLib_funs:f_insertElement(Cog,C:get_val_internal(get(this), 'launchedInstances'),maps:get('nullWorkAround', get(vars)),[O,DC| Stack]))),
-         %% abs/lang/abslang.abs:917--917
+         %% abs/lang/abslang.abs:920--920
         maps:get('result', get(vars))
     catch
         _:Exception:Stacktrace ->
@@ -155,14 +155,14 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [Stacktrace]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs/lang/abslang.abs:920
- %% abs/lang/abslang.abs:920
+ %% abs/lang/abslang.abs:923
+ %% abs/lang/abslang.abs:923
 'm_prelaunchInstance'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},V_d_0,Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O,
  'd' => V_d_0 }),
     try
-         %% abs/lang/abslang.abs:921--921
+         %% abs/lang/abslang.abs:924--924
         put(vars, (get(vars))#{'result' => (fun() -> case O of
             null -> throw(dataNullPointerException);
             Callee=#object{oid=Oid,cog=Cog} ->
@@ -192,17 +192,17 @@ exported() -> #{  }.
                 TempFuture = cog:create_task(Callee,'m_createInstance',[C:get_val_internal(get(this), 'name'),maps:get('d', get(vars)),[]],#task_info{method= <<"createInstance"/utf8>>},Cog),
                 future:get_blocking(TempFuture, Cog, [O,DC| Stack])
         end end)()}),
-         %% abs/lang/abslang.abs:922--922
-        put(vars, (get(vars))#{'tmp1242421329' => cog:create_task(maps:get('result', get(vars)),'m_getStartupDuration',[[]],#task_info{method= <<"getStartupDuration"/utf8>>, creation={dataTime,builtin:currentms(Cog)}, proc_deadline=dataInfDuration},Cog)}),
-         %% abs/lang/abslang.abs:922--922
-        future:await(maps:get('tmp1242421329', get(vars)), Cog, [O,DC| Stack]),
+         %% abs/lang/abslang.abs:925--925
+        put(vars, (get(vars))#{'tmp1547295390' => cog:create_task(maps:get('result', get(vars)),'m_getStartupDuration',[[]],#task_info{method= <<"getStartupDuration"/utf8>>, creation={dataTime,builtin:currentms(Cog)}, proc_deadline=dataInfDuration},Cog)}),
+         %% abs/lang/abslang.abs:925--925
+        future:await(maps:get('tmp1547295390', get(vars)), Cog, [O,DC| Stack]),
         ok,
-         %% abs/lang/abslang.abs:922--922
-        put(vars, (get(vars))#{'startup_duration' => future:get_blocking(maps:get('tmp1242421329', get(vars)), Cog, [O,DC| Stack])}),
-         %% abs/lang/abslang.abs:923--923
+         %% abs/lang/abslang.abs:925--925
+        put(vars, (get(vars))#{'startup_duration' => future:get_blocking(maps:get('tmp1547295390', get(vars)), Cog, [O,DC| Stack])}),
+         %% abs/lang/abslang.abs:926--926
         cog:suspend_current_task_for_duration(Cog,maps:get('startup_duration', get(vars)),maps:get('startup_duration', get(vars)),[O,DC| Stack]),
         ok,
-         %% abs/lang/abslang.abs:924--924
+         %% abs/lang/abslang.abs:927--927
         maps:get('result', get(vars))
     catch
         _:Exception:Stacktrace ->
@@ -210,22 +210,22 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [Stacktrace]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs/lang/abslang.abs:927
- %% abs/lang/abslang.abs:927
+ %% abs/lang/abslang.abs:930
+ %% abs/lang/abslang.abs:930
 'm_prelaunchInstanceNamed'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},V_instancename_0,Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O,
  'instancename' => V_instancename_0 }),
     try
-         %% abs/lang/abslang.abs:928--928
+         %% abs/lang/abslang.abs:931--931
         put(vars, (get(vars))#{'mconfig' => m_ABS_StdLib_funs:f_lookup(Cog,C:get_val_internal(get(this), 'instanceDescriptions'),maps:get('instancename', get(vars)),[O,DC| Stack])}),
-         %% abs/lang/abslang.abs:929--929
+         %% abs/lang/abslang.abs:932--932
         put(vars, (get(vars))#{'dc' => null}),
-         %% abs/lang/abslang.abs:930--930
+         %% abs/lang/abslang.abs:933--933
         case m_ABS_StdLib_funs:f_isJust(Cog,maps:get('mconfig', get(vars)),[O,DC| Stack]) of
-            true ->  %% abs/lang/abslang.abs:931--931
+            true ->  %% abs/lang/abslang.abs:934--934
             put(vars, (get(vars))#{'config' => m_ABS_StdLib_funs:f_fromJust(Cog,maps:get('mconfig', get(vars)),[O,DC| Stack])}),
-             %% abs/lang/abslang.abs:932--932
+             %% abs/lang/abslang.abs:935--935
             put(vars, (get(vars))#{'dc' := (fun() -> case O of
                 null -> throw(dataNullPointerException);
                 Callee=#object{oid=Oid,cog=Cog} ->
@@ -254,20 +254,20 @@ exported() -> #{  }.
                     %% remote call
                     TempFuture = cog:create_task(Callee,'m_createInstance',[iolist_to_binary([iolist_to_binary([C:get_val_internal(get(this), 'name'), <<"-"/utf8>>]), maps:get('instancename', get(vars))]),maps:get('config', get(vars)),[]],#task_info{method= <<"createInstance"/utf8>>},Cog),
                     future:get_blocking(TempFuture, Cog, [O,DC| Stack])
-            end end)()});
+            end end)()}),
+             %% abs/lang/abslang.abs:936--936
+            put(vars, (get(vars))#{'tmp238598483' => cog:create_task(maps:get('dc', get(vars)),'m_getStartupDuration',[[]],#task_info{method= <<"getStartupDuration"/utf8>>, creation={dataTime,builtin:currentms(Cog)}, proc_deadline=dataInfDuration},Cog)}),
+             %% abs/lang/abslang.abs:936--936
+            future:await(maps:get('tmp238598483', get(vars)), Cog, [O,DC| Stack]),
+            ok,
+             %% abs/lang/abslang.abs:936--936
+            put(vars, (get(vars))#{'startup_duration' => future:get_blocking(maps:get('tmp238598483', get(vars)), Cog, [O,DC| Stack])}),
+             %% abs/lang/abslang.abs:937--937
+            cog:suspend_current_task_for_duration(Cog,maps:get('startup_duration', get(vars)),maps:get('startup_duration', get(vars)),[O,DC| Stack]),
+            ok;
             false ->         ok
         end,
-         %% abs/lang/abslang.abs:934--934
-        put(vars, (get(vars))#{'tmp691918003' => cog:create_task(maps:get('dc', get(vars)),'m_getStartupDuration',[[]],#task_info{method= <<"getStartupDuration"/utf8>>, creation={dataTime,builtin:currentms(Cog)}, proc_deadline=dataInfDuration},Cog)}),
-         %% abs/lang/abslang.abs:934--934
-        future:await(maps:get('tmp691918003', get(vars)), Cog, [O,DC| Stack]),
-        ok,
-         %% abs/lang/abslang.abs:934--934
-        put(vars, (get(vars))#{'startup_duration' => future:get_blocking(maps:get('tmp691918003', get(vars)), Cog, [O,DC| Stack])}),
-         %% abs/lang/abslang.abs:935--935
-        cog:suspend_current_task_for_duration(Cog,maps:get('startup_duration', get(vars)),maps:get('startup_duration', get(vars)),[O,DC| Stack]),
-        ok,
-         %% abs/lang/abslang.abs:936--936
+         %% abs/lang/abslang.abs:939--939
         maps:get('dc', get(vars))
     catch
         _:Exception:Stacktrace ->
@@ -275,14 +275,14 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [Stacktrace]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs/lang/abslang.abs:939
- %% abs/lang/abslang.abs:939
+ %% abs/lang/abslang.abs:942
+ %% abs/lang/abslang.abs:942
 'm_launchInstance'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},V_d_0,Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O,
  'd' => V_d_0 }),
     try
-         %% abs/lang/abslang.abs:940--940
+         %% abs/lang/abslang.abs:943--943
         put(vars, (get(vars))#{'result' => (fun() -> case O of
             null -> throw(dataNullPointerException);
             Callee=#object{oid=Oid,cog=Cog} ->
@@ -311,9 +311,9 @@ exported() -> #{  }.
                 TempFuture = cog:create_task(Callee,'m_prelaunchInstance',[maps:get('d', get(vars)),[]],#task_info{method= <<"prelaunchInstance"/utf8>>},Cog),
                 future:get_blocking(TempFuture, Cog, [O,DC| Stack])
         end end)()}),
-         %% abs/lang/abslang.abs:941--941
+         %% abs/lang/abslang.abs:944--944
         put(this, C:set_val_internal(get(this), 'acquiredInstances',m_ABS_StdLib_funs:f_insertElement(Cog,C:get_val_internal(get(this), 'acquiredInstances'),maps:get('result', get(vars)),[O,DC| Stack]))),
-         %% abs/lang/abslang.abs:942--942
+         %% abs/lang/abslang.abs:945--945
         maps:get('result', get(vars))
     catch
         _:Exception:Stacktrace ->
@@ -321,14 +321,14 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [Stacktrace]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs/lang/abslang.abs:945
- %% abs/lang/abslang.abs:945
+ %% abs/lang/abslang.abs:948
+ %% abs/lang/abslang.abs:948
 'm_launchInstanceNamed'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},V_instancename_0,Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O,
  'instancename' => V_instancename_0 }),
     try
-         %% abs/lang/abslang.abs:946--946
+         %% abs/lang/abslang.abs:949--949
         put(vars, (get(vars))#{'result' => (fun() -> case O of
             null -> throw(dataNullPointerException);
             Callee=#object{oid=Oid,cog=Cog} ->
@@ -357,15 +357,15 @@ exported() -> #{  }.
                 TempFuture = cog:create_task(Callee,'m_prelaunchInstanceNamed',[maps:get('instancename', get(vars)),[]],#task_info{method= <<"prelaunchInstanceNamed"/utf8>>},Cog),
                 future:get_blocking(TempFuture, Cog, [O,DC| Stack])
         end end)()}),
-         %% abs/lang/abslang.abs:947--947
+         %% abs/lang/abslang.abs:950--950
         case (not cmp:eq(maps:get('result', get(vars)),null)) of
-            true ->  %% abs/lang/abslang.abs:948--948
+            true ->  %% abs/lang/abslang.abs:951--951
             put(vars, (get(vars))#{'nullableWorkAround' => maps:get('result', get(vars))}),
-             %% abs/lang/abslang.abs:949--949
+             %% abs/lang/abslang.abs:952--952
             put(this, C:set_val_internal(get(this), 'acquiredInstances',m_ABS_StdLib_funs:f_insertElement(Cog,C:get_val_internal(get(this), 'acquiredInstances'),maps:get('nullableWorkAround', get(vars)),[O,DC| Stack])));
             false ->         ok
         end,
-         %% abs/lang/abslang.abs:951--951
+         %% abs/lang/abslang.abs:954--954
         maps:get('result', get(vars))
     catch
         _:Exception:Stacktrace ->
@@ -373,37 +373,37 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [Stacktrace]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs/lang/abslang.abs:954
- %% abs/lang/abslang.abs:954
+ %% abs/lang/abslang.abs:957
+ %% abs/lang/abslang.abs:957
 'm_acquireInstance'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},V_instance_0,Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O,
  'instance' => V_instance_0 }),
     try
-         %% abs/lang/abslang.abs:955--955
-        put(vars, (get(vars))#{'result' => true}),
-         %% abs/lang/abslang.abs:956--956
-        put(vars, (get(vars))#{'tmp631775016' => cog:create_task(maps:get('instance', get(vars)),'m_getProvider',[[]],#task_info{method= <<"getProvider"/utf8>>, creation={dataTime,builtin:currentms(Cog)}, proc_deadline=dataInfDuration},Cog)}),
-         %% abs/lang/abslang.abs:956--956
-        future:await(maps:get('tmp631775016', get(vars)), Cog, [O,DC| Stack]),
-        ok,
-         %% abs/lang/abslang.abs:956--956
-        put(vars, (get(vars))#{'cp' => future:get_blocking(maps:get('tmp631775016', get(vars)), Cog, [O,DC| Stack])}),
-         %% abs/lang/abslang.abs:957--957
-        put(vars, (get(vars))#{'nullableWorkAround' => maps:get('instance', get(vars))}),
          %% abs/lang/abslang.abs:958--958
+        put(vars, (get(vars))#{'result' => true}),
+         %% abs/lang/abslang.abs:959--959
+        put(vars, (get(vars))#{'tmp1248103221' => cog:create_task(maps:get('instance', get(vars)),'m_getProvider',[[]],#task_info{method= <<"getProvider"/utf8>>, creation={dataTime,builtin:currentms(Cog)}, proc_deadline=dataInfDuration},Cog)}),
+         %% abs/lang/abslang.abs:959--959
+        future:await(maps:get('tmp1248103221', get(vars)), Cog, [O,DC| Stack]),
+        ok,
+         %% abs/lang/abslang.abs:959--959
+        put(vars, (get(vars))#{'cp' => future:get_blocking(maps:get('tmp1248103221', get(vars)), Cog, [O,DC| Stack])}),
+         %% abs/lang/abslang.abs:960--960
+        put(vars, (get(vars))#{'nullableWorkAround' => maps:get('instance', get(vars))}),
+         %% abs/lang/abslang.abs:961--961
         case (not cmp:eq(maps:get('cp', get(vars)),O)) of
-            true ->  %% abs/lang/abslang.abs:960--960
-            put(vars, (get(vars))#{'result' := false});
-            false ->          %% abs/lang/abslang.abs:961--962
-        case (m_ABS_StdLib_funs:f_contains(Cog,C:get_val_internal(get(this), 'acquiredInstances'),maps:get('nullableWorkAround', get(vars)),[O,DC| Stack])) or (m_ABS_StdLib_funs:f_contains(Cog,C:get_val_internal(get(this), 'killedInstances'),maps:get('nullableWorkAround', get(vars)),[O,DC| Stack])) of
             true ->  %% abs/lang/abslang.abs:963--963
             put(vars, (get(vars))#{'result' := false});
-            false ->          %% abs/lang/abslang.abs:965--965
+            false ->          %% abs/lang/abslang.abs:964--965
+        case (m_ABS_StdLib_funs:f_contains(Cog,C:get_val_internal(get(this), 'acquiredInstances'),maps:get('nullableWorkAround', get(vars)),[O,DC| Stack])) or (m_ABS_StdLib_funs:f_contains(Cog,C:get_val_internal(get(this), 'killedInstances'),maps:get('nullableWorkAround', get(vars)),[O,DC| Stack])) of
+            true ->  %% abs/lang/abslang.abs:966--966
+            put(vars, (get(vars))#{'result' := false});
+            false ->          %% abs/lang/abslang.abs:968--968
         put(this, C:set_val_internal(get(this), 'acquiredInstances',m_ABS_StdLib_funs:f_insertElement(Cog,C:get_val_internal(get(this), 'acquiredInstances'),maps:get('nullableWorkAround', get(vars)),[O,DC| Stack])))
         end
         end,
-         %% abs/lang/abslang.abs:967--967
+         %% abs/lang/abslang.abs:970--970
         maps:get('result', get(vars))
     catch
         _:Exception:Stacktrace ->
@@ -411,20 +411,20 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [Stacktrace]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs/lang/abslang.abs:969
- %% abs/lang/abslang.abs:969
+ %% abs/lang/abslang.abs:972
+ %% abs/lang/abslang.abs:972
 'm_releaseInstance'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},V_instance_0,Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O,
  'instance' => V_instance_0 }),
     try
-         %% abs/lang/abslang.abs:974--974
+         %% abs/lang/abslang.abs:977--977
         case m_ABS_StdLib_funs:f_contains(Cog,C:get_val_internal(get(this), 'acquiredInstances'),maps:get('instance', get(vars)),[O,DC| Stack]) of
-            true ->  %% abs/lang/abslang.abs:975--975
+            true ->  %% abs/lang/abslang.abs:978--978
             put(this, C:set_val_internal(get(this), 'acquiredInstances',m_ABS_StdLib_funs:f_remove(Cog,C:get_val_internal(get(this), 'acquiredInstances'),maps:get('instance', get(vars)),[O,DC| Stack])));
             false ->         ok
         end,
-         %% abs/lang/abslang.abs:977--977
+         %% abs/lang/abslang.abs:980--980
         true
     catch
         _:Exception:Stacktrace ->
@@ -432,17 +432,17 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [Stacktrace]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs/lang/abslang.abs:980
- %% abs/lang/abslang.abs:980
+ %% abs/lang/abslang.abs:983
+ %% abs/lang/abslang.abs:983
 'm_shutdownInstance'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},V_instance_0,Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O,
  'instance' => V_instance_0 }),
     try
-         %% abs/lang/abslang.abs:981--981
+         %% abs/lang/abslang.abs:984--984
         T_1 = cog:create_task(maps:get('instance', get(vars)),'m_shutdown',[[]],#task_info{method= <<"shutdown"/utf8>>, creation={dataTime,builtin:currentms(Cog)}, proc_deadline=dataInfDuration},Cog),
         T_1,
-         %% abs/lang/abslang.abs:982--982
+         %% abs/lang/abslang.abs:985--985
         true
     catch
         _:Exception:Stacktrace ->
@@ -450,39 +450,39 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [Stacktrace]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs/lang/abslang.abs:985
- %% abs/lang/abslang.abs:985
+ %% abs/lang/abslang.abs:988
+ %% abs/lang/abslang.abs:988
 'm_internalShutdownInstance'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},V_instance_0,Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O,
  'instance' => V_instance_0 }),
     try
-         %% abs/lang/abslang.abs:986--986
-        put(vars, (get(vars))#{'nullWorkAround' => maps:get('instance', get(vars))}),
          %% abs/lang/abslang.abs:989--989
-        put(this, C:set_val_internal(get(this), 'acquiredInstances',m_ABS_StdLib_funs:f_remove(Cog,C:get_val_internal(get(this), 'acquiredInstances'),maps:get('nullWorkAround', get(vars)),[O,DC| Stack]))),
+        put(vars, (get(vars))#{'nullWorkAround' => maps:get('instance', get(vars))}),
          %% abs/lang/abslang.abs:992--992
+        put(this, C:set_val_internal(get(this), 'acquiredInstances',m_ABS_StdLib_funs:f_remove(Cog,C:get_val_internal(get(this), 'acquiredInstances'),maps:get('nullWorkAround', get(vars)),[O,DC| Stack]))),
+         %% abs/lang/abslang.abs:995--995
         put(this, C:set_val_internal(get(this), 'killedInstances',m_ABS_StdLib_funs:f_insertElement(Cog,C:get_val_internal(get(this), 'killedInstances'),maps:get('nullWorkAround', get(vars)),[O,DC| Stack]))),
-         %% abs/lang/abslang.abs:993--993
-        put(vars, (get(vars))#{'tmp1364688840' => cog:create_task(maps:get('instance', get(vars)),'m_getShutdownDuration',[[]],#task_info{method= <<"getShutdownDuration"/utf8>>, creation={dataTime,builtin:currentms(Cog)}, proc_deadline=dataInfDuration},Cog)}),
-         %% abs/lang/abslang.abs:993--993
-        future:await(maps:get('tmp1364688840', get(vars)), Cog, [O,DC| Stack]),
+         %% abs/lang/abslang.abs:996--996
+        put(vars, (get(vars))#{'tmp1731883050' => cog:create_task(maps:get('instance', get(vars)),'m_getShutdownDuration',[[]],#task_info{method= <<"getShutdownDuration"/utf8>>, creation={dataTime,builtin:currentms(Cog)}, proc_deadline=dataInfDuration},Cog)}),
+         %% abs/lang/abslang.abs:996--996
+        future:await(maps:get('tmp1731883050', get(vars)), Cog, [O,DC| Stack]),
         ok,
-         %% abs/lang/abslang.abs:993--993
-        put(vars, (get(vars))#{'shutdown_duration' => future:get_blocking(maps:get('tmp1364688840', get(vars)), Cog, [O,DC| Stack])}),
-         %% abs/lang/abslang.abs:994--994
+         %% abs/lang/abslang.abs:996--996
+        put(vars, (get(vars))#{'shutdown_duration' => future:get_blocking(maps:get('tmp1731883050', get(vars)), Cog, [O,DC| Stack])}),
+         %% abs/lang/abslang.abs:997--997
         cog:suspend_current_task_for_duration(Cog,maps:get('shutdown_duration', get(vars)),maps:get('shutdown_duration', get(vars)),[O,DC| Stack]),
         ok,
-         %% abs/lang/abslang.abs:998--998
-        put(this, C:set_val_internal(get(this), 'launchedInstances',m_ABS_StdLib_funs:f_remove(Cog,C:get_val_internal(get(this), 'launchedInstances'),maps:get('nullWorkAround', get(vars)),[O,DC| Stack]))),
-         %% abs/lang/abslang.abs:1000--1000
-        put(vars, (get(vars))#{'tmp1966930659' => cog:create_task(maps:get('instance', get(vars)),'m_getAccumulatedCost',[[]],#task_info{method= <<"getAccumulatedCost"/utf8>>, creation={dataTime,builtin:currentms(Cog)}, proc_deadline=dataInfDuration},Cog)}),
-         %% abs/lang/abslang.abs:1000--1000
-        future:await(maps:get('tmp1966930659', get(vars)), Cog, [O,DC| Stack]),
-        ok,
-         %% abs/lang/abslang.abs:1000--1000
-        put(vars, (get(vars))#{'cost' => future:get_blocking(maps:get('tmp1966930659', get(vars)), Cog, [O,DC| Stack])}),
          %% abs/lang/abslang.abs:1001--1001
+        put(this, C:set_val_internal(get(this), 'launchedInstances',m_ABS_StdLib_funs:f_remove(Cog,C:get_val_internal(get(this), 'launchedInstances'),maps:get('nullWorkAround', get(vars)),[O,DC| Stack]))),
+         %% abs/lang/abslang.abs:1003--1003
+        put(vars, (get(vars))#{'tmp1975888761' => cog:create_task(maps:get('instance', get(vars)),'m_getAccumulatedCost',[[]],#task_info{method= <<"getAccumulatedCost"/utf8>>, creation={dataTime,builtin:currentms(Cog)}, proc_deadline=dataInfDuration},Cog)}),
+         %% abs/lang/abslang.abs:1003--1003
+        future:await(maps:get('tmp1975888761', get(vars)), Cog, [O,DC| Stack]),
+        ok,
+         %% abs/lang/abslang.abs:1003--1003
+        put(vars, (get(vars))#{'cost' => future:get_blocking(maps:get('tmp1975888761', get(vars)), Cog, [O,DC| Stack])}),
+         %% abs/lang/abslang.abs:1004--1004
         put(this, C:set_val_internal(get(this), 'accumulatedCostOfKilledDCs',( rationals:add(C:get_val_internal(get(this), 'accumulatedCostOfKilledDCs'),maps:get('cost', get(vars)))) )),
         dataUnit
         
@@ -492,21 +492,21 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [Stacktrace]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs/lang/abslang.abs:1004
- %% abs/lang/abslang.abs:1004
+ %% abs/lang/abslang.abs:1007
+ %% abs/lang/abslang.abs:1007
 'm_getAccumulatedCost'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O }),
     try
-         %% abs/lang/abslang.abs:1005--1005
+         %% abs/lang/abslang.abs:1008--1008
         put(vars, (get(vars))#{'result' => 0}),
-         %% abs/lang/abslang.abs:1006--1006
+         %% abs/lang/abslang.abs:1009--1009
         put(vars, (get(vars))#{'t' => m_ABS_StdLib_funs:f_now(Cog,[O,DC| Stack])}),
-         %% abs/lang/abslang.abs:1007--1010
-        put(vars, (get(vars))#{'tmp329829198' => m_ABS_StdLib_funs:f_elements(Cog,C:get_val_internal(get(this), 'launchedInstances'),[O,DC| Stack])}),
-         %% abs/lang/abslang.abs:1007--1010
+         %% abs/lang/abslang.abs:1010--1013
+        put(vars, (get(vars))#{'tmp842748516' => m_ABS_StdLib_funs:f_elements(Cog,C:get_val_internal(get(this), 'launchedInstances'),[O,DC| Stack])}),
+         %% abs/lang/abslang.abs:1010--1013
         []=(fun Loop ([])->
-            case not (m_ABS_StdLib_funs:f_isEmpty(Cog,maps:get('tmp329829198', get(vars)),[O,DC| Stack])) of
+            case not (m_ABS_StdLib_funs:f_isEmpty(Cog,maps:get('tmp842748516', get(vars)),[O,DC| Stack])) of
             false -> [];
             true -> receive
                     {stop_world, CogRef} ->
@@ -515,22 +515,22 @@ exported() -> #{  }.
                         task:wait_for_token(Cog,[O,DC| Stack])
                     after 0 -> ok
                 end,
-                 %% abs/lang/abslang.abs:1007--1010
-                put(vars, (get(vars))#{'dc' => m_ABS_StdLib_funs:f_head(Cog,maps:get('tmp329829198', get(vars)),[O,DC| Stack])}),
-                 %% abs/lang/abslang.abs:1007--1010
-                put(vars, (get(vars))#{'tmp329829198' := m_ABS_StdLib_funs:f_tail(Cog,maps:get('tmp329829198', get(vars)),[O,DC| Stack])}),
-                 %% abs/lang/abslang.abs:1008--1008
-                put(vars, (get(vars))#{'tmp845357243' => cog:create_task(maps:get('dc', get(vars)),'m_getAccumulatedCost',[[]],#task_info{method= <<"getAccumulatedCost"/utf8>>, creation={dataTime,builtin:currentms(Cog)}, proc_deadline=dataInfDuration},Cog)}),
-                 %% abs/lang/abslang.abs:1008--1008
-                future:await(maps:get('tmp845357243', get(vars)), Cog, [O,DC| Stack]),
+                 %% abs/lang/abslang.abs:1010--1013
+                put(vars, (get(vars))#{'dc' => m_ABS_StdLib_funs:f_head(Cog,maps:get('tmp842748516', get(vars)),[O,DC| Stack])}),
+                 %% abs/lang/abslang.abs:1010--1013
+                put(vars, (get(vars))#{'tmp842748516' := m_ABS_StdLib_funs:f_tail(Cog,maps:get('tmp842748516', get(vars)),[O,DC| Stack])}),
+                 %% abs/lang/abslang.abs:1011--1011
+                put(vars, (get(vars))#{'tmp1048340147' => cog:create_task(maps:get('dc', get(vars)),'m_getAccumulatedCost',[[]],#task_info{method= <<"getAccumulatedCost"/utf8>>, creation={dataTime,builtin:currentms(Cog)}, proc_deadline=dataInfDuration},Cog)}),
+                 %% abs/lang/abslang.abs:1011--1011
+                future:await(maps:get('tmp1048340147', get(vars)), Cog, [O,DC| Stack]),
                 ok,
-                 %% abs/lang/abslang.abs:1008--1008
-                put(vars, (get(vars))#{'cost' => future:get_blocking(maps:get('tmp845357243', get(vars)), Cog, [O,DC| Stack])}),
-                 %% abs/lang/abslang.abs:1009--1009
+                 %% abs/lang/abslang.abs:1011--1011
+                put(vars, (get(vars))#{'cost' => future:get_blocking(maps:get('tmp1048340147', get(vars)), Cog, [O,DC| Stack])}),
+                 %% abs/lang/abslang.abs:1012--1012
                 put(vars, (get(vars))#{'result' := ( rationals:add(maps:get('result', get(vars)),maps:get('cost', get(vars)))) }),
             Loop([])  end end)
         ([]),
-         %% abs/lang/abslang.abs:1011--1011
+         %% abs/lang/abslang.abs:1014--1014
         ( rationals:add(maps:get('result', get(vars)),C:get_val_internal(get(this), 'accumulatedCostOfKilledDCs'))) 
     catch
         _:Exception:Stacktrace ->
@@ -538,14 +538,14 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [Stacktrace]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs/lang/abslang.abs:1015
- %% abs/lang/abslang.abs:1015
+ %% abs/lang/abslang.abs:1018
+ %% abs/lang/abslang.abs:1018
 'm_setInstanceDescriptions'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},V_instanceDescriptions_0,Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O,
  'instanceDescriptions' => V_instanceDescriptions_0 }),
     try
-         %% abs/lang/abslang.abs:1016--1016
+         %% abs/lang/abslang.abs:1019--1019
         put(this, C:set_val_internal(get(this), 'instanceDescriptions',maps:get('instanceDescriptions', get(vars)))),
         dataUnit
         
@@ -555,14 +555,14 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [Stacktrace]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs/lang/abslang.abs:1020
- %% abs/lang/abslang.abs:1020
+ %% abs/lang/abslang.abs:1023
+ %% abs/lang/abslang.abs:1023
 'm_addInstanceDescription'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},V_instanceDescription_0,Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O,
  'instanceDescription' => V_instanceDescription_0 }),
     try
-         %% abs/lang/abslang.abs:1021--1021
+         %% abs/lang/abslang.abs:1024--1024
         put(this, C:set_val_internal(get(this), 'instanceDescriptions',m_ABS_StdLib_funs:f_insert(Cog,C:get_val_internal(get(this), 'instanceDescriptions'),maps:get('instanceDescription', get(vars)),[O,DC| Stack]))),
         dataUnit
         
@@ -572,14 +572,14 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [Stacktrace]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs/lang/abslang.abs:1025
- %% abs/lang/abslang.abs:1025
+ %% abs/lang/abslang.abs:1028
+ %% abs/lang/abslang.abs:1028
 'm_removeInstanceDescription'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},V_instanceDescriptionName_0,Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O,
  'instanceDescriptionName' => V_instanceDescriptionName_0 }),
     try
-         %% abs/lang/abslang.abs:1026--1026
+         %% abs/lang/abslang.abs:1029--1029
         put(this, C:set_val_internal(get(this), 'instanceDescriptions',m_ABS_StdLib_funs:f_removeKey(Cog,C:get_val_internal(get(this), 'instanceDescriptions'),maps:get('instanceDescriptionName', get(vars)),[O,DC| Stack]))),
         dataUnit
         
@@ -589,13 +589,13 @@ exported() -> #{  }.
             io:format(standard_error, "stacktrace: ~tp~n", [Stacktrace]),
             object:die(O, Exception), exit(Exception)
     end.
- %% abs/lang/abslang.abs:1029
- %% abs/lang/abslang.abs:1029
+ %% abs/lang/abslang.abs:1032
+ %% abs/lang/abslang.abs:1032
 'm_getInstanceDescriptions'(O=#object{oid=Oid,cog=Cog=#cog{ref=CogRef,dcobj=DC}},Stack)->
     C=(get(this))#state.class,
     put(vars, #{ 'this' => O }),
     try
-         %% abs/lang/abslang.abs:1030--1030
+         %% abs/lang/abslang.abs:1033--1033
         C:get_val_internal(get(this), 'instanceDescriptions')
     catch
         _:Exception:Stacktrace ->

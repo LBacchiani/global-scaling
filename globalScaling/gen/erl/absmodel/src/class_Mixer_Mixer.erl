@@ -4,7 +4,7 @@
 -export([get_val_internal/2,set_val_internal/3,init_internal/0,get_state_for_modelapi/1,implemented_interfaces/0,exported/0]).
 -compile(export_all).
 
-implemented_interfaces() -> [ <<"Object">>, <<"MixerInterface">> ].
+implemented_interfaces() -> [ <<"MixerInterface">>, <<"Object">> ].
 
 exported() -> #{  }.
 
@@ -136,7 +136,7 @@ exported() -> #{  }.
                     after 0 -> ok
                 end,
                  %% workload_mixer.abs:33--33
-                put(vars, (get(vars))#{'curr_weight' := ( rationals:add(maps:get('curr_weight', get(vars)),m_ABS_StdLib_funs:f_abs(Cog,( rationals:mul(m_ABS_StdLib_funs:f_head(Cog,maps:get('diffs', get(vars)),[O,DC| Stack]),m_ABS_StdLib_funs:f_head(Cog,maps:get('dev_factors', get(vars)),[O,DC| Stack]))) ,[O,DC| Stack]))) }),
+                put(vars, (get(vars))#{'curr_weight' := ( rationals:add(maps:get('curr_weight', get(vars)),builtin:abs(Cog,( rationals:mul(m_ABS_StdLib_funs:f_head(Cog,maps:get('diffs', get(vars)),[O,DC| Stack]),m_ABS_StdLib_funs:f_head(Cog,maps:get('dev_factors', get(vars)),[O,DC| Stack]))) ))) }),
                  %% workload_mixer.abs:34--34
                 put(vars, (get(vars))#{'pred_conf' := m_ABS_StdLib_funs:f_tail(Cog,maps:get('pred_conf', get(vars)),[O,DC| Stack])}),
                  %% workload_mixer.abs:35--35
@@ -148,7 +148,7 @@ exported() -> #{  }.
             Loop([])  end end)
         ([]),
          %% workload_mixer.abs:39--39
-        m_ABS_StdLib_funs:f_min(Cog,maps:get('curr_weight', get(vars)),1,[O,DC| Stack])
+        builtin:min(Cog,maps:get('curr_weight', get(vars)),1)
     catch
         _:Exception:Stacktrace ->
             io:format(standard_error, "Uncaught ~s in method compute_weight and no recovery block in class definition, killing object ~s~n", [builtin:toString(Cog, Exception), builtin:toString(Cog, O)]),
@@ -163,7 +163,7 @@ exported() -> #{  }.
  'curr_weight' => V_curr_weight_0 }),
     try
          %% workload_mixer.abs:43--43
-        put(this, C:set_val_internal(get(this), 'errors',m_ABS_StdLib_funs:f_appendright(Cog,C:get_val_internal(get(this), 'errors'),m_ABS_StdLib_funs:f_abs(Cog,maps:get('curr_weight', get(vars)),[O,DC| Stack]),[O,DC| Stack]))),
+        put(this, C:set_val_internal(get(this), 'errors',m_ABS_StdLib_funs:f_appendright(Cog,C:get_val_internal(get(this), 'errors'),builtin:abs(Cog,maps:get('curr_weight', get(vars))),[O,DC| Stack]))),
          %% workload_mixer.abs:44--44
         case cmp:eq(m_ABS_StdLib_funs:f_length(Cog,C:get_val_internal(get(this), 'errors'),[O,DC| Stack]),m_Param_funs:f_memory(Cog,[O,DC| Stack])) of
             true ->  %% workload_mixer.abs:44--44
@@ -189,12 +189,12 @@ exported() -> #{  }.
          %% workload_mixer.abs:49--49
         put(vars, (get(vars))#{'toDivide' => 0}),
          %% workload_mixer.abs:50--53
-        put(vars, (get(vars))#{'tmp1434106728' => C:get_val_internal(get(this), 'errors')}),
+        put(vars, (get(vars))#{'tmp1685350567' => C:get_val_internal(get(this), 'errors')}),
          %% workload_mixer.abs:50--53
         put(vars, (get(vars))#{'i' => 0}),
          %% workload_mixer.abs:50--53
         []=(fun Loop ([])->
-            case not (m_ABS_StdLib_funs:f_isEmpty(Cog,maps:get('tmp1434106728', get(vars)),[O,DC| Stack])) of
+            case not (m_ABS_StdLib_funs:f_isEmpty(Cog,maps:get('tmp1685350567', get(vars)),[O,DC| Stack])) of
             false -> [];
             true -> receive
                     {stop_world, CogRef} ->
@@ -204,9 +204,9 @@ exported() -> #{  }.
                     after 0 -> ok
                 end,
                  %% workload_mixer.abs:50--53
-                put(vars, (get(vars))#{'e' => m_ABS_StdLib_funs:f_head(Cog,maps:get('tmp1434106728', get(vars)),[O,DC| Stack])}),
+                put(vars, (get(vars))#{'e' => m_ABS_StdLib_funs:f_head(Cog,maps:get('tmp1685350567', get(vars)),[O,DC| Stack])}),
                  %% workload_mixer.abs:50--53
-                put(vars, (get(vars))#{'tmp1434106728' := m_ABS_StdLib_funs:f_tail(Cog,maps:get('tmp1434106728', get(vars)),[O,DC| Stack])}),
+                put(vars, (get(vars))#{'tmp1685350567' := m_ABS_StdLib_funs:f_tail(Cog,maps:get('tmp1685350567', get(vars)),[O,DC| Stack])}),
                  %% workload_mixer.abs:51--51
                 put(vars, (get(vars))#{'weight' := ( rationals:add(maps:get('weight', get(vars)),( rationals:mul(maps:get('e', get(vars)),(maps:get('i', get(vars)) + 1) )) )) }),
                  %% workload_mixer.abs:52--52

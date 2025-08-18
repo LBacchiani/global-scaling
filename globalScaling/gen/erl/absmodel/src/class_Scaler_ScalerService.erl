@@ -4,7 +4,7 @@
 -export([get_val_internal/2,set_val_internal/3,init_internal/0,get_state_for_modelapi/1,implemented_interfaces/0,exported/0]).
 -compile(export_all).
 
-implemented_interfaces() -> [ <<"Object">>, <<"ScalerServiceInterface">> ].
+implemented_interfaces() -> [ <<"ScalerServiceInterface">>, <<"Object">> ].
 
 exported() -> #{  }.
 
@@ -462,7 +462,7 @@ exported() -> #{  }.
                  %% global_scaling_alg.abs:76--76
                 put(vars, (get(vars))#{'diff' => (m_ABS_StdLib_funs:f_nth(Cog,maps:get('configDeltas', get(vars)),maps:get('i', get(vars)),[O,DC| Stack]) - m_ABS_StdLib_funs:f_nth(Cog,C:get_val_internal(get(this), 'deployedDeltas'),maps:get('i', get(vars)),[O,DC| Stack])) }),
                  %% global_scaling_alg.abs:77--77
-                put(vars, (get(vars))#{'num' => m_ABS_StdLib_funs:f_abs(Cog,maps:get('diff', get(vars)),[O,DC| Stack])}),
+                put(vars, (get(vars))#{'num' => builtin:abs(Cog,maps:get('diff', get(vars)))}),
                  %% global_scaling_alg.abs:78--78
                 []=(fun Loop ([])->
                     case cmp:gt(maps:get('num', get(vars)),0) of
@@ -612,10 +612,10 @@ exported() -> #{  }.
          %% global_scaling_alg.abs:102--102
         put(vars, (get(vars))#{'totalCost' => C:get_val_internal(get(this), 'initialCost')}),
          %% global_scaling_alg.abs:103--109
-        put(vars, (get(vars))#{'tmp2077672286' => C:get_val_internal(get(this), 'orchestrationDeltas')}),
+        put(vars, (get(vars))#{'tmp883195923' => C:get_val_internal(get(this), 'orchestrationDeltas')}),
          %% global_scaling_alg.abs:103--109
         []=(fun Loop ([])->
-            case not (m_ABS_StdLib_funs:f_isEmpty(Cog,maps:get('tmp2077672286', get(vars)),[O,DC| Stack])) of
+            case not (m_ABS_StdLib_funs:f_isEmpty(Cog,maps:get('tmp883195923', get(vars)),[O,DC| Stack])) of
             false -> [];
             true -> receive
                     {stop_world, CogRef} ->
@@ -625,9 +625,9 @@ exported() -> #{  }.
                     after 0 -> ok
                 end,
                  %% global_scaling_alg.abs:103--109
-                put(vars, (get(vars))#{'orch' => m_ABS_StdLib_funs:f_head(Cog,maps:get('tmp2077672286', get(vars)),[O,DC| Stack])}),
+                put(vars, (get(vars))#{'orch' => m_ABS_StdLib_funs:f_head(Cog,maps:get('tmp883195923', get(vars)),[O,DC| Stack])}),
                  %% global_scaling_alg.abs:103--109
-                put(vars, (get(vars))#{'tmp2077672286' := m_ABS_StdLib_funs:f_tail(Cog,maps:get('tmp2077672286', get(vars)),[O,DC| Stack])}),
+                put(vars, (get(vars))#{'tmp883195923' := m_ABS_StdLib_funs:f_tail(Cog,maps:get('tmp883195923', get(vars)),[O,DC| Stack])}),
                  %% global_scaling_alg.abs:104--104
                 put(vars, (get(vars))#{'wrapper' => maps:get('orch', get(vars))}),
                  %% global_scaling_alg.abs:105--105
@@ -710,10 +710,10 @@ exported() -> #{  }.
          %% global_scaling_alg.abs:114--114
         put(vars, (get(vars))#{'nInstances' => m_Param_funs:f_initInstancesNumber(Cog,[O,DC| Stack])}),
          %% global_scaling_alg.abs:115--120
-        put(vars, (get(vars))#{'tmp1210070267' => C:get_val_internal(get(this), 'orchestrationDeltas')}),
+        put(vars, (get(vars))#{'tmp2077672286' => C:get_val_internal(get(this), 'orchestrationDeltas')}),
          %% global_scaling_alg.abs:115--120
         []=(fun Loop ([])->
-            case not (m_ABS_StdLib_funs:f_isEmpty(Cog,maps:get('tmp1210070267', get(vars)),[O,DC| Stack])) of
+            case not (m_ABS_StdLib_funs:f_isEmpty(Cog,maps:get('tmp2077672286', get(vars)),[O,DC| Stack])) of
             false -> [];
             true -> receive
                     {stop_world, CogRef} ->
@@ -723,9 +723,9 @@ exported() -> #{  }.
                     after 0 -> ok
                 end,
                  %% global_scaling_alg.abs:115--120
-                put(vars, (get(vars))#{'orch' => m_ABS_StdLib_funs:f_head(Cog,maps:get('tmp1210070267', get(vars)),[O,DC| Stack])}),
+                put(vars, (get(vars))#{'orch' => m_ABS_StdLib_funs:f_head(Cog,maps:get('tmp2077672286', get(vars)),[O,DC| Stack])}),
                  %% global_scaling_alg.abs:115--120
-                put(vars, (get(vars))#{'tmp1210070267' := m_ABS_StdLib_funs:f_tail(Cog,maps:get('tmp1210070267', get(vars)),[O,DC| Stack])}),
+                put(vars, (get(vars))#{'tmp2077672286' := m_ABS_StdLib_funs:f_tail(Cog,maps:get('tmp2077672286', get(vars)),[O,DC| Stack])}),
                  %% global_scaling_alg.abs:116--116
                 put(vars, (get(vars))#{'wrapper' => maps:get('orch', get(vars))}),
                  %% global_scaling_alg.abs:117--117
@@ -834,10 +834,10 @@ exported() -> #{  }.
          %% global_scaling_alg.abs:128--128
         put(vars, (get(vars))#{'cost' => 0}),
          %% global_scaling_alg.abs:129--132
-        put(vars, (get(vars))#{'tmp1102941897' => maps:get('dcs', get(vars))}),
+        put(vars, (get(vars))#{'tmp1447955052' => maps:get('dcs', get(vars))}),
          %% global_scaling_alg.abs:129--132
         []=(fun Loop ([])->
-            case not (m_ABS_StdLib_funs:f_isEmpty(Cog,maps:get('tmp1102941897', get(vars)),[O,DC| Stack])) of
+            case not (m_ABS_StdLib_funs:f_isEmpty(Cog,maps:get('tmp1447955052', get(vars)),[O,DC| Stack])) of
             false -> [];
             true -> receive
                     {stop_world, CogRef} ->
@@ -847,9 +847,9 @@ exported() -> #{  }.
                     after 0 -> ok
                 end,
                  %% global_scaling_alg.abs:129--132
-                put(vars, (get(vars))#{'dc' => m_ABS_StdLib_funs:f_head(Cog,maps:get('tmp1102941897', get(vars)),[O,DC| Stack])}),
+                put(vars, (get(vars))#{'dc' => m_ABS_StdLib_funs:f_head(Cog,maps:get('tmp1447955052', get(vars)),[O,DC| Stack])}),
                  %% global_scaling_alg.abs:129--132
-                put(vars, (get(vars))#{'tmp1102941897' := m_ABS_StdLib_funs:f_tail(Cog,maps:get('tmp1102941897', get(vars)),[O,DC| Stack])}),
+                put(vars, (get(vars))#{'tmp1447955052' := m_ABS_StdLib_funs:f_tail(Cog,maps:get('tmp1447955052', get(vars)),[O,DC| Stack])}),
                  %% global_scaling_alg.abs:130--130
                 put(vars, (get(vars))#{'singleCost' => (fun() -> case maps:get('dc', get(vars)) of
                     null -> throw(dataNullPointerException);

@@ -173,10 +173,10 @@ exported() -> #{  }.
  'dcs' => V_dcs_0 }),
     try
          %% sys_initialser.abs:48--51
-        put(vars, (get(vars))#{'tmp489712935' => maps:get('dcs', get(vars))}),
+        put(vars, (get(vars))#{'tmp1588318071' => maps:get('dcs', get(vars))}),
          %% sys_initialser.abs:48--51
         []=(fun Loop ([])->
-            case not (m_ABS_StdLib_funs:f_isEmpty(Cog,maps:get('tmp489712935', get(vars)),[O,DC| Stack])) of
+            case not (m_ABS_StdLib_funs:f_isEmpty(Cog,maps:get('tmp1588318071', get(vars)),[O,DC| Stack])) of
             false -> [];
             true -> receive
                     {stop_world, CogRef} ->
@@ -186,9 +186,9 @@ exported() -> #{  }.
                     after 0 -> ok
                 end,
                  %% sys_initialser.abs:48--51
-                put(vars, (get(vars))#{'dc' => m_ABS_StdLib_funs:f_head(Cog,maps:get('tmp489712935', get(vars)),[O,DC| Stack])}),
+                put(vars, (get(vars))#{'dc' => m_ABS_StdLib_funs:f_head(Cog,maps:get('tmp1588318071', get(vars)),[O,DC| Stack])}),
                  %% sys_initialser.abs:48--51
-                put(vars, (get(vars))#{'tmp489712935' := m_ABS_StdLib_funs:f_tail(Cog,maps:get('tmp489712935', get(vars)),[O,DC| Stack])}),
+                put(vars, (get(vars))#{'tmp1588318071' := m_ABS_StdLib_funs:f_tail(Cog,maps:get('tmp1588318071', get(vars)),[O,DC| Stack])}),
                  %% sys_initialser.abs:49--49
                 put(vars, (get(vars))#{'singleCost' => (fun() -> case maps:get('dc', get(vars)) of
                     null -> throw(dataNullPointerException);
